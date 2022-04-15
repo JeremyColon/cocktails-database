@@ -1,0 +1,181 @@
+/* ==========================================
+                FONTS 
+========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300&family=Teko:wght@500&display=swap');
+
+html,
+body {
+    font-family: 'Manrope', sans-serif;
+}
+
+body table td,
+body table td * {
+    font-family: 'Manrope', sans-serif !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar-brand,
+.table th {
+    font-family: 'Teko', sans-serif;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.02rem;
+}
+
+.navbar-brand {
+    font-size: 1.6rem;
+}
+
+.table th,
+h5 {
+    font-size: 1.2rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+/* ==========================================
+                NAV BAR
+========================================== */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.88) !important;
+    position: fixed;
+    width: 100%;
+    z-index: 99;
+}
+
+#page-content {
+    padding-top: 120px !important;
+    padding-bottom: 80px !important;
+}
+
+.navbar .btn-secondary {
+    background: transparent;
+    border: 0px none;
+    box-shadow: none !important;
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar .btn-secondary:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
+@media (min-width: 768px) {
+    .navbar .btn-secondary {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .navbar-nav {
+        height: 75px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .navbar-nav>a {
+        height: 75px;
+        padding-top: 25px !important;
+        padding-bottom: 25px !important;
+        align-self: center;
+    }
+
+    .navbar-nav>div {
+        height: auto !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .navbar-nav>div>button {
+        height: 75px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .navbar div.dropdown {
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* ==========================================
+                MISC.
+========================================== */
+
+#champions-table-col img {
+    object-fit: cover;
+}
+
+#react-entry-point {
+    background-image: url('background-texture-gray-cotton.jpg');
+    background-repeat: repeat;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+/* ==========================================
+                DATA TABLES.
+========================================== */
+
+th.dash-header div {
+    display: flex;
+}
+
+th.dash-header div span.column-header-name {
+    order: 2;
+}
+
+th.dash-header div span.column-header--sort {
+    order: 1;
+    width: 100%;
+    text-align: right;
+    padding-right: 5px;
+}
+
+span.column-header-name:after {
+    content: "\00a0";
+}
+
+
+/* ==========================================
+                RESPONSIVE
+========================================== */
+@media screen and (max-width: 767px) {
+
+    .col1-,
+    .col-2,
+    .col-3,
+    .col-4,
+    .col-5,
+    .col-6,
+    .col-7,
+    .col-8,
+    .col-9,
+    .col-10,
+    .col-11,
+    .col-12 {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
+
+    #page-content,
+    .dash-table-container,
+    .dash-spreadsheet-container {
+        overflow-x: hidden;
+    }
+
+    .dash-table-container,
+    .table-responsive,
+    .dt-table-container__row {
+        overflow-x: scroll;
+    }
+}
