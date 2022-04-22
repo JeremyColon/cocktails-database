@@ -6,6 +6,7 @@ from utils.helpers import (
     load_object,
     create_OR_filter_string,
     apply_AND_filters,
+    create_filter_lists,
 )
 from ast import literal_eval
 
@@ -14,94 +15,38 @@ server = app.server
 # get relative data folder
 PATH = pathlib.Path(__file__)
 
-# Could update this to be a control
-row_count = 4
+DATABASE_URL = os.environ["DATABASE_URL"]
+COCKTAILS_SQL = os.environ["COCKTAILS_SQL"]
+with psycopg2.connect(DATABASE_URL, sslmode="require") as conn:
+    with conn.cursor() as cursor:
+        cursor.execute(COCKTAILS_SQL)
+        columns = [desc[0] for desc in cursor.description]
+        results = cursor.fetchall()
 
-cocktails = load_object("data/cocktails.pkl")
-cocktails_df = pd.DataFrame(cocktails)
-cocktails_df["ingredients"] = cocktails_df["ingredients"].astype(str)
-
+cocktails_db_test = pd.DataFrame(results, columns=columns)
+recipe_count = cocktails_db_test.cocktail_id.max()
 # Controls
-names = [cocktail.get("recipe_name") for cocktail in cocktails]
-cocktail_names = create_dropdown_from_lists(names, names, "str")
-
-ingredients = set(
-    [
-        re.sub("[*]|,$", "", unidecode(ig.get("name").lower()).title().strip())
-        if ig.get("name") is not None
-        else None
-        for cocktail in cocktails
-        for ig in cocktail.get("ingredients")
-    ]
+names = cocktails_db_test["recipe_name"].unique()
+cocktail_names = create_dropdown_from_data(
+    cocktails_db_test, "recipe_name", "recipe_name"
 )
 
-garnishes = set(
-    [
-        re.sub("[*]|,$", "", unidecode(ig.get("name").lower()).title().strip())
-        if re.search("^Garnish: ", str(ig.get("name")), flags=re.IGNORECASE)
-        or ig.get("unit") == "garnish"
-        else None
-        for cocktail in cocktails
-        for ig in cocktail.get("ingredients")
-    ]
+filter_lists = create_filter_lists(cocktails_db_test)
+
+other_control = create_dropdown_from_lists(
+    filter_lists.get("other"), filter_lists.get("other"), "str"
+)
+garnish_control = create_dropdown_from_lists(
+    filter_lists.get("garnish"), filter_lists.get("garnish"), "str"
+)
+bitters_control = create_dropdown_from_lists(
+    filter_lists.get("bitter"), filter_lists.get("bitter"), "str"
+)
+syrups_control = create_dropdown_from_lists(
+    filter_lists.get("syrup"), filter_lists.get("syrup"), "str"
 )
 
-bitters = set(
-    [
-        re.sub("[*]|,$", "", unidecode(ig.get("name").lower()).title().strip())
-        if re.search("bitter", str(ig.get("name")))
-        else None
-        for cocktail in cocktails
-        for ig in cocktail.get("ingredients")
-    ]
-)
-
-syrups = set(
-    [
-        re.sub("[*]|,$", "", unidecode(ig.get("name").lower()).title().strip())
-        if re.search("syrup", str(ig.get("name")))
-        else None
-        for cocktail in cocktails
-        for ig in cocktail.get("ingredients")
-    ]
-)
-
-other_ingredients = ingredients - garnishes - bitters - syrups
-
-other_list = [i for i in other_ingredients if i]
-other_list.sort()
-
-garnish_list = [i for i in garnishes if i]
-garnish_list.sort()
-
-bitters_list = [i for i in bitters if i]
-bitters_list.sort()
-
-syrups_list = [i for i in syrups if i]
-syrups_list.sort()
-
-other_control = create_dropdown_from_lists(other_list, other_list, "str")
-garnish_control = create_dropdown_from_lists(garnish_list, garnish_list, "str")
-bitters_control = create_dropdown_from_lists(bitters_list, bitters_list, "str")
-syrups_control = create_dropdown_from_lists(syrups_list, syrups_list, "str")
-
-liquors = [
-    "Brandy",
-    "Cognac",
-    "Vodka",
-    "Rum",
-    "Tequila",
-    "Mezcal",
-    "Gin",
-    "Bourbon",
-    "Scotch",
-    "Rye Whiskey",
-    "Other Whiskey",
-]
-
-liquor_control = create_dropdown_from_lists(liquors, liquors, "str")
-
-liquor_regex = {
+liquors = {
     "Brandy": "\\bbrandy\\b",
     "Cognac": "\\bcognac\\b",
     "Vodka": "\\bvodka\\b",
@@ -113,6 +58,10 @@ liquor_regex = {
     "Scotch": "\\bscotch\\b",
     "Whiskey": "\\bwhisk[e]?y\\b",
 }
+
+liquor_control = create_dropdown_from_lists(
+    list(liquors.keys()), list(liquors.keys()), "str"
+)
 
 marks_font_size = 16
 
@@ -381,7 +330,7 @@ layout = [
                                 ],
                                 id="offcanvas-scrollable",
                                 scrollable=True,
-                                title=f"Filters (Showing {len(cocktails)} Recipes)",
+                                title=f"Filters (Showing {recipe_count} Recipes)",
                                 is_open=False,
                             ),
                         ]
@@ -392,7 +341,7 @@ layout = [
                                 [
                                     dbc.Pagination(
                                         id="pagination",
-                                        max_value=len(cocktails) / 6,
+                                        max_value=recipe_count / 6,
                                         active_page=1,
                                         first_last=True,
                                         previous_next=True,
@@ -491,20 +440,27 @@ def update_table(
     filters = [liquor, syrup, bitter, garnish, other, free_text]
 
     if filter_type == "and":
-        filtered_df = apply_AND_filters(filters, cocktails_df)
+        filtered_df = apply_AND_filters(filters, cocktails_db_test)
     else:
         filter_string = create_OR_filter_string(filters)
-        filtered_df = cocktails_df.loc[
-            cocktails_df["ingredients"].str.contains(
+        filtered_df = cocktails_db_test.loc[
+            cocktails_db_test["ingredient"].str.contains(
                 filter_string, regex=True, flags=re.IGNORECASE
             )
-            | cocktails_df["recipe_name"].str.contains(
+            | cocktails_db_test["recipe_name"].str.contains(
                 filter_string, regex=True, flags=re.IGNORECASE
             ),
             :,
         ]
 
-    values = filtered_df.iloc[cocktail_start:cocktail_end, :].values.tolist()
+    recipe_count = len(filtered_df["recipe_name"].unique())
+
+    values = (
+        filtered_df[["recipe_name", "image", "link"]]
+        .drop_duplicates()
+        .iloc[cocktail_start:cocktail_end, :]
+        .values.tolist()
+    )
     # 0: Name
     # 1: Image
     # 2: Link
@@ -539,6 +495,6 @@ def update_table(
 
     return [
         ret,
-        f"Filters (Showing {str(filtered_df.shape[0])} Recipes)",
-        ceil(filtered_df.shape[0] / row_size / row_count),
+        f"Filters (Showing {str(recipe_count)} Recipes)",
+        ceil(recipe_count / row_size / row_count),
     ]

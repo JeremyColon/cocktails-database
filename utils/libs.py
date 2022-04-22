@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 import re
 import os
+import psycopg2
 from math import ceil, floor
 from datetime import datetime as dt
 from utils import controls

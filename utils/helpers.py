@@ -1,4 +1,20 @@
-import pickle, re
+import pickle, re, pandas as pd
+
+
+def check_username(username):
+    ...
+    
+
+def check_password(pwd):
+    ...
+    
+
+def set_username(username):
+    ...
+    
+    
+def set_password(pwd):
+    ...
 
 
 def save_object(obj, filename):
@@ -37,21 +53,73 @@ def apply_AND_filters(filters, df):
     if "" in filter_list:
         filter_list.remove("")
 
-    filtered_df = df
-
     for f in filter_list:
-        filtered_df = filtered_df.loc[
-            (
-                filtered_df["ingredients"].str.contains(
-                    f, regex=True, flags=re.IGNORECASE
-                )
-            )
-            | (
-                filtered_df["recipe_name"].str.contains(
-                    f, regex=True, flags=re.IGNORECASE
-                )
-            ),
+        df = df.loc[
+            (df["ingredient"].str.contains(f, regex=True, flags=re.IGNORECASE))
+            | (df["recipe_name"].str.contains(f, regex=True, flags=re.IGNORECASE)),
             :,
         ]
 
-    return filtered_df
+    return df
+
+
+def create_set_from_series(ser):
+    return set(ser.unique())
+
+
+def convert_set_to_sorted_list(s):
+    ret = [i for i in s if i]
+    ret.sort()
+    return ret
+
+
+def create_filter_lists(df):
+    df_non_null = df.loc[~pd.isnull(df["ingredient"]), :]
+    ingredient_set = create_set_from_series(df_non_null["ingredient"])
+    garnish_set = create_set_from_series(
+        df_non_null.loc[
+            (
+                df_non_null["ingredient"].str.contains(
+                    "^Garnish: ", regex=True, flags=re.IGNORECASE
+                )
+            )
+            | (df_non_null["unit"] == "garnish"),
+            "ingredient",
+        ]
+    )
+
+    bitter_set = create_set_from_series(
+        df_non_null.loc[
+            (
+                df_non_null["ingredient"].str.contains(
+                    "bitter", regex=True, flags=re.IGNORECASE
+                )
+            ),
+            "ingredient",
+        ]
+    )
+
+    syrup_set = create_set_from_series(
+        df_non_null.loc[
+            (
+                df_non_null["ingredient"].str.contains(
+                    "syrup", regex=True, flags=re.IGNORECASE
+                )
+            ),
+            "ingredient",
+        ]
+    )
+
+    other_ingredients = ingredient_set - garnish_set - bitter_set - syrup_set
+
+    other_list = convert_set_to_sorted_list(other_ingredients)
+    garnish_list = convert_set_to_sorted_list(garnish_set)
+    bitter_list = convert_set_to_sorted_list(bitter_set)
+    syrup_list = convert_set_to_sorted_list(syrup_set)
+
+    return {
+        "other": other_list,
+        "garnish": garnish_list,
+        "bitter": bitter_list,
+        "syrup": syrup_list,
+    }

@@ -45,7 +45,7 @@ h2 {
                 NAV BAR
 ========================================== */
 .navbar {
-    background-color: rgba(0, 0, 0, 0.88) !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
     position: fixed;
     width: 100%;
     z-index: 99;
