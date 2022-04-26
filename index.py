@@ -159,10 +159,12 @@ def create_account_button_click(n_clicks, pwd, email):
         status = response.json()["status"]
 
         if user:
-            return "/create", "Email already exists"
+            return "/create", dbc.Row(dbc.Col([html.H3("Email already exists")]))
 
         if status == "invalid":
-            return "/create", "Email address is invalid"
+            return "/create", dbc.Row(
+                dbc.Col([html.H3("Invalid email, please try again")])
+            )
 
         newuser = User(pwd=generate_password_hash(pwd).decode("utf-8"), email=email)
         db.session.add(newuser)

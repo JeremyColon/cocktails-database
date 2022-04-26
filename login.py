@@ -112,8 +112,8 @@ create_account = [
                 n_clicks=0,
             ),
             html.Br(),
-            html.Div(children="", id="create-account-output-state"),
             html.Br(),
+            html.Div(children="", id="create-account-output-state"),
         ]
     )
 ]
