@@ -1,5 +1,6 @@
 from app import app
 import main, os, json
+import requests
 from login import login, success, failed, logout, create_account
 from utils.libs import Input, Output, State
 from utils.libs import dbc
@@ -149,8 +150,19 @@ def login_button_click(n_clicks, email, password):
 def create_account_button_click(n_clicks, pwd, email):
     if n_clicks > 0:
         user = User.query.filter_by(email=email).first()
+        response = requests.get(
+            "https://isitarealemail.com/api/email/validate",
+            params={"email": email},
+            headers={"Authorization": "Bearer " + os.getenv("EMAIL_CHECK_API_KEY")},
+        )
+
+        status = response.json()["status"]
+
         if user:
             return "/create", "Email already exists"
+
+        if status == "invalid":
+            return "/create", "Email address is invalid"
 
         newuser = User(pwd=generate_password_hash(pwd).decode("utf-8"), email=email)
         db.session.add(newuser)

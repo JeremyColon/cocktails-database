@@ -111,6 +111,7 @@ create_account = [
                 id="create-account-button",
                 n_clicks=0,
             ),
+            html.Br(),
             html.Div(children="", id="create-account-output-state"),
             html.Br(),
         ]
