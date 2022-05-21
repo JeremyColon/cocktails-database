@@ -1,7 +1,7 @@
 from app import app
 import main, os, json
 import requests
-from login import login, success, failed, logout, create_account
+from login import login, failed, create_account
 from utils.libs import Input, Output, State
 from utils.libs import dbc
 from utils.libs import dcc
@@ -28,19 +28,14 @@ nav = dbc.Navbar(
                     ],
                     align="center",
                 ),
+                href="/",
             ),
             dbc.NavbarToggler(id="navbar-toggler"),
-            dbc.Collapse(
-                dbc.Nav(
-                    [
-                        dbc.NavLink("Home", href="/", active="exact"),
-                        dbc.NavLink("Logout", href="/logout", active="exact"),
-                        dbc.NavLink("Create Account", href="/create", active="exact"),
-                    ],
-                    className="ml-auto",
-                    navbar=True,
-                ),
-                id="navbar-collapse",
+            dbc.Nav(
+                [
+                    dbc.NavLink("Logout", href="/logout", active="exact"),
+                ],
+                className="ml-auto",
                 navbar=True,
             ),
         ],
@@ -53,6 +48,7 @@ nav = dbc.Navbar(
 
 app.layout = html.Div(
     [
+        dcc.Store(id="user-store", storage_type="session"),
         # Location gets the current url of the browser
         # Need this for the callback that updates the page layout
         #  after clicking a button
@@ -96,7 +92,7 @@ class User(UserMixin, db.Model):
         return "<User %r>" % self.email
 
     def to_json(self):
-        return {"name": self.name, "email": self.email}
+        return {"id": self.id, "email": self.email}
 
     def is_authenticated(self):
         return True
@@ -121,24 +117,32 @@ def load_user(user_id):
 
 
 @app.callback(
-    Output("url_login", "pathname"),
-    Output("output-state", "children"),
-    [Input("login-button", "n_clicks")],
+    [
+        Output("url_login", "pathname"),
+        Output("output-state", "children"),
+        Output("user-store", "data"),
+    ],
+    [
+        Input("login-button", "n_clicks"),
+        Input("create-account-page-button", "n_clicks"),
+    ],
     [State("email-box", "value"), State("pwd-box", "value")],
 )
-def login_button_click(n_clicks, email, password):
-    if n_clicks > 0:
+def login_button_click(n_clicks_login, n_clicks_create, email, password):
+    if n_clicks_login > 0:
         user = User.query.filter_by(email=email).first()
         if not user:
-            return "/login", "Email doesn't exist, please sign up first."
+            return "/login", "Email doesn't exist, please sign up first.", None
         elif not check_password_hash(user.pwd, password):
             print("Login Unsuccessful")
-            return "/login", "Incorrect login details, please try again."
+            return "/login", "Incorrect login details, please try again.", None
 
         login_user(user)
-        return "/", ""
+        return "/", "", user.to_json()
+    elif n_clicks_create > 0:
+        return "/create", "", None
     else:
-        return "/login", ""
+        return "/login", "", None
 
 
 @app.callback(
@@ -170,7 +174,7 @@ def create_account_button_click(n_clicks, pwd, email):
         db.session.add(newuser)
         db.session.commit()
 
-        return "/create", "Account Created"
+        return "/login", "Account Created"
     else:
         return "/create", ""
 
@@ -199,8 +203,6 @@ def login_status(url):
     [Input("url", "pathname")],
 )
 def display_page(pathname):
-    view = None
-    url = no_update
     if pathname == "/login":
         return login
     elif pathname == "/create":

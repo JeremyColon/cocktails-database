@@ -1,14 +1,6 @@
 # Import required libraries
-from app import app, server
 from utils.libs import *
 from utils.controls import *
-from utils.helpers import (
-    load_object,
-    create_OR_filter_string,
-    apply_AND_filters,
-    create_filter_lists,
-)
-from ast import literal_eval
 
 # Login screen
 login = [
@@ -52,8 +44,32 @@ login = [
                     width=4,
                 )
             ),
-            dbc.Button(
-                "Login", size="lg", className="me-1", id="login-button", n_clicks=0
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Button(
+                                "Login",
+                                size="lg",
+                                className="me-1",
+                                id="login-button",
+                                n_clicks=0,
+                            ),
+                        ],
+                        width=2,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Button(
+                                "Create Account",
+                                size="lg",
+                                className="me-1",
+                                id="create-account-page-button",
+                                n_clicks=0,
+                            ),
+                        ],
+                    ),
+                ]
             ),
             html.Div(children="", id="output-state"),
             html.Br(),

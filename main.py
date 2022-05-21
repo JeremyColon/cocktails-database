@@ -3,12 +3,24 @@ from app import app
 from utils.libs import *
 from utils.controls import *
 from utils.helpers import (
-    load_object,
     create_OR_filter_string,
     apply_AND_filters,
     create_filter_lists,
+    run_query,
+    get_favorite,
+    get_cocktail_nps,
+    update_favorite,
+    update_rating,
 )
-from ast import literal_eval
+from dash.exceptions import PreventUpdate
+from dash.long_callback import DiskcacheLongCallbackManager
+from dash.dependencies import MATCH, ALL
+
+## Diskcache
+import diskcache
+
+cache = diskcache.Cache("./cache")
+long_callback_manager = DiskcacheLongCallbackManager(cache)
 
 server = app.server
 
@@ -23,8 +35,16 @@ with psycopg2.connect(DATABASE_URL, sslmode="require") as conn:
         columns = [desc[0] for desc in cursor.description]
         results = cursor.fetchall()
 
+results, columns = run_query(DATABASE_URL, COCKTAILS_SQL, True)
 cocktails_db_test = pd.DataFrame(results, columns=columns)
+cocktail_ids = cocktails_db_test["cocktail_id"].unique()
 recipe_count = cocktails_db_test.cocktail_id.max()
+
+avg_cocktail_ratings, columns = run_query(
+    DATABASE_URL, "select * from vw_cocktail_ratings", True
+)
+avg_cocktail_ratings_df = pd.DataFrame(avg_cocktail_ratings, columns=columns)
+
 # Controls
 names = cocktails_db_test["recipe_name"].unique()
 cocktail_names = create_dropdown_from_data(
@@ -69,12 +89,135 @@ marks_font_size = 16
 layout = [
     html.Div(
         [
+            html.Div(id="hidden-div", style={"display": "none"}),
+            dcc.Store("favorites-store", storage_type="session"),
             dbc.Container(
                 [
                     dbc.Row(
                         [
                             dbc.Offcanvas(
                                 [
+                                    dbc.Row(
+                                        dbc.Col(
+                                            dbc.Card(
+                                                dbc.CardBody(
+                                                    [
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    [
+                                                                        dbc.Button(
+                                                                            "Apply Filters",
+                                                                            id="apply-filters-button",
+                                                                            n_clicks=0,
+                                                                        )
+                                                                    ],
+                                                                ),
+                                                                dbc.Col(
+                                                                    [
+                                                                        dbc.Button(
+                                                                            "Reset All Filters",
+                                                                            id="reset-filters-button",
+                                                                            n_clicks=0,
+                                                                        )
+                                                                    ]
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ]
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Card(
+                                                        dbc.CardBody(
+                                                            [
+                                                                dbc.Row(
+                                                                    dbc.Col(
+                                                                        [
+                                                                            dbc.Checklist(
+                                                                                options=[
+                                                                                    {
+                                                                                        "label": "Show Favorites Only",
+                                                                                        "value": 1,
+                                                                                    },
+                                                                                ],
+                                                                                value=[],
+                                                                                id="favorites-switch-input",
+                                                                                switch=True,
+                                                                                inline=True,
+                                                                            ),
+                                                                            dbc.Checklist(
+                                                                                options=[
+                                                                                    {
+                                                                                        "label": "Include Unrated Cocktails",
+                                                                                        "value": 1,
+                                                                                    },
+                                                                                ],
+                                                                                value=[
+                                                                                    1
+                                                                                ],
+                                                                                id="unrated-checkbox-input",
+                                                                                inline=True,
+                                                                            ),
+                                                                        ]
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        )
+                                                    )
+                                                ]
+                                            )
+                                        ]
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Card(
+                                                        dbc.CardBody(
+                                                            [
+                                                                html.H5(
+                                                                    "Cocktail NPS Range"
+                                                                ),
+                                                                dcc.RangeSlider(
+                                                                    id="cocktail-nps-range-slider",
+                                                                    min=-100,
+                                                                    max=100,
+                                                                    step=10,
+                                                                    value=[-100, 100],
+                                                                    allowCross=False,
+                                                                    pushable=10,
+                                                                    marks={
+                                                                        i: {
+                                                                            "label": "{}".format(
+                                                                                i
+                                                                                if i
+                                                                                % 20
+                                                                                == 0
+                                                                                else ""
+                                                                            )
+                                                                        }
+                                                                        for i in range(
+                                                                            -100,
+                                                                            101,
+                                                                            10,
+                                                                        )
+                                                                    },
+                                                                    persistence=True,
+                                                                    persistence_type="session",
+                                                                ),
+                                                            ]
+                                                        )
+                                                    )
+                                                ],
+                                            )
+                                        ]
+                                    ),
                                     dbc.Row(
                                         [
                                             dbc.Col(
@@ -224,107 +367,38 @@ layout = [
                                                     dbc.Card(
                                                         dbc.CardBody(
                                                             [
-                                                                html.H5("# of Rows"),
-                                                                dbc.Input(
-                                                                    id="row-count-input",
-                                                                    min=3,
-                                                                    max=10,
-                                                                    value=4,
-                                                                    type="number",
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5("Filter Type"),
-                                                                dbc.RadioItems(
-                                                                    id="filter-type",
-                                                                    options=[
-                                                                        {
-                                                                            "label": "AND",
-                                                                            "value": "and",
-                                                                        },
-                                                                        {
-                                                                            "label": "OR",
-                                                                            "value": "or",
-                                                                        },
+                                                                dbc.Row(
+                                                                    [
+                                                                        dbc.Col(
+                                                                            [
+                                                                                html.H5(
+                                                                                    "Filter Type"
+                                                                                ),
+                                                                                dbc.RadioItems(
+                                                                                    id="filter-type",
+                                                                                    options=[
+                                                                                        {
+                                                                                            "label": "AND",
+                                                                                            "value": "and",
+                                                                                        },
+                                                                                        {
+                                                                                            "label": "OR",
+                                                                                            "value": "or",
+                                                                                        },
+                                                                                    ],
+                                                                                    value="and",
+                                                                                    persistence=True,
+                                                                                    persistence_type="session",
+                                                                                ),
+                                                                            ],
+                                                                        ),
                                                                     ],
-                                                                    value="and",
-                                                                    persistence=True,
-                                                                    persistence_type="session",
                                                                 ),
                                                             ]
                                                         )
                                                     )
                                                 ],
                                             ),
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5(
-                                                                    "Cocktails Per Row"
-                                                                ),
-                                                                dcc.Slider(
-                                                                    id="cocktails-per-row-slider",
-                                                                    min=4,
-                                                                    max=8,
-                                                                    step=1,
-                                                                    value=6,
-                                                                    marks={
-                                                                        4: {
-                                                                            "label": "4",
-                                                                            "style": {
-                                                                                "font-size": 16
-                                                                            },
-                                                                        },
-                                                                        5: {
-                                                                            "label": "5",
-                                                                            "style": {
-                                                                                "font-size": 16
-                                                                            },
-                                                                        },
-                                                                        6: {
-                                                                            "label": "6",
-                                                                            "style": {
-                                                                                "font-size": 16
-                                                                            },
-                                                                        },
-                                                                        7: {
-                                                                            "label": "7",
-                                                                            "style": {
-                                                                                "font-size": 16
-                                                                            },
-                                                                        },
-                                                                        8: {
-                                                                            "label": "8",
-                                                                            "style": {
-                                                                                "font-size": 16
-                                                                            },
-                                                                        },
-                                                                    },
-                                                                    included=False,
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            )
                                         ]
                                     ),
                                 ],
@@ -338,26 +412,12 @@ layout = [
                     dbc.Row(
                         [
                             dbc.Col(
-                                [
-                                    dbc.Pagination(
-                                        id="pagination",
-                                        max_value=recipe_count / 6,
-                                        active_page=1,
-                                        first_last=True,
-                                        previous_next=True,
-                                        fully_expanded=False,
-                                        size="lg",
-                                    ),
-                                ],
-                                width={"offset": 3},
-                            ),
-                            dbc.Col(
                                 dbc.Button(
                                     "Open Filters",
                                     id="open-offcanvas-scrollable",
                                     n_clicks=0,
                                 ),
-                                width={"offset": 1},
+                                # width={"offset": 1},
                             ),
                         ],
                     ),
@@ -376,10 +436,56 @@ layout = [
                     ),
                 ],
                 fluid=True,
-            )
+            ),
         ]
     )
 ]
+
+
+@app.callback(
+    [
+        Output("liquor-dropdown", "value"),
+        Output("syrup-dropdown", "value"),
+        Output("bitter-dropdown", "value"),
+        Output("garnish-dropdown", "value"),
+        Output("other-dropdown", "value"),
+        Output("free-text-search", "value"),
+        Output("filter-type", "value"),
+        Output("favorites-switch-input", "value"),
+        Output("unrated-checkbox-input", "value"),
+        Output("cocktail-nps-range-slider", "value"),
+    ],
+    Input("reset-filters-button", "n_clicks"),
+    # [
+    #     State("liquor-dropdown", "value"),
+    #     State("syrup-dropdown", "value"),
+    #     State("bitter-dropdown", "value"),
+    #     State("garnish-dropdown", "value"),
+    #     State("other-dropdown", "value"),
+    #     State("free-text-search", "value"),
+    #     State("filter-type", "value"),
+    #     State("favorites-switch-input", "value"),
+    #     State("unrated-checkbox-input", "value"),
+    #     State("cocktail-nps-range-slider", "value"),
+    # ],
+)
+def toggle_offcanvas_scrollable(
+    reset_filters,
+    # liquor,
+    # syrup,
+    # bitter,
+    # garnish,
+    # other,
+    # free_text,
+    # filter_type,
+    # show_favorites,
+    # show_unrated_cocktails,
+    # cocktail_nps_range,
+):
+    if reset_filters:
+        return (None, None, None, None, None, None, "and", [], [1], [-100, 100])
+    else:
+        raise PreventUpdate
 
 
 @app.callback(
@@ -393,50 +499,43 @@ def toggle_offcanvas_scrollable(n1, is_open):
     return is_open
 
 
-# @app.callback(
-#     [Output("pagination", "max_value")],
-#     Input("cocktails-per-row-slider", "value"),
-#     Input("row-count-input", "value"),
-# )
-# def toggle_row_size(row_size, row_count):
-#     return [ceil(len(cocktails) / row_size / row_count)]
-
-
 # Callback to update table
 @app.callback(
     [
         Output("cocktails-col", "children"),
         Output("offcanvas-scrollable", "title"),
-        Output("pagination", "max_value"),
     ],
+    Input("apply-filters-button", "n_clicks"),
     [
-        Input("liquor-dropdown", "value"),
-        Input("syrup-dropdown", "value"),
-        Input("bitter-dropdown", "value"),
-        Input("garnish-dropdown", "value"),
-        Input("other-dropdown", "value"),
-        Input("free-text-search", "value"),
-        Input("cocktails-per-row-slider", "value"),
-        Input("row-count-input", "value"),
-        Input("pagination", "active_page"),
-        Input("filter-type", "value"),
+        State("liquor-dropdown", "value"),
+        State("syrup-dropdown", "value"),
+        State("bitter-dropdown", "value"),
+        State("garnish-dropdown", "value"),
+        State("other-dropdown", "value"),
+        State("free-text-search", "value"),
+        State("filter-type", "value"),
+        State("favorites-switch-input", "value"),
+        State("unrated-checkbox-input", "value"),
+        State("cocktail-nps-range-slider", "value"),
+        State("user-store", "data"),
     ],
 )
 def update_table(
+    apply_filters,
     liquor,
     syrup,
     bitter,
     garnish,
     other,
     free_text,
-    row_size,
-    row_count,
-    page_number,
     filter_type,
+    show_favorites,
+    show_unrated_cocktails,
+    cocktail_nps_range,
+    user_obj,
 ):
-    cocktail_start = (page_number - 1) * row_count * row_size
-    cocktail_end = page_number * row_count * row_size
 
+    user_id = user_obj.get("id")
     filters = [liquor, syrup, bitter, garnish, other, free_text]
 
     if filter_type == "and":
@@ -453,19 +552,61 @@ def update_table(
             :,
         ]
 
+    cocktail_ids_to_filter_on = avg_cocktail_ratings_df.loc[
+        (avg_cocktail_ratings_df["cocktail_nps"] >= cocktail_nps_range[0])
+        & (avg_cocktail_ratings_df["cocktail_nps"] <= cocktail_nps_range[1]),
+        "cocktail_id",
+    ].values.tolist()
+
+    if len(show_unrated_cocktails) > 0:
+        cocktails_to_remove = avg_cocktail_ratings_df.loc[
+            ~avg_cocktail_ratings_df["cocktail_id"].isin(cocktail_ids_to_filter_on),
+            "cocktail_id",
+        ].values
+        filtered_df = filtered_df.loc[
+            ~filtered_df["cocktail_id"].isin(cocktails_to_remove), :
+        ]
+    else:
+        filtered_df = filtered_df.loc[
+            filtered_df["cocktail_id"].isin(cocktail_ids_to_filter_on), :
+        ]
+
     recipe_count = len(filtered_df["recipe_name"].unique())
+    favorites, columns = run_query(
+        DATABASE_URL, f"SELECT * FROM user_favorites WHERE user_id={user_id}", True
+    )
+    favorites_df = pd.DataFrame(favorites, columns=columns)
+
+    user_ratings, columns = run_query(
+        DATABASE_URL,
+        f"SELECT cocktail_id, rating FROM user_ratings WHERE user_id={user_id}",
+        True,
+    )
+    user_ratings_df = pd.DataFrame(user_ratings, columns=columns)
+
+    join_type = "left" if len(show_favorites) == 0 else "inner"
+    filtered_w_favorites_df = filtered_df.merge(
+        favorites_df, on="cocktail_id", how=join_type
+    ).assign(
+        favorite=lambda row: np.where(
+            pd.isnull(row["favorite"]), False, row["favorite"]
+        )
+    )
+
+    if len(show_favorites) == 1:
+        filtered_w_favorites_df = filtered_w_favorites_df.loc[
+            filtered_w_favorites_df["favorite"] == True, :
+        ]
 
     values = (
-        filtered_df[["recipe_name", "image", "link"]]
+        filtered_w_favorites_df[
+            ["cocktail_id", "recipe_name", "image", "link", "favorite"]
+        ]
         .drop_duplicates()
-        .iloc[cocktail_start:cocktail_end, :]
         .values.tolist()
     )
-    # 0: Name
-    # 1: Image
-    # 2: Link
-    # 3: Ingredients
 
+    row_size = 5
     rows = ceil(len(values) / row_size)
     ret = list()
     for i in range(rows):
@@ -473,17 +614,128 @@ def update_table(
         start_val = i * row_size
         end_val = (i + 1) * row_size
         for j, value in enumerate(values[start_val:end_val]):
-            name = value[0]
-            image = value[1]
-            link = value[2]
+            cocktail_id = value[0]
+            name = value[1]
+            image = value[2]
+            link = value[3]
+            favorite = value[4]
+            user_rating = user_ratings_df.loc[
+                user_ratings_df["cocktail_id"] == cocktail_id, "rating"
+            ].values
+            cocktail_nps = avg_cocktail_ratings_df.loc[
+                avg_cocktail_ratings_df["cocktail_id"] == cocktail_id, "cocktail_nps"
+            ].values
+            cocktail_nps = None if len(cocktail_nps) == 0 else cocktail_nps[0]
+            button_label = "Rate"
+            if cocktail_nps is not None:
+                button_label = f"{cocktail_nps}"
+                if len(user_rating) > 0:
+                    button_label += f" ({user_rating[0]})"
+
+            user_rating = 8 if len(user_rating) == 0 else user_rating[0]
             card = dbc.Card(
                 [
                     html.A(
                         dbc.CardImg(src=image, top=True), href=link, target="_blank"
                     ),
                     dbc.CardBody(
-                        [html.H5(name, className=name, style={"text-align": "center"})],
-                        id=f"cocktail-card-{j}",
+                        [
+                            html.H5(
+                                [
+                                    name,
+                                    html.Br(),
+                                    html.Br(),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                dbc.Button(
+                                                    html.I(className="fa-solid fa-star")
+                                                    if favorite
+                                                    else html.I(
+                                                        className="fa-regular fa-star"
+                                                    ),
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "favorite-button",
+                                                    },
+                                                    outline=False,
+                                                    size="lg",
+                                                    n_clicks=0,
+                                                )
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Button(
+                                                        button_label,
+                                                        id={
+                                                            "index": cocktail_id,
+                                                            "type": "cNPS-button",
+                                                        },
+                                                        n_clicks=0,
+                                                    ),
+                                                    dbc.Modal(
+                                                        [
+                                                            dbc.ModalHeader(
+                                                                dbc.ModalTitle(
+                                                                    "Cocktail NPS"
+                                                                )
+                                                            ),
+                                                            dbc.ModalBody(
+                                                                [
+                                                                    html.H5(
+                                                                        "On a scale of 0-10, how likely are you to recommend this cocktail to your friend?"
+                                                                    ),
+                                                                    dcc.Slider(
+                                                                        id={
+                                                                            "index": cocktail_id,
+                                                                            "type": "cNPS-rating",
+                                                                        },
+                                                                        min=0,
+                                                                        value=user_rating,
+                                                                        max=10,
+                                                                        step=1,
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                            dbc.ModalFooter(
+                                                                [
+                                                                    dbc.Button(
+                                                                        "Cancel",
+                                                                        id={
+                                                                            "index": cocktail_id,
+                                                                            "type": "cNPS-cancel",
+                                                                        },
+                                                                        className="ml-auto",
+                                                                        n_clicks=0,
+                                                                    ),
+                                                                    dbc.Button(
+                                                                        "Save",
+                                                                        id={
+                                                                            "index": cocktail_id,
+                                                                            "type": "cNPS-save",
+                                                                        },
+                                                                        className="ms-auto",
+                                                                        n_clicks=0,
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ],
+                                                        id={
+                                                            "index": cocktail_id,
+                                                            "type": "cNPS-modal",
+                                                        },
+                                                        is_open=False,
+                                                    ),
+                                                ],
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                # className=name,
+                                style={"text-align": "center"},
+                            ),
+                        ],
+                        id=f"cocktail-card-{cocktail_id}",
                     ),
                 ]
             )
@@ -496,5 +748,123 @@ def update_table(
     return [
         ret,
         f"Filters (Showing {str(recipe_count)} Recipes)",
-        ceil(recipe_count / row_size / row_count),
     ]
+
+
+# @app.callback(
+#     Output({"type": "taste-tag-modal", "index": MATCH}, "is_open"),
+#     [
+#         Input({"type": "taste-tag-button", "index": MATCH}, "n_clicks"),
+#         Input({"type": "taste-tag-save", "index": MATCH}, "n_clicks"),
+#     ],
+#     [
+#         State({"type": "taste-tag-modal", "index": MATCH}, "is_open"),
+#         State("user-store", "data"),
+#     ],
+#     prevent_initial_call=True,
+# )
+# def toggle_modal(open_btn, save_btn, is_open, user_obj):
+#     user_id = user_obj.get("id")
+#     if open_btn or save_btn:
+#         if save_btn:
+#             print(user_id, 1)
+#             # update_rating(user_id, cNPS)
+#         return not is_open
+#     return is_open
+
+
+@app.callback(
+    [
+        Output({"type": "cNPS-modal", "index": MATCH}, "is_open"),
+        Output({"type": "cNPS-button", "index": MATCH}, "children"),
+    ],
+    [
+        Input({"type": "cNPS-button", "index": MATCH}, "children"),
+        Input({"type": "cNPS-button", "index": MATCH}, "n_clicks"),
+        Input({"type": "cNPS-save", "index": MATCH}, "n_clicks"),
+        Input({"type": "cNPS-cancel", "index": MATCH}, "n_clicks"),
+    ],
+    [
+        State({"type": "cNPS-rating", "index": MATCH}, "value"),
+        State({"type": "cNPS-modal", "index": MATCH}, "is_open"),
+        State("user-store", "data"),
+    ],
+    prevent_initial_call=True,
+)
+def toggle_modal(
+    button_label, open_btn, save_btn, cancel_btn, user_rating, is_open, user_obj
+):
+    user_id = user_obj.get("id")
+    ctx = dash.callback_context
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    cocktail_id = json.loads(button_id).get("index")
+    if open_btn or cancel_btn or save_btn:
+        if save_btn:
+            update_rating(DATABASE_URL, user_id, cocktail_id, user_rating)
+            cNPS = get_cocktail_nps(DATABASE_URL, cocktail_id)
+            button_label = f"{cNPS[0][0]} ({user_rating})"
+        return not is_open, button_label
+    return is_open, button_label
+
+
+@app.callback(
+    Output({"type": "favorite-button", "index": MATCH}, "children"),
+    Input(
+        component_id={"index": MATCH, "type": "favorite-button"},
+        component_property="n_clicks",
+    ),
+    State("user-store", "data"),
+    prevent_initial_call=True,
+)
+def update_favorites(favorite_button, user_obj):
+    user_id = user_obj.get("id")
+
+    ctx = dash.callback_context
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    cocktail_id = json.loads(button_id).get("index")
+    value = ctx.triggered[0]["value"]
+
+    if value is None:
+        raise PreventUpdate
+    else:
+
+        favorites, columns = run_query(
+            DATABASE_URL, f"SELECT * FROM user_favorites WHERE user_id={user_id}", True
+        )
+        favorites_df = pd.DataFrame(favorites, columns=columns)
+
+        cocktails_favorites = (
+            cocktails_db_test[["cocktail_id", "recipe_name"]]
+            .drop_duplicates()
+            .merge(favorites_df, on="cocktail_id", how="left")
+            .assign(
+                favorite=lambda row: np.where(
+                    pd.isnull(row["favorite"]), False, row["favorite"]
+                )
+            )
+        )
+
+    ret_favorite = cocktails_favorites.loc[
+        cocktails_favorites["cocktail_id"] == cocktail_id, "favorite"
+    ].values
+    if len(ret_favorite) > 0:
+        favorite = not ret_favorite[0]
+    else:
+        favorite = True
+
+    cocktails_favorites.loc[
+        cocktails_favorites["cocktail_id"] == cocktail_id, "favorite"
+    ] = favorite
+
+    update_favorite(
+        DATABASE_URL, user_obj.get("id"), cocktail_id, favorite, False, None
+    )
+
+    icon = (
+        html.I(className="fa-solid fa-star")
+        if favorite
+        else html.I(className="fa-regular fa-star")
+    )
+
+    return icon
