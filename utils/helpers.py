@@ -37,14 +37,32 @@ def apply_AND_filters(filters, df):
     if "" in filter_list:
         filter_list.remove("")
 
-    for f in filter_list:
-        df = df.loc[
-            (df["ingredient"].str.contains(f, regex=True, flags=re.IGNORECASE))
-            | (df["recipe_name"].str.contains(f, regex=True, flags=re.IGNORECASE)),
-            :,
-        ]
+    if len(filter_list) > 0:
+        filtered_df = df.copy()
+        for f in filter_list:
+            cocktail_ids = filtered_df.loc[
+                (
+                    filtered_df["ingredient"].str.contains(
+                        f, regex=True, flags=re.IGNORECASE
+                    )
+                )
+                | (
+                    filtered_df["recipe_name"].str.contains(
+                        f, regex=True, flags=re.IGNORECASE
+                    )
+                ),
+                "cocktail_id",
+            ].values.tolist()
+            filtered_df = filtered_df.loc[
+                filtered_df["cocktail_id"].isin(cocktail_ids), :
+            ]
 
-    return df
+        cocktail_ids = filtered_df["cocktail_id"].unique().tolist()
+    else:
+
+        cocktail_ids = df["cocktail_id"].unique().tolist()
+
+    return df.loc[df["cocktail_id"].isin(cocktail_ids), :]
 
 
 def create_set_from_series(ser):
