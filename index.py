@@ -30,12 +30,19 @@ nav = dbc.Navbar(
                 ),
                 href="/",
             ),
-            dbc.NavbarToggler(id="navbar-toggler"),
-            dbc.Nav(
+            dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
+            dbc.Collapse(
                 [
-                    dbc.NavLink("Logout", href="/logout", active="exact"),
+                    dbc.Nav(
+                        [
+                            dbc.NavLink("Logout", href="/logout", active="exact"),
+                        ],
+                        className="ml-auto",
+                        navbar=True,
+                    ),
                 ],
-                className="ml-auto",
+                id="navbar-collapse",
+                is_open=False,
                 navbar=True,
             ),
         ],

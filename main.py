@@ -10,6 +10,7 @@ from utils.helpers import (
     get_favorite,
     get_cocktail_nps,
     update_favorite,
+    update_bookmark,
     update_rating,
 )
 from dash.exceptions import PreventUpdate
@@ -148,6 +149,18 @@ layout = [
                                                                                 ],
                                                                                 value=[],
                                                                                 id="favorites-switch-input",
+                                                                                switch=True,
+                                                                                inline=True,
+                                                                            ),
+                                                                            dbc.Checklist(
+                                                                                options=[
+                                                                                    {
+                                                                                        "label": "Show Bookmarks Only",
+                                                                                        "value": 1,
+                                                                                    },
+                                                                                ],
+                                                                                value=[],
+                                                                                id="bookmarks-switch-input",
                                                                                 switch=True,
                                                                                 inline=True,
                                                                             ),
@@ -452,38 +465,17 @@ layout = [
         Output("free-text-search", "value"),
         Output("filter-type", "value"),
         Output("favorites-switch-input", "value"),
+        Output("bookmarks-switch-input", "value"),
         Output("unrated-checkbox-input", "value"),
         Output("cocktail-nps-range-slider", "value"),
     ],
     Input("reset-filters-button", "n_clicks"),
-    # [
-    #     State("liquor-dropdown", "value"),
-    #     State("syrup-dropdown", "value"),
-    #     State("bitter-dropdown", "value"),
-    #     State("garnish-dropdown", "value"),
-    #     State("other-dropdown", "value"),
-    #     State("free-text-search", "value"),
-    #     State("filter-type", "value"),
-    #     State("favorites-switch-input", "value"),
-    #     State("unrated-checkbox-input", "value"),
-    #     State("cocktail-nps-range-slider", "value"),
-    # ],
 )
 def toggle_offcanvas_scrollable(
     reset_filters,
-    # liquor,
-    # syrup,
-    # bitter,
-    # garnish,
-    # other,
-    # free_text,
-    # filter_type,
-    # show_favorites,
-    # show_unrated_cocktails,
-    # cocktail_nps_range,
 ):
     if reset_filters:
-        return (None, None, None, None, None, None, "and", [], [1], [-100, 100])
+        return (None, None, None, None, None, None, "and", [], [], [1], [-100, 100])
     else:
         raise PreventUpdate
 
@@ -515,6 +507,7 @@ def toggle_offcanvas_scrollable(n1, is_open):
         State("free-text-search", "value"),
         State("filter-type", "value"),
         State("favorites-switch-input", "value"),
+        State("bookmarks-switch-input", "value"),
         State("unrated-checkbox-input", "value"),
         State("cocktail-nps-range-slider", "value"),
         State("user-store", "data"),
@@ -530,6 +523,7 @@ def update_table(
     free_text,
     filter_type,
     show_favorites,
+    show_bookmarks,
     show_unrated_cocktails,
     cocktail_nps_range,
     user_obj,
@@ -571,7 +565,6 @@ def update_table(
             filtered_df["cocktail_id"].isin(cocktail_ids_to_filter_on), :
         ]
 
-    recipe_count = len(filtered_df["recipe_name"].unique())
     favorites, columns = run_query(
         DATABASE_URL, f"SELECT * FROM user_favorites WHERE user_id={user_id}", True
     )
@@ -584,6 +577,11 @@ def update_table(
     )
     user_ratings_df = pd.DataFrame(user_ratings, columns=columns)
 
+    bookmarks, columns = run_query(
+        DATABASE_URL, f"SELECT * FROM user_bookmarks WHERE user_id={user_id}", True
+    )
+    bookmarks_df = pd.DataFrame(bookmarks, columns=columns)
+
     join_type = "left" if len(show_favorites) == 0 else "inner"
     filtered_w_favorites_df = filtered_df.merge(
         favorites_df, on="cocktail_id", how=join_type
@@ -593,18 +591,34 @@ def update_table(
         )
     )
 
+    join_type = "left" if len(show_bookmarks) == 0 else "inner"
+    filtered_final_df = filtered_w_favorites_df.merge(
+        bookmarks_df, on="cocktail_id", how=join_type
+    ).assign(
+        bookmark=lambda row: np.where(
+            pd.isnull(row["bookmark"]), False, row["bookmark"]
+        )
+    )
+
     if len(show_favorites) == 1:
-        filtered_w_favorites_df = filtered_w_favorites_df.loc[
-            filtered_w_favorites_df["favorite"] == True, :
+        filtered_final_df = filtered_final_df.loc[
+            filtered_final_df["favorite"] == True, :
+        ]
+
+    if len(show_bookmarks) == 1:
+        filtered_final_df = filtered_final_df.loc[
+            filtered_final_df["bookmark"] == True, :
         ]
 
     values = (
-        filtered_w_favorites_df[
-            ["cocktail_id", "recipe_name", "image", "link", "favorite"]
+        filtered_final_df[
+            ["cocktail_id", "recipe_name", "image", "link", "favorite", "bookmark"]
         ]
         .drop_duplicates()
         .values.tolist()
     )
+
+    recipe_count = len(values)
 
     row_size = 5
     rows = ceil(len(values) / row_size)
@@ -619,6 +633,7 @@ def update_table(
             image = value[2]
             link = value[3]
             favorite = value[4]
+            bookmark = value[5]
             user_rating = user_ratings_df.loc[
                 user_ratings_df["cocktail_id"] == cocktail_id, "rating"
             ].values
@@ -659,7 +674,25 @@ def update_table(
                                                         "type": "favorite-button",
                                                     },
                                                     outline=False,
-                                                    size="lg",
+                                                    size="sm",
+                                                    n_clicks=0,
+                                                )
+                                            ),
+                                            dbc.Col(
+                                                dbc.Button(
+                                                    html.I(
+                                                        className="fa-solid fa-bookmark"
+                                                    )
+                                                    if bookmark
+                                                    else html.I(
+                                                        className="fa-regular fa-bookmark"
+                                                    ),
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "bookmark-button",
+                                                    },
+                                                    outline=False,
+                                                    size="sm",
                                                     n_clicks=0,
                                                 )
                                             ),
@@ -671,6 +704,7 @@ def update_table(
                                                             "index": cocktail_id,
                                                             "type": "cNPS-button",
                                                         },
+                                                        size="sm",
                                                         n_clicks=0,
                                                     ),
                                                     dbc.Modal(
@@ -865,6 +899,69 @@ def update_favorites(favorite_button, user_obj):
         html.I(className="fa-solid fa-star")
         if favorite
         else html.I(className="fa-regular fa-star")
+    )
+
+    return icon
+
+
+@app.callback(
+    Output({"type": "bookmark-button", "index": MATCH}, "children"),
+    Input(
+        component_id={"index": MATCH, "type": "bookmark-button"},
+        component_property="n_clicks",
+    ),
+    State("user-store", "data"),
+    prevent_initial_call=True,
+)
+def update_favorites(bookmark_button, user_obj):
+    user_id = user_obj.get("id")
+
+    ctx = dash.callback_context
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    cocktail_id = json.loads(button_id).get("index")
+    value = ctx.triggered[0]["value"]
+
+    if value is None:
+        raise PreventUpdate
+    else:
+
+        bookmarks, columns = run_query(
+            DATABASE_URL, f"SELECT * FROM user_bookmarks WHERE user_id={user_id}", True
+        )
+        bookmarks_df = pd.DataFrame(bookmarks, columns=columns)
+
+        cocktails_bookmarks = (
+            cocktails_db_test[["cocktail_id", "recipe_name"]]
+            .drop_duplicates()
+            .merge(bookmarks_df, on="cocktail_id", how="left")
+            .assign(
+                bookmark=lambda row: np.where(
+                    pd.isnull(row["bookmark"]), False, row["bookmark"]
+                )
+            )
+        )
+
+    ret_bookmark = cocktails_bookmarks.loc[
+        cocktails_bookmarks["cocktail_id"] == cocktail_id, "bookmark"
+    ].values
+    if len(ret_bookmark) > 0:
+        bookmark = not ret_bookmark[0]
+    else:
+        bookmark = True
+
+    cocktails_bookmarks.loc[
+        cocktails_bookmarks["cocktail_id"] == cocktail_id, "bookmark"
+    ] = bookmark
+
+    update_bookmark(
+        DATABASE_URL, user_obj.get("id"), cocktail_id, bookmark, False, None
+    )
+
+    icon = (
+        html.I(className="fa-solid fa-bookmark")
+        if bookmark
+        else html.I(className="fa-regular fa-bookmark")
     )
 
     return icon
