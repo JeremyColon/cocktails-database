@@ -187,6 +187,19 @@ layout = [
                                                                                 switch=True,
                                                                                 inline=True,
                                                                             ),
+                                                                            html.Br(),
+                                                                            dbc.Checklist(
+                                                                                options=[
+                                                                                    {
+                                                                                        "label": "Include Garnishes?",
+                                                                                        "value": 1,
+                                                                                    },
+                                                                                ],
+                                                                                value=[],
+                                                                                id="include-garnish-switch-input",
+                                                                                switch=True,
+                                                                                inline=True,
+                                                                            ),
                                                                         ]
                                                                     ),
                                                                 ),
@@ -539,6 +552,7 @@ layout = [
         Output("favorites-switch-input", "value"),
         Output("bookmarks-switch-input", "value"),
         Output("unrated-switch-input", "value"),
+        Output("include-garnish-switch-input", "value"),
         Output("cocktail-nps-range-slider", "value"),
     ],
     Input("reset-filters-button", "n_clicks"),
@@ -561,6 +575,7 @@ def toggle_offcanvas_scrollable(
             [],
             [],
             [1],
+            [],
             [-100, 100],
         )
     else:
@@ -600,6 +615,7 @@ def toggle_offcanvas_scrollable(n1, is_open):
         State("favorites-switch-input", "value"),
         State("bookmarks-switch-input", "value"),
         State("unrated-switch-input", "value"),
+        State("include-garnish-switch-input", "value"),
         State("cocktail-nps-range-slider", "value"),
         State("user-store", "data"),
     ],
@@ -619,6 +635,7 @@ def update_table(
     show_favorites,
     show_bookmarks,
     show_unrated_cocktails,
+    include_garnish,
     cocktail_nps_range,
     user_obj,
 ):
@@ -626,8 +643,14 @@ def update_table(
     user_id = user_obj.get("id")
     filters = [liquor, syrup, bitter, garnish, other, free_text]
 
-    available_cocktails_df = get_available_cocktails(user_id)
-    available_ids = available_cocktails_df["cocktail_id"].tolist()
+    if len(include_garnish) > 0:
+        include_garnish = True
+    else:
+        include_garnish = False
+
+    available_cocktails_df = get_available_cocktails(
+        user_id, include_garnish=include_garnish
+    )
 
     if filter_type == "and":
         filtered_df = apply_AND_filters(filters, cocktails_db)

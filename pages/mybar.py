@@ -50,6 +50,7 @@ layout = [
                                                     searchable=True,
                                                 ),
                                                 html.Br(),
+                                                html.Br(),
                                                 dmc.Button(
                                                     "Add to My Bar",
                                                     id="my-bar-button",
@@ -150,6 +151,24 @@ layout = [
                                             ),
                                         ]
                                     ),
+                                    dbc.Row(
+                                        dbc.Card(
+                                            dbc.CardBody(
+                                                dbc.Checklist(
+                                                    options=[
+                                                        {
+                                                            "label": "Include Garnishes?",
+                                                            "value": 1,
+                                                        },
+                                                    ],
+                                                    value=[],
+                                                    id="mybar-include-garnish-switch-input",
+                                                    switch=True,
+                                                    inline=True,
+                                                ),
+                                            )
+                                        )
+                                    ),
                                 ],
                                 width=6,
                             ),
@@ -228,6 +247,7 @@ layout = [
     ],
     Input("my-bar-button", "n_clicks"),
     Input("my-bar-table", "data"),
+    Input("mybar-include-garnish-switch-input", "value"),
     [
         State("ingredients-dropdown", "value"),
         State("user-store", "data"),
@@ -236,6 +256,7 @@ layout = [
 def update_table(
     add_ingredient,
     table_rows,
+    include_garnish,
     ingredients_to_add,
     user_obj,
 ):
@@ -263,7 +284,14 @@ def update_table(
         update_bar(user_id, list(set(ingredient_list)))
 
         my_bar_df = get_my_bar(user_id, return_df=True)
-        available_cocktails = get_available_cocktails(user_id, include_garnish=False)
+
+        if len(include_garnish) > 0:
+            include_garnish = True
+        else:
+            include_garnish = False
+        available_cocktails = get_available_cocktails(
+            user_id, include_garnish=include_garnish
+        )
 
         have_all = available_cocktails.loc[
             available_cocktails["perc_ingredients_in_bar"] == 1, :
@@ -303,7 +331,9 @@ def update_table(
             + ", ".join([f"{i+1}. {el.title()}" for i, el in enumerate(top_5_missing)]),
         )
 
-    available_cocktails = get_available_cocktails(user_id, include_garnish=False)
+    available_cocktails = get_available_cocktails(
+        user_id, include_garnish=include_garnish
+    )
 
     have_all = available_cocktails.loc[
         available_cocktails["perc_ingredients_in_bar"] == 1, :
