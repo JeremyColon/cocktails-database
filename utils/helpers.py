@@ -1,4 +1,33 @@
-import pickle, re, pandas as pd, psycopg2
+import os, pickle, re, pandas as pd, psycopg2, numpy as np
+
+
+def get_env_creds():
+    return dict(
+        DB_HOST=os.environ["COCKTAILS_HOST"],
+        DB_PW=os.environ["COCKTAILS_PWD"],
+        DB_PORT=os.environ["COCKTAILS_PORT"],
+        DB_USER=os.environ["COCKTAILS_USER"],
+        DB_NAME=os.environ["COCKTAILS_DB"],
+    )
+
+
+def get_creds():
+    creds = get_env_creds()
+    return (
+        creds.get("DB_USER"),
+        creds.get("DB_PW"),
+        creds.get("DB_HOST"),
+        creds.get("DB_NAME"),
+        creds.get("DB_PORT"),
+    )
+
+
+def create_conn_string():
+    DB_USER, DB_PW, DB_HOST, DB_NAME, DB_PORT = get_creds()
+    conn_string = (
+        f"postgresql+psycopg2://{DB_USER}:{DB_PW}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
+    return conn_string
 
 
 def save_object(obj, filename):
@@ -42,7 +71,7 @@ def apply_AND_filters(filters, df):
         for f in filter_list:
             cocktail_ids = filtered_df.loc[
                 (
-                    filtered_df["ingredient"].str.contains(
+                    filtered_df["mapped_ingredient"].str.contains(
                         f, regex=True, flags=re.IGNORECASE
                     )
                 )
@@ -76,8 +105,10 @@ def convert_set_to_sorted_list(s):
 
 
 def create_filter_lists(df):
-    df_non_null = df.loc[~pd.isnull(df["ingredient"]), :]
-    ingredient_set = create_set_from_series(df_non_null["ingredient"])
+    df_non_null = df.loc[
+        (pd.isnull(df["alcohol_type"])) & (~pd.isnull(df["ingredient"])), :
+    ]
+    ingredient_set = create_set_from_series(df_non_null["mapped_ingredient"])
     garnish_set = create_set_from_series(
         df_non_null.loc[
             (
@@ -86,29 +117,31 @@ def create_filter_lists(df):
                 )
             )
             | (df_non_null["unit"] == "garnish"),
-            "ingredient",
+            "mapped_ingredient",
         ]
     )
 
     bitter_set = create_set_from_series(
         df_non_null.loc[
             (
-                df_non_null["ingredient"].str.contains(
+                df_non_null["mapped_ingredient"].str.contains(
                     "bitter", regex=True, flags=re.IGNORECASE
                 )
-            ),
-            "ingredient",
+            )
+            & (pd.isnull(df_non_null["alcohol_type"])),
+            "mapped_ingredient",
         ]
     )
 
     syrup_set = create_set_from_series(
         df_non_null.loc[
             (
-                df_non_null["ingredient"].str.contains(
+                df_non_null["mapped_ingredient"].str.contains(
                     "syrup", regex=True, flags=re.IGNORECASE
                 )
-            ),
-            "ingredient",
+            )
+            & (pd.isnull(df_non_null["alcohol_type"])),
+            "mapped_ingredient",
         ]
     )
 
@@ -127,37 +160,35 @@ def create_filter_lists(df):
     }
 
 
-def get_favorite(DATABASE_URL, user_id, cocktail_id):
+def get_favorite(user_id, cocktail_id):
     sql = f"""
     SELECT favorite 
     FROM user_favorites 
     WHERE user_id={user_id} AND cocktail_id={cocktail_id}
     """
 
-    return run_query(DATABASE_URL, sql)
+    return run_query(sql)
 
 
-def get_bookmark(DATABASE_URL, user_id, cocktail_id):
+def get_bookmark(user_id, cocktail_id):
     sql = f"""
     SELECT bookmark 
     FROM user_bookmarks 
     WHERE user_id={user_id} AND cocktail_id={cocktail_id}
     """
 
-    return run_query(DATABASE_URL, sql)
+    return run_query(sql)
 
 
-def get_cocktail_nps(DATABASE_URL, cocktail_id):
+def get_cocktail_nps(cocktail_id):
     sql = (
         f"select cocktail_nps from vw_cocktail_ratings where cocktail_id={cocktail_id}"
     )
 
-    return run_query(DATABASE_URL, sql)
+    return run_query(sql)
 
 
-def update_bookmark(
-    DATABASE_URL, user_id, cocktail_id, bool_val, sql_only=False, sqls_to_run=None
-):
+def update_bookmark(user_id, cocktail_id, bool_val, sql_only=False, sqls_to_run=None):
     sql = f"""
             insert into user_bookmarks(user_id,cocktail_id,bookmark,last_updated_ts)
             values({user_id}, {cocktail_id}, {bool_val}, now())
@@ -166,19 +197,17 @@ def update_bookmark(
             update set bookmark=EXCLUDED.bookmark;
             """
     if sqls_to_run is not None:
-        run_query(DATABASE_URL, sqls_to_run)
+        run_query(sqls_to_run)
     else:
         if sql_only:
             return sql
         else:
-            run_query(DATABASE_URL, sql)
+            run_query(sql)
 
     return None
 
 
-def update_favorite(
-    DATABASE_URL, user_id, cocktail_id, bool_val, sql_only=False, sqls_to_run=None
-):
+def update_favorite(user_id, cocktail_id, bool_val, sql_only=False, sqls_to_run=None):
     sql = f"""
             insert into user_favorites(user_id,cocktail_id,favorite,last_updated_ts)
             values({user_id}, {cocktail_id}, {bool_val}, now())
@@ -187,19 +216,17 @@ def update_favorite(
             update set favorite=EXCLUDED.favorite;
             """
     if sqls_to_run is not None:
-        run_query(DATABASE_URL, sqls_to_run)
+        run_query(sqls_to_run)
     else:
         if sql_only:
             return sql
         else:
-            run_query(DATABASE_URL, sql)
+            run_query(sql)
 
     return None
 
 
-def update_rating(
-    DATABASE_URL, user_id, cocktail_id, rating, sql_only=False, sqls_to_run=None
-):
+def update_rating(user_id, cocktail_id, rating, sql_only=False, sqls_to_run=None):
     sql = f"""
             insert into user_ratings(user_id,cocktail_id,rating,last_updated_ts)
             values({user_id}, {cocktail_id}, {rating}, now())
@@ -208,18 +235,148 @@ def update_rating(
             update set rating=EXCLUDED.rating;
             """
     if sqls_to_run is not None:
-        run_query(DATABASE_URL, sqls_to_run)
+        run_query(sqls_to_run)
     else:
         if sql_only:
             return sql
         else:
-            run_query(DATABASE_URL, sql)
+            run_query(sql)
 
     return None
 
 
-def run_query(DATABASE_URL, sql, ret_columns=False):
-    with psycopg2.connect(DATABASE_URL, sslmode="require") as conn:
+def get_my_bar(user_id, return_df=False):
+
+    my_bar, columns = run_query(
+        f"""
+            with user_bar_ids as (
+                select unnest(ingredient_list) as ingredient_id
+                from user_bar
+                where user_id = {user_id}
+            )
+            select i.*
+            from ingredients i
+            join user_bar_ids ubi
+            ON i.ingredient_id = ubi.ingredient_id
+        """,
+        True,
+    )
+
+    if return_df:
+        return pd.DataFrame(my_bar, columns=columns)
+
+    return my_bar, columns
+
+
+def get_available_cocktails(user_id, include_garnish=True, return_df=True):
+
+    my_bar = get_my_bar(user_id, True)
+    my_ingredients = my_bar["ingredient_id"].to_list()
+    my_ingredients_str = ",".join(map(str, my_ingredients))
+
+    if include_garnish:
+        sql_str = ""
+    else:
+        sql_str = "and lower(i.ingredient) NOT LIKE 'garnish%'"
+
+    available_cocktails, columns = run_query(
+        f"""
+            with my_bar as (
+                select distinct ingredient_id, ingredient, mapped_ingredient
+                from ingredients
+                where ingredient_id IN ({my_ingredients_str})
+            ), my_cocktails as (
+            select c.*,
+                   i.ingredient, 
+                   i.mapped_ingredient, 
+                   my_bar.ingredient_id IS NOT NULL as have_ingredient
+            from cocktails c
+            join cocktails_ingredients ci
+                on c.cocktail_id = ci.cocktail_id
+            join ingredients i
+                on ci.ingredient_id = i.ingredient_id
+                {sql_str}
+            left join my_bar
+                on i.ingredient_id = my_bar.ingredient_id
+            )
+            select cocktail_id,
+                   recipe_name,
+                   link,
+                   have_ingredient,
+                   COUNT(*) as num_ingredients,
+                   ARRAY_AGG(ingredient) as ingredients,
+                   ARRAY_AGG(mapped_ingredient) as mapped_ingredients
+            from my_cocktails
+            group by 1,2,3,4
+        """,
+        return_df,
+    )
+
+    available_cocktails_df = pd.DataFrame(available_cocktails, columns=columns)
+
+    pivoted = available_cocktails_df.pivot_table(
+        index=["cocktail_id", "recipe_name", "link"],
+        columns="have_ingredient",
+        values=["ingredients", "mapped_ingredients", "num_ingredients"],
+        aggfunc="max",
+    ).reset_index()
+
+    pivoted.columns = [
+        "_".join(map(str, col)) if col[1] != "" else col[0] for col in pivoted.columns
+    ]
+    pivoted["perc_ingredients_in_bar"] = np.where(
+        pd.isnull(pivoted["num_ingredients_True"]), 0, pivoted["num_ingredients_True"]
+    ) / (
+        np.where(
+            pd.isnull(pivoted["num_ingredients_False"]),
+            0,
+            pivoted["num_ingredients_False"],
+        )
+        + np.where(
+            pd.isnull(pivoted["num_ingredients_True"]),
+            0,
+            pivoted["num_ingredients_True"],
+        )
+    )
+    pivoted["perc_ingredients_in_bar"] = np.where(
+        pd.isnull(pivoted["perc_ingredients_in_bar"]),
+        0,
+        pivoted["perc_ingredients_in_bar"],
+    )
+
+    return pivoted
+
+
+def update_bar(user_id, ingredient_list, sql_only=False, sqls_to_run=None):
+    ingredient_sql = "{" + ",".join(map(str, ingredient_list)) + "}"
+    sql = f"""
+            insert into user_bar(user_id,ingredient_list,last_updated_ts)
+            values({user_id}, '{ingredient_sql}', now())
+            on conflict(user_id)
+            do
+            update set ingredient_list=EXCLUDED.ingredient_list;
+            """
+    if sqls_to_run is not None:
+        run_query(sqls_to_run)
+    else:
+        if sql_only:
+            return sql
+        else:
+            run_query(sql)
+
+    return None
+
+
+def run_query(sql, ret_columns=False):
+    DB_USER, DB_PW, DB_HOST, DB_NAME, DB_PORT = get_creds()
+    with psycopg2.connect(
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PW,
+        host=DB_HOST,
+        port=DB_PORT,
+        sslmode="require",
+    ) as conn:
         with conn.cursor() as cursor:
             cursor.execute(sql)
             # columns = [desc[0] for desc in cursor.description]

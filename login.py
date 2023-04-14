@@ -56,8 +56,13 @@ login = [
                                 n_clicks=0,
                             ),
                         ],
-                        width=2,
+                        # width=2,
                     ),
+                ]
+            ),
+            html.Br(),
+            dbc.Row(
+                [
                     dbc.Col(
                         [
                             dbc.Button(
@@ -71,8 +76,100 @@ login = [
                     ),
                 ]
             ),
+            html.Br(),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Button(
+                                "Reset Password",
+                                size="lg",
+                                className="me-1",
+                                id="change-password-page-button",
+                                n_clicks=0,
+                            ),
+                        ],
+                    ),
+                ]
+            ),
             html.Div(children="", id="output-state"),
             html.Br(),
+        ]
+    )
+]
+
+# change password screen
+change_password = [
+    html.Div(
+        [
+            dcc.Location(id="change_password", refresh=False),
+            html.H2("""Change Password""", id="h1"),
+            dbc.Row(
+                dbc.Col(
+                    [
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    dbc.Input(
+                                        placeholder="Enter email",
+                                        type="text",
+                                        id="change-email-box",
+                                    ),
+                                ]
+                            )
+                        ),
+                    ],
+                    width=4,
+                )
+            ),
+            dbc.Row(
+                dbc.Col(
+                    [
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    dbc.Input(
+                                        placeholder="Enter password",
+                                        type="password",
+                                        id="change-pwd-box",
+                                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$",
+                                    ),
+                                ]
+                            )
+                        ),
+                    ],
+                    width=4,
+                )
+            ),
+            dbc.Row(
+                dbc.Col(
+                    [
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    dbc.Input(
+                                        placeholder="Confirm password",
+                                        type="password",
+                                        id="confirm-change-pwd-box",
+                                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$",
+                                    ),
+                                ]
+                            )
+                        ),
+                    ],
+                    width=4,
+                )
+            ),
+            dbc.Button(
+                "Reset Password",
+                size="lg",
+                className="me-1",
+                id="change-password-button",
+                n_clicks=0,
+            ),
+            html.Br(),
+            html.Br(),
+            html.Div(children="", id="change-password-output-state"),
         ]
     )
 ]
@@ -111,6 +208,25 @@ create_account = [
                                         placeholder="Enter password",
                                         type="password",
                                         id="create-pwd-box",
+                                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$",
+                                    ),
+                                ]
+                            )
+                        ),
+                    ],
+                    width=4,
+                )
+            ),
+            dbc.Row(
+                dbc.Col(
+                    [
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    dbc.Input(
+                                        placeholder="Confirm password",
+                                        type="password",
+                                        id="confirm-create-pwd-box",
                                         pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$",
                                     ),
                                 ]

@@ -1,0 +1,1297 @@
+﻿ingredient_id,ingredient,ingredient_map,alcohol_type
+1,blended scotch whisky,scotch,scotch
+2,orange bitters ,orange bitters,NULL
+3,london dry gin,dry gin,gin
+4,orange curaçao,orange curaçao,liqueur
+5,cachaça (such as leblon),cachaça,liqueur
+6,vanilla simple syrup,vanilla simple syrup,NULL
+7,kübler absinthe (switzerland),absinthe,absinthe
+8,kubler absinthe,absinthe,absinthe
+9,absinthe,absinthe,absinthe
+10,"absinthe, to rinse",absinthe,absinthe
+11,absinthe bitters,absinthe bitters,NULL
+12,st. george absinthe verte,absinthe verte,absinthe
+13,cedilla açaí liqueur,açaí liqueur,liqueur
+14,agave nectar syrup (1 part agave nectar and 1 part water),agave,NULL
+15,agave syrup,agave,NULL
+16,agave nectar,agave,NULL
+17,albariño wine (such as terras gauda abadia de san campio),albariño wine,white wine
+18,bell’s two hearted ale,ale,NULL
+19,allspice dram,allspice dram,NULL
+20,allspice liqueur,allspice liqueur,liqueur
+21,almond milk,almond milk,NULL
+22,alpe génépy,alpe génépy,NULL
+23,alvear pale cream sherry,alvear pale cream sherry,NULL
+24,amaretto,amaretto,liqueur
+25,amaretto liqueur,amaretto,liqueur
+26,cardamaro vino amaro,amaro,liqueur
+27,averna amaro,amaro,liqueur
+28,amaro,amaro,liqueur
+29,amaro ciociaro,amaro,liqueur
+30,amaro di angostura,amaro,liqueur
+31,amaro montenegro,amaro,liqueur
+32,amaro nonino quintessentia,amaro,liqueur
+33,bordiga bitter rosso amaro,amaro,liqueur
+34,lo-fi gentian amaro,amaro,liqueur
+35,luxardo amaro abano,amaro,liqueur
+36,nonino amaro,amaro,liqueur
+37,averna,amaro,liqueur
+38,amer picon,amer picon,NULL
+39,amontillado sherry,amontillado sherry,liqueur
+40,ancho-chile-infused bourbon*,ancho-chile-infused bourbon,bourbon
+41,ancho reyes ancho chile liqueur,ancho chile liqueur,NULL
+42,angostura bitters,angostura bitters,NULL
+43,dashes angostura,angostura bitters,NULL
+44,"angostura bitters, divided",angostura bitters,NULL
+45,angostura orange bitters,angostura orange bitters,NULL
+46,anise pod,anise,NULL
+47,anisette,anisette,liqueur
+48,antica killer rio*,antica killer rio,NULL
+49,aperol,aperol,liqueur
+50,rosemary-infused aperol (750 ml)*,aperol,liqueur
+51,apple slices,apple,NULL
+52,granny smith apple,apple,NULL
+53,granny smith apples,apple,NULL
+54,apple fan,apple,NULL
+55,apple slice,apple,NULL
+56,apple slice fan,apple,NULL
+57,apple,apple,NULL
+58,2 apple slices,apple,NULL
+59,garnish: apple blossom flower,apple blossom flower,NULL
+60,laird’s bottled-in-bond apple brandy,apple brandy,brandy
+61,laird’s bottled-in-bond straight apple brandy,apple brandy,brandy
+62,laird’s straight bottled in bond apple brandy,apple brandy,brandy
+63,st. george apple brandy,apple brandy,brandy
+64,laird’s apple brandy,apple brandy,brandy
+65,apple brandy,apple brandy,brandy
+66,calvados or other apple brandy,apple brandy,brandy
+67,clear creek eight-year-old apple brandy,apple brandy,brandy
+68,laird's bonded apple brandy,apple brandy,brandy
+69,apple cider,apple cider,NULL
+70,fresh apple cider,apple cider,NULL
+71,"apple cider, warmed",apple cider,NULL
+72,apple cider syrup*,apple cider syrup,NULL
+73,apple cider vinegar,apple cider vinegar,NULL
+74,apple eau de vie (hawksmoor uses neversink),apple eau de vie,eau de vie
+75,applejack,applejack,NULL
+76,apple juice,apple juice,NULL
+77,fresh apple juice,apple juice,NULL
+78,apricot brandy,apricot brandy,NULL
+79,apricot liqueur,apricot liqueur,liqueur
+80,massenez orchard apricot liqueur,apricot liqueur,liqueur
+81,apricot eau-de-vie,apricot eau-de-vie,eau de vie
+82,aquavit,aquavit,NULL
+83,árbol tincture*,árbol tincture,NULL
+84,domaine d'esperance blanche armagnac,armagnac,brandy
+85,armagnac,armagnac,brandy
+86,odvi armagnac,armagnac,brandy
+87,bittered sling kensington aromatic bitters,aromatic bitters,NULL
+88,aurora hemp-infused beverage,aurora hemp-infused beverage,NULL
+89,avocado,avocado,NULL
+90,avocado pit orgeat*,avocado pit orgeat,NULL
+91,garnish: baby’s breath (optional),baby’s breath,NULL
+92,4 crispy bacon strips,bacon,NULL
+93,bacon-infused bushmills irish whiskey*,bacon-infused whiskey,whiskey
+94,baileys irish cream,baileys irish cream,liqueur
+95,baker's 107-proof bourbon,baker's 107-proof bourbon,bourbon
+96,"garnish: banana chunk, with peel",banana,NULL
+97,banana,banana,NULL
+98,bourbon-flambéed banana slices,banana,NULL
+99,banana liqueur,banana liqueur,liqueur
+100,banana slice,banana slice,NULL
+101,barolo chinato,barolo chinato,NULL
+102,barspoon green chartreuse,barspoon green chartreuse,NULL
+103,barspoon kumquat marmalade*,barspoon kumquat marmalade,NULL
+104,basil leaves,basil,NULL
+105,basil leaves (large),basil,NULL
+106,basil,basil,NULL
+107,basil leaf,basil,NULL
+108,batavia-arrack,batavia-arrack,NULL
+109,becherovka,becherovka,NULL
+110,beer,beer,NULL
+111,beet juice,beet juice,NULL
+112,"beet puree (cooked and peeled beets, pureed)",beet puree,NULL
+113,bell pepper puree*,bell pepper puree,NULL
+114,benedictine liqueur,benedictine,liqueur
+115,bénédictine liqueur,benedictine,liqueur
+116,benedictine,benedictine,liqueur
+117,b.g. reynolds don's spices #2,b.g. reynolds don's spices #2,NULL
+118,bigallet china-china amer,bigallet china-china amer,liqueur
+119,bitters,bitters,NULL
+120,bitters,bitters,NULL
+121,bitter truth exr liqueur,bitter truth exr liqueur,liqueur
+122,2 blackberries,blackberries,NULL
+123,blackberries,blackberries,NULL
+124,teaspoon blackberry jam,blackberry jam,NULL
+125,blackberry liqueur,blackberry liqueur,liqueur
+126,blackberry mint syrup,blackberry mint syrup,NULL
+127,blackberry sage tea syrup,blackberry sage tea syrup,NULL
+128,black cardamom,black cardamom,NULL
+129,black cardamom syrup*,black cardamom syrup,NULL
+130,black garlic financier,black garlic financier,NULL
+131,black pepper,black pepper,NULL
+132,black tea (chilled),black tea,NULL
+133,fee brothers black walnut bitters,black walnut bitters,NULL
+134,blanco tequila (such as partida),blanco tequila,tequila
+135,blanco tequila (such as siete leguas),blanco tequila,tequila
+136,"blanco tequila, preferably el tesoro blanco",blanco tequila,tequila
+137,casamigos blanco tequila,blanco tequila,tequila
+138,silver tequila,blanco tequila,tequila
+139,tapatio blanco tequila,blanco tequila,tequila
+140,blanco tequila,blanco tequila,tequila
+141,martini bianco vermouth,blanco vermouth,vermouth
+142,dolin blanc vermouth de chambéry,blanc vermouth,vermouth
+143,dolin blanc vermouth,blanc vermouth,vermouth
+144,blended scotch (such as chivas),blended scotch,scotch
+145,blood orange wheel,blood orange,NULL
+146,of blood orange peel,blood orange,NULL
+147,blood orange twist,blood orange,NULL
+148,blood orange juice,blood orange juice,NULL
+149,"blood orange juice, freshly squeezed",blood orange juice,NULL
+150,solerno blood orange liqueur,blood orange liqueur,liqueur
+151,blossom honey,blossom honey,NULL
+152,blueberries,blueberries,NULL
+153,blue curaçao,blue curaçao,liqueur
+154,blue mix*,blue mix,NULL
+155,blume apricot eau de vie,blume apricot eau de vie,eau de vie
+156,blume marillen apricot eau-de-vie,blume marillen apricot eau-de-vie,eau de vie
+157,boiling water,boiling water,NULL
+158,boiron passion fruit puree,boiron passion fruit puree,NULL
+159,bonal gentiane-quina,bonal gentiane-quina,liqueur
+160,basil hayden’s bourbon,bourbon,bourbon
+161,bourbon,bourbon,bourbon
+162,bourbon (or brandy),bourbon,bourbon
+163,"bourbon (or rye whiskey, if preferred)",bourbon,bourbon
+164,bourbon (preferably elijah craig small batch),bourbon,bourbon
+165,bourbon or rye whiskey,bourbon,bourbon
+166,brown-butter-washed bourbon,bourbon,bourbon
+167,"hudson bright lights, big bourbon",bourbon,bourbon
+168,kentucky straight bourbon,bourbon,bourbon
+169,old forester 100-proof bourbon,bourbon,bourbon
+170,branca menta,branca menta,liqueur
+171,brandied cherry,brandied cherries,NULL
+172,brandied cherries,brandied cherries,NULL
+173,singani 63 brandy,brandy,brandy
+174,lustau brandy de jerez,brandy,brandy
+175,brandy,brandy,brandy
+176,"brewed black tea, chilled",brewed black tea,NULL
+177,brown sugar,brown sugar,NULL
+178,brown sugar syrup,brown sugar syrup,NULL
+179,butter,butter,NULL
+180,butterscotch schnapps,butterscotch schnapps,schnapps
+181,butterscotch syrup,butterscotch syrup,NULL
+182,butterscotch whipped cream,butterscotch whipped cream,NULL
+183,cachaça (such as leblon),cachaça,cachaça
+184,chacha,cachaça,cachaça
+185,leblon cachaça,cachaça,cachaça
+186,leblon reserva especial cachaça,cachaça,cachaça
+187,unaged cachaça,cachaça,cachaça
+188,avua amburana cachaça,cachaça,cachaça
+189,cachaça,cachaça,cachaça
+190,calvados or bourbon (optional),calvados,brandy
+191,calvados,calvados,brandy
+192,adrien camut six-year-old calvados,calvados,brandy
+193,campari,campari,liqueur
+194,garnish: candied ginger,candied ginger,NULL
+195,candied ginger,candied ginger,NULL
+196,garnish: candy cap mushroom dust (optional),candy cap mushroom dust,NULL
+197,cane syrup,cane syrup,NULL
+198,cantaloupe cordial*,cantaloupe cordial,liqueur
+199,cappelletti aperitif,cappelletti aperitif,liqueur
+200,house-made caramel*,caramel,NULL
+201,caramel candy,caramel candy,NULL
+202,cardamaro,cardamaro,liqueur
+203,cardamom pods,cardamom,NULL
+204,1 carrot top,carrot,NULL
+205,carrot chip,carrot,NULL
+206,fresh carrot-ginger juice*,carrot-ginger juice,NULL
+207,"heirloom carrot juice (purple, orange and yellow)",carrot juice,NULL
+208,carrot juice,carrot juice,NULL
+209,cava,cava,champagne/sparkling wine
+210,cayenne pepper,cayenne pepper,NULL
+211,cbd oil,cbd oil,NULL
+212,celery stalk,celery,NULL
+213,celery stick,celery,NULL
+214,celery,celery,NULL
+215,3 celery leaves,celery,NULL
+216,scrappy’s celery bitters,celery bitters,NULL
+217,celery bitters,celery bitters,NULL
+218,celery bitters (such as bittermens celery shrub),celery bitters,NULL
+219,celery juice,celery juice,NULL
+220,fresh celery juice,celery juice,NULL
+221,celery salt,celery salt,NULL
+222,garnish: celery spear,celery spear,NULL
+223,celery syrup (recipe below),celery syrup,NULL
+224,don ciccio & figli cerasum aperitivo,cerasum aperitivo,liqueur
+225,chablis,chablis,white wine
+226,chambord,chambord,liqueur
+227,chamoe juice (or honeydew juice),chamoe juice (or honeydew juice),NULL
+228,chamoe slice (or honeydew slice),chamoe slice (or honeydew slice),NULL
+229,chamomile-infused blanc vermouth*,chamomile-infused blanc vermouth,NULL
+230,chamomile-infused rye whiskey*,chamomile-infused rye whiskey,NULL
+231,chamomile tea,chamomile tea,NULL
+232,"chamomile tea, heated",chamomile tea,NULL
+233,"champagne, chilled, to top",champagne,champagne/sparkling wine
+234,champagne,champagne,champagne/sparkling wine
+235,champagne corn cob syrup*,champagne corn cob syrup,NULL
+236,chardonnay,chardonnay,white wine
+237,chareau liqueur,chareau liqueur,liqueur
+238,amarena cherries,cherries,NULL
+239,cherries,cherries,NULL
+240,cherry (optional),cherries,NULL
+241,cherry,cherries,NULL
+242,"garnish: 3 brandied cherries, skewered",cherry,NULL
+243,candied cherry,cherry,NULL
+244,"cherry (or lemon twist, if preferred)",cherry,NULL
+245,cherry or a lemon twist,cherry,NULL
+246,garnish: brandied cherry,cherry,NULL
+247,garnish: maraschino cherry,cherry,NULL
+248,"garnish: maraschino cherry (and more, if desired)",cherry,NULL
+249,"garnish: maraschino cherry, speared",cherry,NULL
+250,green maraschino cherry,cherry,NULL
+251,preserved cherry,cherry,NULL
+252,cherry (or other) kombucha,cherry kombucha,NULL
+253,cherry heering,cherry liqueur,liqueur
+254,cherry liqueur,cherry liqueur,liqueur
+255,cherry heering liqueur,cherry liqueur,liqueur
+256,cherrywood chips,cherrywood chips,NULL
+257,chile threads,chile,NULL
+258,chile pepper slices,chile,NULL
+259,garnish: chile de arbol,chile de arbol,NULL
+260,garnish: dried chile de árbol pepper,chile de arbol,NULL
+261,chile piquin,chile piquin,NULL
+262,chile powder,chile powder,NULL
+263,chili salt,chili salt,NULL
+264,semisweet chocolate,chocolate,NULL
+265,fee brothers aztec chocolate bitters,chocolate bitters,NULL
+266,the bitter truth chocolate bitters,chocolate bitters,NULL
+267,chocolate bunny,chocolate bitters,NULL
+268,chocolate bitters (such as bittermen’s),chocolate bitters,NULL
+269,chocolate liqueur,chocolate liqueur,liqueur
+270,chocolate shavings,chocolate shavings,NULL
+271,chrysanthemum flowers,chrysanthemum flowers,NULL
+272,cider,cider,NULL
+273,cilantro,cilantro,NULL
+274,cilantro sprig,cilantro,NULL
+275,cilantro leaf,cilantro,NULL
+276,cinnamon,cinnamon,NULL
+277,cinnamon powder,cinnamon,NULL
+278,cinnamon-demerara syrup,cinnamon-demerara syrup,NULL
+279,cinnamon schnapps (such as goldschläger) or peppermint schnapps (such as rumplemintz),cinnamon schnapps,schnapps
+280,cinnamon simple syrup,cinnamon simple syrup,NULL
+281,stick,cinnamon stick,NULL
+282,cinnamon sticks,cinnamon stick,NULL
+283,cinnamon stick,cinnamon stick,NULL
+284,cinnamon-sugar,cinnamon sugar,NULL
+285,cinnamon sugar,cinnamon sugar,NULL
+286,rich cinnamon syrup (2:1),cinnamon syrup,NULL
+287,cinnamon syrup,cinnamon syrup,NULL
+288,cinnamon vanilla syrup*,cinnamon vanilla syrup,NULL
+289,citric acid,citric acid,NULL
+290,citrus oleo saccharum*,citrus oleo saccharum,NULL
+291,citrus slice,citrus slice,NULL
+292,citrus syrup*,citrus syrup,NULL
+293,clamato juice,clamato juice,NULL
+294,clarified gin milk punch*,clarified gin milk punch,NULL
+295,clear creek pear eau-de-vie,clear creek pear eau-de-vie,eau de vie
+296,clément creole shrubb,clément creole shrubb,NULL
+297,"cleto chiarli pruno nero lambrusco, chilled",cleto chiarli pruno nero lambrusco,NULL
+298,cloves,cloves,NULL
+299,clove simple syrup*,clove simple syrup,NULL
+300,"club soda, chilled",club soda,NULL
+301,"club soda, chilled, to top",club soda,NULL
+302,club soda (optional),club soda,NULL
+303,club soda,club soda,NULL
+304,coca-cola,coca-cola,NULL
+305,cola,coca-cola,NULL
+306,coca-cola syrup**,coca-cola syrup,NULL
+307,cocalero clásico herbal spirit,cocalero clásico herbal spirit,liqueur
+308,cocchi americano,cocchi americano,liqueur
+309,cocchi americano aperitif,cocchi americano aperitif,liqueur
+310,cocchi americano aperitivo,cocchi americano aperitif,liqueur
+311,cocchi barolo chinato,cocchi barolo chinato,liqueur
+312,garnish: cocktail onion,cocktail onion,NULL
+313,cocktail umbrella,cocktail umbrella,NULL
+314,cocoa nib-infused campari*,cocoa nib-infused campari,liqueur
+315,cocoa nibs,cocoa nibs,NULL
+316,cocoa powder,cocoa powder,NULL
+317,coco lopez-matcha green tea powder mix,coco lopez-matcha green tea powder mix,NULL
+318,coconut cream*,coconut cream,NULL
+319,coconut cream,coconut cream,NULL
+320,coconut-infused bourbon*,coconut-infused bourbon,bourbon
+321,coconut-lemongrass syrup,coconut-lemongrass syrup,NULL
+322,kalani coconut liqueur,coconut liqueur,liqueur
+323,rhum clément mahina coco liqueur,coconut liqueur,liqueur
+324,coconut milk,coconut milk,NULL
+325,coconut rum,coconut rum,rum
+326,coconut water,coconut water,NULL
+327,"dark-roast coffee, freshly brewed",coffee,NULL
+328,coffee (iced or hot),coffee,NULL
+329,brewed coffee,coffee,NULL
+330,coffee beans,coffee beans,NULL
+331,coffee ice cream,coffee ice cream,NULL
+332,coffee liqueur,coffee liqueur,liqueur
+333,caffè borghetti coffee liqueur,coffee liqueur,liqueur
+334,the block coffee liqueur,coffee liqueur,liqueur
+335,st. george nola coffee liqueur,coffee liqueur,liqueur
+336,cognac,cognac,cognac
+337,d’ussé cognac,cognac,cognac
+338,rémy martin xo cognac,cognac,cognac
+339,cold brew-coffee,cold brew coffee,NULL
+340,cold-brew coffee,cold brew coffee,NULL
+341,cold brew coffee,cold brew coffee,NULL
+342,combier,combier,NULL
+343,condensed milk,condensed milk,NULL
+344,cotton & reed allspice dram,cotton & reed allspice dram,NULL
+345,cran-apple juice,cran-apple juice,NULL
+346,cranberry,cranberries,NULL
+347,cranberries,cranberries,NULL
+348,cranberry juice,cranberry juice,NULL
+349,cranberry juice cocktail,cranberry juice cocktail,NULL
+350,cream,cream,NULL
+351,cream of coconut,cream of coconut,NULL
+352,cream of coconut (such as coco lopez),cream of coconut,NULL
+353,cream sherry,cream sherry,NULL
+354,cream soda,cream soda,NULL
+355,creme de banane,creme de banane,liqueur
+356,creme de cacao,creme de cacao,liqueur
+357,giffard creme de cacao,creme de cacao,liqueur
+358,marie brizard white creme de cacao,creme de cacao,liqueur
+359,creme de cassis,creme de cassis,liqueur
+360,lejay crème de cassis,creme de cassis,liqueur
+361,andes creme de menthe,creme de menthe,liqueur
+362,creme de menthe,creme de menthe,liqueur
+363,giffard creme de pamplemousse rose liqueur,creme de pamplemousse rose liqueur,liqueur
+364,creme de peche,creme de peche,liqueur
+365,creme de violette,creme de violette,liqueur
+366,creme yvette,creme yvette,liqueur
+367,croft pink port,croft pink port,port wine
+368,crude bitterless marriage hibiscus lavender oak bitters,crude bitterless marriage hibiscus lavender oak bitters,NULL
+369,cucumber slices,cucumber,NULL
+370,cucumber spear,cucumber,NULL
+371,"cucumber wheel, sliced thinly",cucumber,NULL
+372,"cucumber, cut into quarter-inch slices",cucumber,NULL
+373,garnish: cucumber slice,cucumber,NULL
+374,thin cucumber slices,cucumber,NULL
+375,"wheels, thickly sliced",cucumber,NULL
+376,cucumber slice,cucumber,NULL
+377,cucumber,cucumber,NULL
+378,cucumber bitters,cucumber bitters,NULL
+379,fresh cucumber juice,cucumber juice,NULL
+380,cucumber juice,cucumber juice,NULL
+381,cucumber vodka,cucumber vodka,vodka
+382,pierre ferrand dry curaçao ancienne methode,curaçao,liqueur
+383,pierre ferrand dry curaçao,curaçao,liqueur
+384,fresh curry leaf,curry leaf,NULL
+385,curry leaves,curry leaves,NULL
+386,cynar,cynar,NULL
+387,cynar amaro,cynar amaro,liqueur
+388,cyril zangs ciderman apple cider,cyril zangs ciderman apple cider,NULL
+389,dale degroff’s pimento aromatic bitters,dale degroff’s pimento aromatic bitters,NULL
+390,dark chocolate,dark chocolate,NULL
+391,dark creme de cacao,dark creme de cacao,liqueur
+392,dark rum (such as cruzan single barrel estate),dark rum,rum
+393,garnish: crumbled dehydrated blueberries,dehydrated blueberries,NULL
+394,dehydrated lime wheel,dehydrated lime wheel,NULL
+395,garnish: dehydrated orange wheel,dehydrated orange wheel,NULL
+396,distilleria gualco camomila,distilleria gualco camomila,liqueur
+397,dr. adam elmegirab's the dead rabbit orinoco bitters,dr. adam elmegirab's the dead rabbit orinoco bitters,NULL
+398,dragon fruit slice covered with electricdust,dragon fruit slice covered with electricdust,NULL
+399,dragon fruit syrup*,dragon fruit syrup,NULL
+400,drambuie,drambuie,liqueur
+401,dried apple slice,dried apple slice,NULL
+402,dried black cherries,dried black cherries,NULL
+403,dried burdock root chip,dried burdock root chip,NULL
+404,dried organic rosebuds,dried organic rosebuds,NULL
+405,dried-rose-infused lillet blanc,dried-rose-infused lillet blanc,liqueur
+406,drops,drops,NULL
+407,dry curaçao,dry curaçao,liqueur
+408,monopolowa dry gin (or other citrus-forward gin),dry gin,gin
+409,london dry or old tom gin,dry gin,gin
+410,london dry gin,dry gin,gin
+411,dolin dry vermouth de chambery,dry vermouth,vermouth
+412,dry vermouth,dry vermouth,vermouth
+413,dry vermouth (preferably dolin),dry vermouth,vermouth
+414,extra dry vermouth,dry vermouth,vermouth
+415,noilly prat dry vermouth (france),dry vermouth,vermouth
+416,noilly prat extra dry vermouth,dry vermouth,vermouth
+417,carpano dry vermouth,dry vermouth,vermouth
+418,dolin dry vermouth,dry vermouth,vermouth
+419,dubonnet rouge,dubonnet rouge,liqueur
+420,earl grey syrup,earl grey syrup,NULL
+421,pear williams purkhart eau de vie,eau de vie,eau de vie
+422,edible flowers,edible flowers,NULL
+423,edible flower,edible flowers,NULL
+424,edible glitter,edible glitter,NULL
+425,edible gold flakes,edible gold flakes,NULL
+426,edible orchid,edible orchid,NULL
+427,edible viola flower,edible viola flower,NULL
+428,eggs,egg,NULL
+429,egg (whole),egg,NULL
+430,egg white,egg,NULL
+431,organic egg white (about 1 ounce),egg,NULL
+432,whole egg,egg,NULL
+433,egg,egg,NULL
+434,eggnog,eggnog,NULL
+435,eggnog base*,eggnog,NULL
+436,elderflower liqueur,elderflower liqueur,liqueur
+437,"espresso, freshly brewed",espresso,NULL
+438,counter culture espresso,espresso,NULL
+439,espresso,espresso,NULL
+440,espresso (or cold-brew coffee),espresso,NULL
+441,falernum,falernum,NULL
+442,fat-washed four roses bourbon,fat-washed four roses bourbon,bourbon
+443,fennel bitters,fennel bitters,NULL
+444,fennel frond,fennel frond,NULL
+445,fennel-infused cocchi americano*,fennel-infused cocchi americano,liqueur
+446,fernet-branca liqueur,fernet-branca liqueur,liqueur
+447,fernet-branca,fernet-branca liqueur,liqueur
+448,fresh figs,figs,NULL
+449,fino sherry,fino sherry,sherry
+450,flamed blood orange twist,flamed blood orange twist,NULL
+451,flamed orange peel,flamed orange peel,NULL
+452,flamed rosemary sprig,flamed rosemary sprig,NULL
+453,food coloring,food coloring,NULL
+454,fortaleza still-strength blanco tequila,fortaleza still-strength blanco tequila,tequila
+455,fusion verjus blanc,fusion verjus blanc,liqueur
+456,gage & tollner house bitters (an equal-parts mix of angostura and the bitter truth bogart’s bitters),gage & tollner house bitters (an equal-parts mix of angostura and the bitter truth bogart’s bitters),NULL
+457,galliano l’autentico liqueur,galliano l’autentico liqueur,liqueur
+458,galliano,galliano l’autentico liqueur,liqueur
+459,genever,genever,genever
+460,bols genever,genever,genever
+461,giffard banane du brésil liqueur,giffard banane du brésil,liqueur
+462,giffard banane du brésil,giffard banane du brésil,liqueur
+463,gilka kümmel,gilka kümmel,liqueur
+464,plymouth gin,gin,gin
+465,aviation gin,gin,gin
+466,barr hill gin,gin,gin
+467,barr hill tom cat gin,gin,gin
+468,beefeater gin,gin,gin
+469,bluecoat gin,gin,gin
+470,dry gin,gin,gin
+471,gin (plymouth or london dry),gin,gin
+472,gin (such as hendrick’s),gin,gin
+473,gin (such as roku),gin,gin
+474,gin blend,gin,gin
+475,gin or vodka,gin,gin
+476,hendrick’s gin,gin,gin
+477,ki no bi gin (or other herbaceous dry gin),gin,gin
+478,plymouth sloe gin,gin,gin
+479,ransom old tom gin,gin,gin
+480,scapegrace black gin,gin,gin
+481,sloe gin,gin,gin
+482,sloe gin,gin,gin
+483,tanqueray gin,gin,gin
+484,tanqueray london dry gin,gin,gin
+485,tanqueray no. 10 gin,gin,gin
+486,gin,gin,gin
+487,fresh ginger,ginger,NULL
+488,sliced ginger,ginger,NULL
+489,ginger ale,ginger ale,NULL
+490,"ginger ale, chilled",ginger ale,NULL
+491,monkey 47 gin,ginger beer,NULL
+492,opihr gin,ginger beer,NULL
+493,ginger beer,ginger beer,NULL
+494,fentimans ginger beer,ginger beer,NULL
+495,ginger beer (to top),ginger beer,NULL
+496,llanllyr source fiery ginger beer,ginger beer,NULL
+497,ginger–brown-sugar syrup,ginger–brown-sugar syrup,NULL
+498,ginger-habanero syrup*,ginger-habanero syrup,NULL
+499,ginger honey syrup*,ginger honey syrup,NULL
+500,ginger juice,ginger juice,NULL
+501,ginger liqueur (such as domaine de canton),ginger liqueur,liqueur
+502,ginger liqueur,ginger liqueur,liqueur
+503,ginger shrub,ginger shrub,NULL
+504,ginger peel,ginger slice,NULL
+505,ginger slice,ginger slice,NULL
+506,rich ginger syrup (3 parts sugar to 4 parts ginger juice),ginger syrup,NULL
+507,ginger syrup*,ginger syrup,NULL
+508,ginger syrup,ginger syrup,NULL
+509,ginger syrup**,ginger syrup,NULL
+510,"clear spirit of choice (such as aquavit, gin, tequila, vodka or white rum)","gin, tequila, vodka, or white rum",gin|tequila|vodka|rum
+511,golden delicious soda*,golden delicious soda,NULL
+512,gold luster dust,gold luster dust,NULL
+513,grand marnier,grand marnier,liqueur
+514,grapefruit quarter-wheel,grapefruit,NULL
+515,grapefruit slice,grapefruit,NULL
+516,grapefruit twist,grapefruit,NULL
+517,grapefruit wheel,grapefruit,NULL
+518,"grapefruit, pitted and peeled",grapefruit,NULL
+519,grapefruit peel,grapefruit,NULL
+520,grapefruit half-wheel,grapefruit,NULL
+521,"garnish: grapefruit twist, cut wide",grapefruit,NULL
+522,garnish: grapefruit twist,grapefruit,NULL
+523,16 grapefruit wheels,grapefruit,NULL
+524,grapefruit bitters,grapefruit bitters,NULL
+525,"white grapefruit juice, freshly squeezed",grapefruit juice,NULL
+526,grapefruit juice,grapefruit juice,NULL
+527,"grapefruit juice, freshly squeezed",grapefruit juice,NULL
+528,"pink grapefruit juice, freshly squeezed",grapefruit juice,NULL
+529,ruby red grapefruit juice,grapefruit juice,NULL
+530,grapefruit soda,grapefruit soda,NULL
+531,"grapefruit soda, chilled, to top",grapefruit soda,NULL
+532,london essence pink pomelo tonic water (or other grapefruit tonic water),grapefruit tonic water,NULL
+533,grasshopper salt*,grasshopper salt,NULL
+534,grated cinnamon,grated cinnamon,NULL
+535,grated dark chocolate,grated dark chocolate,NULL
+536,grated nutmeg,grated nutmeg,NULL
+537,greenbar apple bitters,greenbar apple bitters,NULL
+538,green chartreuse,green chartreuse,liqueur
+539,green creme de menthe,green creme de menthe,liqueur
+540,spiced stone's original green ginger wine*,green ginger wine,NULL
+541,green olive,green olive,NULL
+542,green olive cocktail brine,green olive brine,NULL
+543,green olives,green olives,NULL
+544,green tea,green tea,NULL
+545,brewed green tea,green tea,NULL
+546,green tea syrup,green tea syrup,NULL
+547,grenadine,grenadine,NULL
+548,ground allspice,ground allspice,NULL
+549,ground black pepper,ground black pepper,NULL
+550,ground cayenne,ground cayenne,NULL
+551,ground cinnamon,ground cinnamon,NULL
+552,ground cloves,ground cloves,NULL
+553,ground cumin,ground cumin,NULL
+554,ground ginger,ground ginger,NULL
+555,ground nutmeg,ground nutmeg,NULL
+556,guava fruit leather,guava fruit leather,NULL
+557,guava juice,guava juice,NULL
+558,guava syrup,guava syrup,NULL
+559,guinness draught,guinness,beer
+560,guinness beer,guinness,beer
+561,half-and-half (or one ounce heavy cream and one ounce whole milk),half-and-half,NULL
+562,half-and-half,half-and-half,NULL
+563,1 ounce heavy cream,heavy cream,NULL
+564,heavy cream,heavy cream,NULL
+565,heering cherry liqueur,heering cherry liqueur,liqueur
+566,heirloom alchermes,heirloom alchermes,liqueur
+567,hibiscus tea syrup,hibiscus tea syrup,NULL
+568,hoja santa and tarragon tea,hoja santa and tarragon tea,NULL
+569,honey,honey,NULL
+570,calamansi honey,honey,NULL
+571,"garnish: pickled honeydew melon ball**, skewered",honeydew melon,NULL
+572,honeydew pickling liquid**,honeydew pickling liquid,NULL
+573,honey-ginger syrup,honey-ginger syrup,NULL
+574,bärenjäger honey liqueur,honey liqueur,liqueur
+575,honey-pineapple syrup*,honey-pineapple syrup,NULL
+576,honey sage syrup,honey sage syrup,NULL
+577,honey syrup,honey syrup,NULL
+578,honey syrup (equal parts honey and water),honey syrup,NULL
+579,horseradish,horseradish,NULL
+580,hot buttered rum batter,hot buttered rum batter,NULL
+581,hot sauce,hot sauce,NULL
+582,tabasco,hot sauce,NULL
+583,tabasco sauce,hot sauce,NULL
+584,tapatio hot sauce,hot sauce,NULL
+585,ice,ice,NULL
+586,iced tea,iced tea,NULL
+587,"deschutes fresh squeezed ipa, chilled",ipa,NULL
+588,irish cream liqueur,irish cream,liqueur
+589,irish cream,irish cream,liqueur
+590,italicus aperitivo,italicus aperitivo,liqueur
+591,mint-tea-infused jägermeister*,jägermeister,liqueur
+592,jägermeister,jägermeister,liqueur
+593,jalapeño pepper (adjust amount to taste),jalapeno,NULL
+594,jalapeño round,jalapeno,NULL
+595,jalape,jalapeno,NULL
+596,jalapeno,jalapeno,NULL
+597,jalapeño,jalapeno,NULL
+598,jalapeno coins,jalapeno,NULL
+599,jalapeno pepper,jalapeno,NULL
+600,jalapeño pepper,jalapeno,NULL
+601,jalapeño-infused tequila*   ,jalapeño-infused tequila,tequila
+602,suntory toki whisky,japanese whiskey,whiskey
+603,kikori japanese whisky,japanese whiskey,whiskey
+604,jasmine blossom (optional),jasmine blossom,NULL
+605,"garnish: jicama slice, chilled and seasoned with sal de gusano",jicama,NULL
+606,juice,juice,NULL
+607,juniper berries,juniper berries,NULL
+608,juniper syrup,juniper syrup,NULL
+609,kahlúa,kahlúa,NULL
+610,kiwi slice,kiwi,NULL
+611,kiwi syrup**,kiwi syrup,NULL
+612,kook soon dang makgeolli,kook soon dang makgeolli,liqueur
+613,"kumquats, cut in half lengthwise",kumquats,NULL
+614,la boíte borneo n. 26 spice mix,la boíte borneo n. 26 spice mix,NULL
+615,lacto-fermented green tomato brine**,lacto-fermented green tomato brine,NULL
+616,lacto-fermented melon brine*,lacto-fermented melon brine,NULL
+617,lager,lager,beer
+618,"lager beer, chilled, to top",lager,beer
+619,budweiser,lager,beer
+620,lager beer,lager,beer
+621,la gitana manzanilla sherry,la gitana manzanilla sherry,sherry
+622,la ina fino sherry,la ina fino sherry,sherry
+623,lavender sprig,lavender,NULL
+624,lavender,lavender,NULL
+625,lavender bitters,lavender bitters,NULL
+626,scrappy’s lavender bitters,lavender bitters,NULL
+627,lazzaroni amaro,lazzaroni amaro,liqueur
+628,leaves,leaves,NULL
+629,olive or lemon twist,lemon,NULL
+630,12 lemon half-wheels studded with cloves,lemon,NULL
+631,charred lemon wheel,lemon,NULL
+632,garnish: lemon peel,lemon,NULL
+633,garnish: lemon twist,lemon,NULL
+634,garnish: lemon wheel,lemon,NULL
+635,lemon,lemon,NULL
+636,lemon peel,lemon,NULL
+637,lemon peel or wheel,lemon,NULL
+638,lemon slice,lemon,NULL
+639,lemon slices,lemon,NULL
+640,lemon twist,lemon,NULL
+641,lemon twist or olive,lemon,NULL
+642,lemon twists,lemon,NULL
+643,lemon wedge,lemon,NULL
+644,lemon wedges,lemon,NULL
+645,lemon wheel,lemon,NULL
+646,lemon zest,lemon,NULL
+647,lemons,lemon,NULL
+648,lemonade,lemonade,NULL
+649,lemon bitters,lemon bitters,NULL
+650,the bitter truth lemon bitters,lemon bitters,NULL
+651,lemongrass,lemongrass,NULL
+652,lemongrass-infused simple syrup (recipe below),lemongrass-infused syrup,NULL
+653,lemongrass syrup,lemongrass syrup,NULL
+654,"lemon juice,",lemon juice,NULL
+655,"lemon juice, freshly squeezed",lemon juice,NULL
+656,"lemon, lime or grapefruit juice, freshly squeezed",lemon juice,NULL
+657,"yuzu or lemon juice, freshly squeezed",lemon juice,NULL
+658,fresh lemon juice,lemon juice,NULL
+659,lemon juice,lemon juice,NULL
+660,7up,lemon-lime soda,NULL
+661,lemon-lime soda,lemon-lime soda,NULL
+662,"lemon-lime soda (such as 7up or sprite), chilled, to top",lemon-lime soda,NULL
+663,"lemon-lime soda (such as 7up or sprite), to top",lemon-lime soda,NULL
+664,lemon peel oil,lemon peel oil,NULL
+665,lemon soda,lemon soda,NULL
+666,lemon wheel studded with cloves,lemon wheel studded with cloves,NULL
+667,licor 43,licor 43,liqueur
+668,lillet blanc,lillet blanc,liqueur
+669,lillet blanc aperitif,lillet blanc,liqueur
+670,lillet rouge aperitif,lillet rouge aperitif,liqueur
+671,garnish: lime wheel,lime,NULL
+672,garnish: lime twist,lime,NULL
+673,garnish: lime wedge,lime,NULL
+674,lime,lime,NULL
+675,lime half-wheel,lime,NULL
+676,lime husk,lime,NULL
+677,lime peel,lime,NULL
+678,lime shell,lime,NULL
+679,lime slice,lime,NULL
+680,lime twist,lime,NULL
+681,lime wedge,lime,NULL
+682,lime wheel,lime,NULL
+683,lime wheels,lime,NULL
+684,lime wheels or other seasonal garnishes you may prefer,lime,NULL
+685,pieces (about the shape of small lime quarter),lime,NULL
+686,wedges,lime,NULL
+687,scrappy’s lime bitters,lime bitters,NULL
+688,"lime juice, freshly squeezed",lime juice,NULL
+689,fresh lime juice,lime juice,NULL
+690,"lime juice, freshly squeezed (save the husks to use as the garnish)",lime juice,NULL
+691,lime juice,lime juice,NULL
+692,"lime juice,",lime juice,NULL
+693,linie aquavit,linie aquavit,grain alcohol
+694,liqueur (such as giffard),liqueur,liqueur
+695,liqueur,liqueur,liqueur
+696,liquore strega,liquore strega,liqueur
+697,lotus root wheel (optional),lotus root wheel,NULL
+698,soho lychee liqueur,lychee liqueur,liqueur
+699,"lychee nuts, shelled (drained if canned)",lychee nuts,NULL
+700,macvin du jura liqueur wine,macvin du jura liqueur wine,liqueur
+701,madeira wine,madeira wine,liqueur
+702,makrut lime leaf,makrut lime leaf,NULL
+703,malic acid edv*,malic acid edv,NULL
+704,mango-infused rum,mango-infused rum,rum
+705,gina mango nectar,mango nectar,NULL
+706,mango-pandan syrup*,mango-pandan syrup,NULL
+707,maple beet shrub,maple beet shrub,NULL
+708,maple leaf candy,maple leaf candy,NULL
+709,maple syrup,maple syrup,NULL
+710,grade b maple syrup,maple syrup,NULL
+711,deep mountain grade b maple syrup,maple syrup,NULL
+712,cabin fever maple flavored whiskey,maple whiskey,whiskey
+713,luxardo maraschino,maraschino cherries,NULL
+714,luxardo maraschino cherry,maraschino cherries,NULL
+715,maraschino cherry,maraschino cherries,NULL
+716,maraschino cherries,maraschino cherries,NULL
+717,luxardo marasca cherries,maraschino cherries,NULL
+718,luxardo maraschino cherries,maraschino cherries,NULL
+719,luxardo maraschino liqueur,maraschino liqueur,liqueur
+720,maraschino liqueur,maraschino liqueur,liqueur
+721,maraschino liqueur (preferably luxardo),maraschino liqueur,liqueur
+722,"marigold tea, brewed and chilled",marigold tea,NULL
+723,4 leaves fresh marjoram,marjoram,NULL
+724,"marmalade (blackberry, black cherry or orange)",marmalade,NULL
+725,marmalade,marmalade,NULL
+726,mini marshmallows,marshmellows,NULL
+727,matcha,matcha,NULL
+728,matcha powder,matcha,NULL
+729,medjool date,medjool date,NULL
+730,melon ball,melon,NULL
+731,merlot wine,merlot wine,red wine
+732,meyer lemon twist,meyer lemon twist,NULL
+733,montelobos espadín mezcal,mezcal,mezcal
+734,mezcal (preferably del maguey vida),mezcal,mezcal
+735,mezcal espadín,mezcal,mezcal
+736,del maguey vida mezcal,mezcal,mezcal
+737,el silencio mezcal,mezcal,mezcal
+738,espadín mezcal,mezcal,mezcal
+739,ilegal joven mezcal,mezcal,mezcal
+740,ilegal mezcal joven,mezcal,mezcal
+741,ilegal reposado mezcal,mezcal,mezcal
+742,joven mezcal,mezcal,mezcal
+743,madre mezcal,mezcal,mezcal
+744,mezcal,mezcal,mezcal
+745,mezcal (preferably del maguey chichicapa),mezcal,mezcal
+746,mezcal (preferably del maguey san luis del rio),mezcal,mezcal
+747,midori,midori,liqueur
+748,milk,milk,NULL
+749,mint leaves,mint,NULL
+750,garnish: mint sprig,mint,NULL
+751,garnish: mint sprig skewed through a cucumber slice,mint,NULL
+752,garnish: mint sprigs,mint,NULL
+753,large mint leaves,mint,NULL
+754,mini,mint,NULL
+755,mint,mint,NULL
+756,mint leaf,mint,NULL
+757,mint or microgreen leaf,mint,NULL
+758,mint sprig,mint,NULL
+759,mint sprigs,mint,NULL
+760,mint jelly,mint jelly,NULL
+761,12 mint leaves,mint leaves,NULL
+762,monin mint syrup,mint simple syrup,NULL
+763,mixed berries,mixed berries,NULL
+764,bittermens xocolatl mole bitters,mole bitters,NULL
+765,kings county moonshine (white corn whiskey),moonshine,grain alcohol
+766,mozzarella foam**,mozzarella foam,NULL
+767,nocino ,nocino,NULL
+768,nutmeg,nutmeg,NULL
+769,"garnish: nutmeg, freshly grated",nutmeg,NULL
+770,"nutmeg, freshly grated",nutmeg,NULL
+771,freshly grated nutmeg,nutmeg,NULL
+772,fee brothers old fashioned bitters,old fashioned bitters,NULL
+773,old fashioned bitters,old fashioned bitters,NULL
+774,olive,olive,NULL
+775,olives,olive,NULL
+776,olive brine,olive brine,NULL
+777,"osmanthus oolong tea, hot-brewed**",oolong tea,NULL
+778,orange wedge,orange,NULL
+779,orange wheels,orange,NULL
+780,swath of orange peel,orange,NULL
+781,garnish: orange peel,orange,NULL
+782,garnish: orange twist,orange,NULL
+783,garnish: torched dehydrated orange wheel,orange,NULL
+784,orange wheel,orange,NULL
+785,orange,orange,NULL
+786,orange half-wheel,orange,NULL
+787,orange peel,orange,NULL
+788,orange peels,orange,NULL
+789,orange slice,orange,NULL
+790,orange slices,orange,NULL
+791,orange twist,orange,NULL
+792,orange wedges,orange,NULL
+793,orange and lemon twists,orange and lemon twists,NULL
+794,orange bitters,orange bitters,NULL
+795,fee brothers west indian orange bitters,orange bitters,NULL
+796,regan's orange bitters no. 6,orange bitters,NULL
+797,regan’s orange bitters,orange bitters,NULL
+798,regan’s orange bitters no. 6,orange bitters,NULL
+799,regans orange bitters,orange bitters,NULL
+800,regans’ orange bitters no. 6,orange bitters,NULL
+801,the bitter truth orange bitters (germany),orange bitters,NULL
+802,orange blossom bubbles**,orange blossom bubbles,NULL
+803,orange blossom water,orange blossom water,NULL
+804,orange curaçao,orange curaçao,NULL
+805,orange flower water,orange flower water,NULL
+806,orange-ginger marmalade,orange-ginger marmalade,NULL
+807,"orange juice, freshly squeezed",orange juice,NULL
+808,juice of one orange,orange juice,NULL
+809,orange juice,orange juice,NULL
+810,triple sec (such as combier),orange liqueur,liqueur
+811,cointreau,orange liqueur,liqueur
+812,combier orange liqueur,orange liqueur,liqueur
+813,orange liqueur,orange liqueur,liqueur
+814,orange liqueur (such as combier),orange liqueur,liqueur
+815,premium triple sec (kol uses muyu chinotto),orange liqueur,liqueur
+816,triple sec,orange liqueur,liqueur
+817,orange marmalade,orange marmalade,NULL
+818,10 orange twists,orange twists,NULL
+819,orchid,orchid,NULL
+820,"oreo cookies, crushed",oreo cookies,NULL
+821,giffard orgeat,orgeat,NULL
+822,orgeat,orgeat,NULL
+823,latitude 29 formula orgeat,orgeat,NULL
+824,orgeat-chantilly cream**,orgeat-chantilly cream,NULL
+825,the dead rabbit orinoco bitters,orinoco bitters,NULL
+826,dead rabbit orinoco bitters,orinoco bitters,NULL
+827,oysters,oysters,NULL
+828,pale ale,pale ale,beer
+829,palm sugar syrup,palm sugar syrup,NULL
+830,palo santo cordial,palo santo cordial,NULL
+831,palo santo tincture***,palo santo tincture,NULL
+832,pamplemousse liqueur,pamplemousse liqueur,liqueur
+833,"pandan leaf, sliced",pandan leaf,NULL
+834,garnish: tied pandan leaf,pandan leaf,NULL
+835,pandan leaf,pandan leaf,NULL
+836,pandan syrup*,pandan syrup,NULL
+837,parsley sprig,parsley sprig,NULL
+838,passion fruit,passion fruit,NULL
+839,passion fruit liqueur (such as giffard),passion fruit liqueur,liqueur
+840,passion fruit puree,passion fruit puree,NULL
+841,peach,peach,NULL
+842,peach bitters,peach bitters,NULL
+843,peach-infused bourbon*,peach-infused bourbon,bourbon
+844,creme de peche (or high-quality peach liqueur),peach liqueur,liqueur
+845,peach mead,peach mead,NULL
+846,peach schnapps,peach schnapps,schnapps
+847,peach slices,peach slices,NULL
+848,peach slices (or other stone fruit),peach slices,NULL
+849,pear fan,pear,NULL
+850,pear,pear,NULL
+851,st. george spiced pear liqueur,pear brandy,brandy
+852,st. george pear brandy,pear brandy,brandy
+853,pear eau de vie (hawksmoor uses clear creek),pear eau de vie,eau de vie
+854,pear liqueur,pear liqueur,liqueur
+855,pear puree,pear puree,NULL
+856,compass box the peat monster scotch,peaty scotch,scotch
+857,pebble ice,pebble ice,NULL
+858,cracked pepper,pepper,NULL
+859,"garnish: black pepper, ground",pepper,NULL
+860,cracked black pepper,pepper,NULL
+861,fresh cracked black pepper,pepper,NULL
+862,peppercorns,peppercorns,NULL
+863,pepper slices,pepper slices,NULL
+864,pernod absinthe,pernod,liqueur
+865,pernod,pernod,liqueur
+866,peychaud's bitters,peychaud's bitters,NULL
+867,peychaud’s bitters,peychaud’s bitters,NULL
+868,pho broth*,pho broth,NULL
+869,pickle brine,pickle brine,NULL
+870,pickled peach juice*,pickled peach juice,NULL
+871,pickled peach slice,pickled peach slice,NULL
+872,pickled pear brine*,pickled pear brine,NULL
+873,pickled pear slice,pickled pear slice,NULL
+874,pickled vegetable,pickled vegetable,NULL
+875,"victory prima pils pilsner, to top",pilsner,beer
+876,pimm’s blackberry and elderflower liqueur,pimm’s blackberry and elderflower liqueur,liqueur
+877,pimm’s no. 1 liqueur,pimm's no. 1 liqueur,liqueur
+878,pimm's no. 1 liqueur,pimm's no. 1 liqueur,liqueur
+879,pineapple slice,pineapple,NULL
+880,pineapple wedge,pineapple,NULL
+881,garnish: pineapple fronds,pineapple,NULL
+882,garnish: pineapple wedge,pineapple,NULL
+883,"large fresh pineapple chunk,",pineapple,NULL
+884,pineapple,pineapple,NULL
+885,pineapple chunk,pineapple,NULL
+886,pineapple chunks,pineapple,NULL
+887,pineapple frond,pineapple,NULL
+888,pineapple shrub,pineapple,NULL
+889,pineapple-infused mezcal*,pineapple-infused mezcal,mezcal
+890,pineapple juice,pineapple juice,NULL
+891,grilled pineapple juice*,pineapple juice,NULL
+892,"pineapple juice (if using fresh juice, save the rind for tepache)",pineapple juice,NULL
+893,pineapple leaf,pineapple leaf,NULL
+894,plantation stiggins’ fancy pineapple rum,pineapple rum,rum
+895,"pink peppercorn, ground",pink peppercorns,NULL
+896,pinot noir juice,pinot noir juice,NULL
+897,pisco,pisco,brandy
+898,pistachio syrup,pistachio syrup,NULL
+899,pistachio syrup*,pistachio syrup,NULL
+900,pomegranate arils (seeds),pomegranate,NULL
+901,pomegranate juice,pomegranate juice,NULL
+902,pama pomegranate liqueur,pomegranate liqueur,liqueur
+903,pomegranate molasses,pomegranate molasses,NULL
+904,port,port wine,port wine
+905,port wine,port wine,port wine
+906,graham's six grapes port,port wine,port wine
+907,powdered sugar,powdered sugar,NULL
+908,prosecco or other sparkling wine,prosecco,champagne/sparkling wine
+909,prosecco,prosecco,champagne/sparkling wine
+910,"prosecco, chilled",prosecco,champagne/sparkling wine
+911,pumpkin ale,pumpkin ale,NULL
+912,pumpkin-butter-infused fat-washed bourbon,pumpkin-butter-infused fat-washed bourbon,bourbon
+913,libby's pumpkin purée,pumpkin puree,NULL
+914,pumpkin puree,pumpkin puree,NULL
+915,pumpkin soda,pumpkin soda,NULL
+916,pumpkin syrup,pumpkin syrup,NULL
+917,punt e mes,punt e mes,vermouth
+918,queso fresco,queso fresco,NULL
+919,raspberries,raspberries,NULL
+920,raspberry syrup*,raspberry syrup,NULL
+921,raspberry syrup,raspberry syrup,NULL
+922,red bull,red bull,NULL
+923,red chile pepper,red chile pepper,NULL
+924,red pepper flakes,red pepper flakes,NULL
+925,red wine,red wine,red wine
+926,beaujolais nouveau wine (you may substitute another red wine),red wine,red wine
+927,red wine vinegar*,red wine vinegar,NULL
+928,rhubarb shrub,rhubarb shrub,NULL
+929,rhum agricole,rhum agricole,rum
+930,roasted pumpkin,roasted pumpkin,NULL
+931,roman mix,roman mix,NULL
+932,"root beer, chilled",root beer,NULL
+933,lillet rosé,rosé,champagne/sparkling wine
+934,rosé wine,rosé,champagne/sparkling wine
+935,rosé,rosé,champagne/sparkling wine
+936,garnish: garden herbs such as rosemary and spearmint,rosemary,NULL
+937,rosemary,rosemary,NULL
+938,rosemary sprig,rosemary,NULL
+939,16 rosemary sprigs,rosemary,NULL
+940,rosemary or thyme sprig,rosemary,NULL
+941,rose salt,rose salt,NULL
+942,brut rosé sparkling wine,rosé sparkling wine,champagne/sparkling wine
+943,rosé champagne,rosé sparkling wine,champagne/sparkling wine
+944,rosé cava syrup*,rosé syrup,NULL
+945,martini & rossi rosso vermouth (italy),rosso vermouth,vermouth
+946,mini rubber ducky,rubber ducky,NULL
+947,ruby port,ruby port,port wine
+948,gold rum,rum,rum
+949,151-proof rum,rum,rum
+950,aged rum,rum,rum
+951,appleton estate 12 year rum,rum,rum
+952,appleton estate rum,rum,rum
+953,appleton reserve rum,rum,rum
+954,bacardí maestro de ron,rum,rum
+955,bacardi reserva ocho rum,rum,rum
+956,barbancourt 8 rum,rum,rum
+957,blackstrap rum,rum,rum
+958,cabbage rum*,rum,rum
+959,caña brava 7-year-old grand reserve añeja rum,rum,rum
+960,dark jamaican rum,rum,rum
+961,demerara rum,rum,rum
+962,don papa rum,rum,rum
+963,don q cristal rum,rum,rum
+964,don q gold rum,rum,rum
+965,dr. bird jamaican rum,rum,rum
+966,dr. birds jamaican rum,rum,rum
+967,el dorado 15-year-old special reserve rum,rum,rum
+968,el dorado special reserve 15-year-old rum,rum,rum
+969,flor de caña 7-year-old grand reserve rum,rum,rum
+970,foursquare 2004 single-blended rum,rum,rum
+971,gosling’s black seal rum,rum,rum
+972,j. wray & nephew overproof rum,rum,rum
+973,light rum,rum,rum
+974,overproof demerara rum (such as plantation oftd),rum,rum
+975,overproof jamaican rum,rum,rum
+976,overproof rum (preferably smith & cross),rum,rum
+977,plantation dark rum,rum,rum
+978,plantation five-year-old rum,rum,rum
+979,rhum clément v.s.o.p. martinique rhum agricole vieux,rum,rum
+980,rum,rum,rum
+981,smith & cross jamaican rum,rum,rum
+982,smith and cross jamaican rum,rum,rum
+983,spiced rum,rum,rum
+984,tanduay gold asian rum,rum,rum
+985,white or aged rum,rum,rum
+986,worthy park overproof rum,rum,rum
+987,wray & nephew overproof rum (with optional blue food coloring),rum,rum
+988,zacapa 23 rum,rum,rum
+989,american rye whiskey,rye whiskey,whiskey
+990,canadian club rye whiskey,rye whiskey,whiskey
+991,george dickel rye whiskey,rye whiskey,whiskey
+992,mister katz’s rock & rye,rye whiskey,whiskey
+993,kings county empire rye whiskey,rye whiskey,whiskey
+994,lock stock & barrel rye whiskey,rye whiskey,whiskey
+995,old overholt rye whiskey,rye whiskey,whiskey
+996,old overholt straight rye whiskey,rye whiskey,whiskey
+997,rittenhouse rye,rye whiskey,whiskey
+998,rittenhouse rye whiskey,rye whiskey,whiskey
+999,rye,rye whiskey,whiskey
+1000,rye whiskey,rye whiskey,whiskey
+1001,rye whiskey (preferably rittenhouse),rye whiskey,whiskey
+1002,sancho pepper-infused wild turkey 0 rye whiskey*,rye whiskey,whiskey
+1003,wild turkey rye whiskey,rye whiskey,whiskey
+1004,fresh sage leaf,sage leaf,NULL
+1005,sage leaf,sage leaf,NULL
+1006,sage leaves,sage leaf,NULL
+1007,sake,sake,sake
+1008,salers gentian aperitif,salers gentian aperitif,NULL
+1009,saline solution (5:1 water to kosher salt),saline,NULL
+1010,0% saline solution (1:5 ratio of salt to water),saline,NULL
+1011,"mineral saline (1 part kosher salt to 9 parts mineral water, such as crazy water #4 from texas)",saline,NULL
+1012,saline,saline,NULL
+1013,saline solution,saline,NULL
+1014,salt solution (recipe below),saline,NULL
+1015,spicy-sweet salt rim (recipe below),salt,NULL
+1016,kosher salt,salt,NULL
+1017,salt,salt,NULL
+1018,salt rim,salt,NULL
+1019,sea salt,salt,NULL
+1020,salted pandan syrup*,salted pandan syrup,NULL
+1021,"sambuca, chilled",sambuca,liqueur
+1022,sambuca,sambuca,liqueur
+1023,sambuca syrup*,sambuca syrup,NULL
+1024,scotch,scotch,scotch
+1025,bowmore 12-year-old islay scotch,scotch,scotch
+1026,ardbeg uigeadail single-malt scotch,scotch,scotch
+1027,benriach curiositas peated 10-year-old scotch,scotch,scotch
+1028,blended scotch whisky,scotch,scotch
+1029,blended scotch whisky (cutty sark prohibition edition is preferred),scotch,scotch
+1030,chivas regal 12 year old,scotch,scotch
+1031,compass box great king street artist’s blend scotch,scotch,scotch
+1032,dewar’s white label scotch,scotch,scotch
+1033,glenlivet 2-year scotch,scotch,scotch
+1034,great king st. glasgow blend scotch,scotch,scotch
+1035,highland park 18-year-old scotch whisky,scotch,scotch
+1036,islay scotch,scotch,scotch
+1037,isle of jura superstition single-malt scotch,scotch,scotch
+1038,johnnie walker black label blended scotch,scotch,scotch
+1039,johnnie walker double black scotch whisky,scotch,scotch
+1040,monkey shoulder scotch,scotch,scotch
+1041,laphroaig 10 year single malt scotch,scotch,scotch
+1042,scotch (choose one that isn't too peated),scotch,scotch
+1043,scotch whisky,scotch,scotch
+1044,springbank 10-year-old scotch,scotch,scotch
+1045,the famous grouse scotch,scotch,scotch
+1046,the famous grouse smoky black scotch,scotch,scotch
+1047,the famous grouse the black grouse blended scotch,scotch,scotch
+1048,laphroaig 10-year-old single malt scotch,scotch,scotch
+1049,laphroaig single-malt scotch,scotch,scotch
+1050,seedlip garden,seedlip garden,NULL
+1051,sparkling water,seltzer,NULL
+1052,seltzer,seltzer,NULL
+1053,seltzer water,seltzer,NULL
+1054,serrano-chile-infused shochu*,serrano-chile-infused shochu,NULL
+1055,serrano-infused triple sec*,serrano-infused triple sec,NULL
+1056,serrano peppers,serrano peppers,NULL
+1057,lustau fino sherry,sherry,sherry
+1058,manzanilla sherry,sherry,sherry
+1059,oloroso sherry,sherry,sherry
+1060,pedro ximénez sherry,sherry,sherry
+1061,pedro ximenez sherry (preferably lustau),sherry,sherry
+1062,sherry,sherry,sherry
+1063,barbadillo pedro ximénez sherry,sherry,sherry
+1064,dry sack 15-year-old oloroso sherry,sherry,sherry
+1065,lustau fino jarana sherry,sherry,sherry
+1066,shichimi togarashi (for rim),shichimi togarashi,NULL
+1067,mizu shochu,shochu,shochu
+1068,plus 5 teaspoons shochu (goto prefers iichiko saiten),shochu,shochu
+1069,rice shochu,shochu,shochu
+1070,iichiko saiten shochu,shochu,shochu
+1071,hwayo 41° soju,shochu,shochu
+1072,shredded toasted coconut,shredded toasted coconut,NULL
+1073,demerara simple syrup,simple syrup,NULL
+1074,rich simple syrup,simple syrup,NULL
+1075,sugar cane syrup,simple syrup,NULL
+1076,sugar syrup,simple syrup,NULL
+1077,syrup,simple syrup,NULL
+1078,syrup*,simple syrup,NULL
+1079,rich,simple syrup,NULL
+1080,simple syrup,simple syrup,NULL
+1081,demerara syrup,simple syrup,NULL
+1082,smoked cherry bitters,smoked cherry bitters,NULL
+1083,hella bitters smoked chile cocktail bitters,smoked chile cocktail bitters,NULL
+1084,smoked citrus juice,smoked citrus juice,NULL
+1085,smoked fernet-branca*,smoked fernet-branca,NULL
+1086,smoked paprika,smoked paprika,NULL
+1087,smoked salt rim,smoked salt rim,NULL
+1088,smoked maldon sea salt,smoked sea salt,NULL
+1089,"soda water, chilled, to top",soda water,NULL
+1090,"soda water, to top",soda water,NULL
+1091,soda water,soda water,NULL
+1092,"soda water (750 ml), to top",soda water,NULL
+1093,"soda water, chilled",soda water,NULL
+1094,sotol por siempre,sotol por siempre,sotol
+1095,sour apple schnapps,sour apple schnapps,schnapps
+1096,sour mix,sour mix,NULL
+1097,southern comfort,southern comfort,liqueur
+1098,sparkling cider,sparkling cider,NULL
+1099,"dry sparkling wine (750 ml), to top",sparkling wine,NULL
+1100,sparkling wine,sparkling wine,NULL
+1101,speared lime peel and cherry,speared lime peel and cherry,NULL
+1102,spiced almond demerara syrup**,spiced almond demerara syrup,NULL
+1103,spiced-butter-brushed baked mini pumpkins,spiced-butter-brushed baked mini pumpkins,NULL
+1104,spiced cranberry syrup*,spiced cranberry syrup,NULL
+1105,spiced honey syrup*,spiced honey syrup,NULL
+1106,spiced syrup,spiced syrup,NULL
+1107,spice mixture,spice mixture,NULL
+1108,spirit,spirit,NULL
+1109,sprig,sprig,NULL
+1110,sprig cbd-infused zero-sugar sparkling citrus soda,sprig cbd-infused zero-sugar sparkling citrus soda,NULL
+1111,square one botanical,square one botanical vodka,vodka
+1112,star anise and black tea-infused simple syrup*,star anise and black tea-infused simple syrup,NULL
+1113,star anise pod,star anise pods,NULL
+1114,star anise pods,star anise pods,NULL
+1115,star anise powder,star anise powder,NULL
+1116,st. elizabeth allspice dram,st. elizabeth allspice dram,NULL
+1117,st-germain elderflower liqueur,st-germain,liqueur
+1118,st-germain,st-germain,liqueur
+1119,st-germain liqueur,st-germain liqueur,liqueur
+1120,stone’s original green ginger wine,stone’s original green ginger wine,NULL
+1121,"dupont monk’s stout or other stout-style beer, chilled",stout beer,beer
+1122,stout beer,stout beer,beer
+1123,"small strawberries, hulled",strawberry,NULL
+1124,strawberries,strawberry,NULL
+1125,strawberry,strawberry,NULL
+1126,garnish: strawberry (fresh or dehydrated),strawberry,NULL
+1127,garnish: strawberry slice,strawberry,NULL
+1128,fresh strawberries,strawberry,NULL
+1129,strawberry demerara syrup*,strawberry demerara syrup,NULL
+1130,strawberry-infused rhum barbancourt,strawberry-infused rhum barbancourt,rum
+1131,strawberry puree,strawberry puree,NULL
+1132,strawberry syrup,strawberry syrup,NULL
+1133,strawberry-vanilla syrup*,strawberry-vanilla syrup,NULL
+1134,strega,strega,NULL
+1135,sugar,sugar,NULL
+1136,granulated sugar,sugar,NULL
+1137,raw sugar,sugar,NULL
+1138,sugar cube,sugar,NULL
+1139,sugar rim,sugar,NULL
+1140,white granulated sugar,sugar,NULL
+1141,sumac powder,sumac powder,NULL
+1142,super juice*,super juice,NULL
+1143,suze,suze,NULL
+1144,sweet and sour mix,sweet and sour mix,NULL
+1145,sweet-and-sour mix*,sweet-and-sour mix,NULL
+1146,sweetened coconut milk syrup**,sweetened coconut milk syrup,NULL
+1147,sweet pepper,sweet pepper,NULL
+1148,sweet/sour/salty mixture*,sweet/sour/salty mixture,NULL
+1149,sweet tea oleo saccharum,sweet tea oleo saccharum,NULL
+1150,sweet vermouth (such as cinzano 1757 rosso),sweet vermouth,vermouth
+1151,sweet vermouth (preferably dolin rouge),sweet vermouth,vermouth
+1152,sweet italian vermouth,sweet vermouth,vermouth
+1153,odd society bittersweet vermouth,sweet vermouth,vermouth
+1154,chai-infused sweet vermouth,sweet vermouth,vermouth
+1155,dolin rouge sweet vermouth,sweet vermouth,vermouth
+1156,italian sweet vermouth,sweet vermouth,vermouth
+1157,sweet vermouth (preferably carpano antica),sweet vermouth,vermouth
+1158,sweet vermouth,sweet vermouth,vermouth
+1159,sweet vermouth (such as dolin or martini & rossi),sweet vermouth,vermouth
+1160,"garnish: tajín, for rim",tajín,NULL
+1161,tajín seasoning (for rim),tajín,NULL
+1162,tamarind chutney,tamarind chutney,NULL
+1163,tangerine juice,tangerine juice,NULL
+1164,tarragon simple syrup*,tarragon simple syrup,NULL
+1165,tartaric acid solution,tartaric acid solution,NULL
+1166,taylor fladgate 10-year-old tawny port,tawny port,port wine
+1167,taylor fladgate lbv port,tawny port,port wine
+1168,feist tawny port,tawny port,port wine
+1169,tawny port (such as ferreira),tawny port,port wine
+1170,"0-year-old tawny port, to float",tawny port,port wine
+1171,tempus fugit gran classico bitter,tempus fugit gran classico bitter,NULL
+1172,tempus fugit gran classico bitter aperitif,tempus fugit gran classico bitter aperitif,liqueur
+1173,tempus fugit gran classico bitter liqueur,tempus fugit gran classico bitter liqueur,liqueur
+1174,tempus fugit white creme de menthe,tempus fugit white creme de menthe,liqueur
+1175,patrón reposado tequila,tequila,tequila
+1176,reposado tequila,tequila,tequila
+1177,ritual tequila alternative,tequila,tequila
+1178,siete leguas añejo tequila,tequila,tequila
+1179,tequila,tequila,tequila
+1180,tequila (preferably el tesoro),tequila,tequila
+1181,tequila ocho plata,tequila,tequila
+1182,el jimador reposado tequila,tequila,tequila
+1183,don julio reposado tequila,tequila,tequila
+1184,añejo tequila,tequila,tequila
+1185,thai chile pepper,thai chile pepper,NULL
+1186,the bitter truth jerry thomas’ own decanter bitters,the bitter truth jerry thomas’ own decanter bitters,NULL
+1187,the block autumn gin,the block autumn gin,gin
+1188,thin mint cookie,thin mint cookie,NULL
+1189,thyme,thyme sprig,NULL
+1190,thyme sprig,thyme sprig,NULL
+1191,tiki whipped cream*,tiki whipped cream,NULL
+1192,tomatillos,tomatillos,NULL
+1193,tomato juice,tomato juice,NULL
+1194,tom & jerry batter,tom & jerry batter,NULL
+1195,tom yum syrup*,tom yum syrup,NULL
+1196,q tonic water,tonic,NULL
+1197,tonic water,tonic,NULL
+1198,turmeric simple syrup*,turmeric syrup,NULL
+1199,ube halaya (purple yam jam),ube halaya,NULL
+1200,unsweetened coconut water,unsweetened coconut water,NULL
+1201,unsweetened iced tea,unsweetened iced tea,NULL
+1202,vanilla extract,vanilla extract,NULL
+1203,vanilla ice cream,vanilla ice cream,NULL
+1204,vanilla-infused brandy*,vanilla-infused brandy,brandy
+1205,vanilla salt,vanilla salt,NULL
+1206,vanilla soda,vanilla soda,NULL
+1207,vanilla syrup,vanilla syrup,NULL
+1208,vanilla flavored vodka,vanilla vodka,vodka
+1209,vanilla vodka,vanilla vodka,vodka
+1210,john d. taylor's velvet falernum,velvet falernum,liqueur
+1211,velvet falernum,velvet falernum,liqueur
+1212,ancho reyes verde chile liqueur,verde chile liqueur,liqueur
+1213,verjus blanc,verjus,NULL
+1214,verjus (such as wolffer),verjus,NULL
+1215,verjus,verjus,NULL
+1216,cocchi torino sweet vermouth,vermouth,vermouth
+1217,noilly prat ambré vermouth,vermouth,vermouth
+1218,vermouth,vermouth,vermouth
+1219,vermouth,vermouth,vermouth
+1220,blanc vermouth,vermouth,vermouth
+1221,carpano antica formula vermouth,vermouth,vermouth
+1222,carpano antica sweet vermouth,vermouth,vermouth
+1223,citron vodka,vodka,vodka
+1224,absolut elyx vodka,vodka,vodka
+1225,absolut vodka,vodka,vodka
+1226,broken shed vodka,vodka,vodka
+1227,republic restoratives civic vodka,vodka,vodka
+1228,reyka vodka,vodka,vodka
+1229,tito’s handmade vodka,vodka,vodka
+1230,vodka,vodka,vodka
+1231,vodka (such as grey goose),vodka,vodka
+1232,walnut orgeat,walnut orgeat,NULL
+1233,wassail,wassail,NULL
+1234,wassail syrup*,wassail syrup,NULL
+1235,"water, chilled",water,NULL
+1236,water,water,NULL
+1237,filtered water,water,NULL
+1238,seedless watermelon,watermelon,NULL
+1239,watermelon cubes,watermelon,NULL
+1240,watermelon juice,watermelon juice,NULL
+1241,"belgian-style wheat beer (such as allagash white), chilled",wheat beer,beer
+1242,wheat beer,wheat beer,beer
+1243,whipped cream,whipped cream,NULL
+1244,garnish: whipped coconut cream,whipped cream,NULL
+1245,garnish: whipped cream,whipped cream,NULL
+1246,jameson irish whiskey,whiskey,whiskey
+1247,knappogue castle 12 year old single malt irish whiskey,whiskey,whiskey
+1248,lot 40 canadian whisky,whiskey,whiskey
+1249,mellow corn whiskey,whiskey,whiskey
+1250,michael collins blended irish whiskey,whiskey,whiskey
+1251,michter's single barrel rye whiskey,whiskey,whiskey
+1252,single pot still irish whiskey,whiskey,whiskey
+1253,"tennessee whiskey, barrel proof",whiskey,whiskey
+1254,tullamore d.e.w. 12-year-old irish whiskey,whiskey,whiskey
+1255,west cork distillers 0-year-old single-malt irish whiskey,whiskey,whiskey
+1256,whiskey,whiskey,whiskey
+1257,whisky,whiskey,whiskey
+1258,redbreast 1-year-old irish whiskey,whiskey,whiskey
+1259,alberta premium canadian whisky,whiskey,whiskey
+1260,blended whiskey (such as firestone & robertson tx),whiskey,whiskey
+1261,bushmills irish whiskey,whiskey,whiskey
+1262,canadian whisky,whiskey,whiskey
+1263,connemara cask-strength peated irish whiskey,whiskey,whiskey
+1264,corsair triple smoke american malt whiskey,whiskey,whiskey
+1265,crown royal whisky (canada),whiskey,whiskey
+1266,george dickel superior no. 12 tennessee whiskey,whiskey,whiskey
+1267,high west silver oat whiskey,whiskey,whiskey
+1268,irish whiskey,whiskey,whiskey
+1269,jameson black barrel irish whiskey,whiskey,whiskey
+1270,jameson black barrel whiskey,whiskey,whiskey
+1271,jameson caskmates whiskey,whiskey,whiskey
+1272,powers irish whiskey,whiskey,whiskey
+1273,powers 12 year old special reserve irish whiskey,whiskey,whiskey
+1274,fee brothers whiskey barrel bitters,whiskey barrel bitters,NULL
+1275,white,white,NULL
+1276,white creme de cacao,white creme de cacao,liqueur
+1277,white creme de menthe,white creme de menthe,liqueur
+1278,white miso cane syrup*,white miso cane syrup,NULL
+1279,quinta do infantado white port,white port,port wine
+1280,taylor fladgate chip dry white port,white port,port wine
+1281,white rum,white rum,rum
+1282,cotton & reed white rum,white rum,rum
+1283,white verjus,white verjus,NULL
+1284,"crisp white wine, such as sauvignon blanc (optional)",white wine,white wine
+1285,white wine,white wine,white wine
+1286,whole allspice berries,whole allspice berries,NULL
+1287,whole cloves,whole cloves,NULL
+1288,whole milk,whole milk,NULL
+1289,worcestershire sauce,worcestershire sauce,NULL
+1290,xo cognac,xo cognac,NULL
+1291,yaguara plata cachaça,yaguara plata cachaça,cachaça
+1292,yellow chartreuse,yellow chartreuse,liqueur
+1293,yuzu twist,yuzu,NULL
+1294,yuzu bitters,yuzu bitters,NULL
+1295,yuzu kosho,yuzu kosho,NULL
+1296,yuzushu (yuzu sake),yuzushu,sake

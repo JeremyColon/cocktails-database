@@ -1,20 +1,26 @@
 from app import app
-import main, os, json
-import requests
-from login import login, failed, create_account
-from utils.libs import Input, Output, State
-from utils.libs import dbc
-from utils.libs import dcc
-from utils.libs import html
-from dash import no_update
-from flask import request, jsonify
+from pages import main, mybar
+
+from login import login, failed, create_account, change_password
+
+import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output, State
+from dash import dcc
+from dash import html
+
+import os
+from pyisemail import is_email
+
 from flask_login import login_user, logout_user, current_user, LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import bcrypt, check_password_hash, generate_password_hash
+from flask_bcrypt import check_password_hash, generate_password_hash
+
+from utils.helpers import create_conn_string
+
 
 server = app.server
 
-NNF_LOGO = "assets/nnf_logo.jpg"
+NNF_LOGO = "assets/cocktail_glass.png"
 
 nav = dbc.Navbar(
     dbc.Container(
@@ -24,7 +30,7 @@ nav = dbc.Navbar(
                 dbc.Row(
                     [
                         dbc.Col(html.Img(src=NNF_LOGO, height="75px", width="75px")),
-                        dbc.Col(dbc.NavbarBrand("Cocktail Database", className="ml-2")),
+                        dbc.Col(dbc.NavbarBrand("Cocktail Finder", className="ml-2")),
                     ],
                     align="center",
                 ),
@@ -35,6 +41,15 @@ nav = dbc.Navbar(
                 [
                     dbc.Nav(
                         [
+                            dbc.NavLink(
+                                "Home", href="/", active="exact", id="home-navlink"
+                            ),
+                            dbc.NavLink(
+                                "My Bar",
+                                href="/my-bar",
+                                active="exact",
+                                id="mybar-navlink",
+                            ),
                             dbc.NavLink("Logout", href="/logout", active="exact"),
                         ],
                         className="ml-auto",
@@ -56,27 +71,18 @@ nav = dbc.Navbar(
 app.layout = html.Div(
     [
         dcc.Store(id="user-store", storage_type="session"),
-        # Location gets the current url of the browser
-        # Need this for the callback that updates the page layout
-        #  after clicking a button
+        dcc.Store(id="bar-updated-store", storage_type="session"),
         dcc.Location(id="url", refresh=False),
-        # One Store object for each page (excluding pivot table)
-        # dcc.Store(id='main-session-filters', storage_type='session')
-        # Main layout
         html.Div([nav], id="navbar"),
         dbc.Container(id="page-content", className="pt-4"),
     ]
 )
-app.title = "Cocktail Database"
+app.title = "Cocktail Finder"
 
 
 # Updating the Flask Server configuration with Secret Key to encrypt the user session cookie
 server.config.update(SECRET_KEY=os.getenv("SECRET_KEY"))
-server.config.update(
-    SQLALCHEMY_DATABASE_URI=os.getenv("DATABASE_URL").replace(
-        "postgres://", "postgresql://"
-    )
-)
+server.config.update(SQLALCHEMY_DATABASE_URI=create_conn_string())
 server.config.update(SQLALCHEMY_TRACK_MODIFICATIONS=False)
 
 # Login manager object will be used to login / logout users
@@ -116,10 +122,6 @@ class User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    """This function loads the user by user id. Typically this looks up the user from a user database.
-    We won't be registering or looking up users in this example, since we'll just login using LDAP server.
-    So we'll simply return a User object with the passed in username.
-    """
     return User.query.get(int(user_id))
 
 
@@ -132,22 +134,41 @@ def load_user(user_id):
     [
         Input("login-button", "n_clicks"),
         Input("create-account-page-button", "n_clicks"),
+        Input("change-password-page-button", "n_clicks"),
     ],
     [State("email-box", "value"), State("pwd-box", "value")],
 )
-def login_button_click(n_clicks_login, n_clicks_create, email, password):
+def login_button_click(
+    n_clicks_login, n_clicks_create, n_clicks_chg_pwd, email, password
+):
     if n_clicks_login > 0:
         user = User.query.filter_by(email=email).first()
         if not user:
-            return "/login", "Email doesn't exist, please sign up first.", None
+            return (
+                "/login",
+                html.Span(
+                    "Email doesn't exist, please sign up first.",
+                    style={"color": "red"},
+                ),
+                None,
+            )
         elif not check_password_hash(user.pwd, password):
             print("Login Unsuccessful")
-            return "/login", "Incorrect login details, please try again.", None
+            return (
+                "/login",
+                html.Span(
+                    "Incorrect login details, please try again.",
+                    style={"color": "red"},
+                ),
+                None,
+            )
 
         login_user(user)
         return "/", "", user.to_json()
     elif n_clicks_create > 0:
         return "/create", "", None
+    elif n_clicks_chg_pwd > 0:
+        return "/change_password", "", None
     else:
         return "/login", "", None
 
@@ -156,25 +177,35 @@ def login_button_click(n_clicks_login, n_clicks_create, email, password):
     Output("create_account", "pathname"),
     Output("create-account-output-state", "children"),
     [Input("create-account-button", "n_clicks")],
-    [State("create-pwd-box", "value"), State("create-email-box", "value")],
+    [
+        State("create-pwd-box", "value"),
+        State("confirm-create-pwd-box", "value"),
+        State("create-email-box", "value"),
+    ],
 )
-def create_account_button_click(n_clicks, pwd, email):
+def create_account_button_click(n_clicks, pwd, confirm_pwd, email):
     if n_clicks > 0:
         user = User.query.filter_by(email=email).first()
-        response = requests.get(
-            "https://isitarealemail.com/api/email/validate",
-            params={"email": email},
-            headers={"Authorization": "Bearer " + os.getenv("EMAIL_CHECK_API_KEY")},
-        )
 
-        status = response.json()["status"]
+        verify_email = is_email(email, check_dns=True)
 
         if user:
-            return "/create", dbc.Row(dbc.Col([html.H3("Email already exists")]))
-
-        if status == "invalid":
             return "/create", dbc.Row(
-                dbc.Col([html.H3("Invalid email, please try again")])
+                dbc.Col([html.H3("Email already exists", style={"color": "red"})])
+            )
+
+        if not verify_email:
+            return "/create", dbc.Row(
+                dbc.Col(
+                    [html.H3("Please Enter a Valid Email!", style={"color": "red"})]
+                )
+            )
+
+        if pwd != confirm_pwd:
+            return "/create", dbc.Row(
+                dbc.Col(
+                    [html.H3("Your Passwords Don't Match!", style={"color": "red"})]
+                )
             )
 
         newuser = User(pwd=generate_password_hash(pwd).decode("utf-8"), email=email)
@@ -184,6 +215,41 @@ def create_account_button_click(n_clicks, pwd, email):
         return "/login", "Account Created"
     else:
         return "/create", ""
+
+
+@app.callback(
+    Output("change_password", "pathname"),
+    Output("change-password-output-state", "children"),
+    [Input("change-password-button", "n_clicks")],
+    [
+        State("change-pwd-box", "value"),
+        State("confirm-change-pwd-box", "value"),
+        State("change-email-box", "value"),
+    ],
+)
+def change_password_button_click(n_clicks, pwd, confirm_pwd, email):
+    if n_clicks > 0:
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            return "/change_password", dbc.Row(
+                dbc.Col([html.H3("Email doesn't exist", style={"color": "red"})])
+            )
+
+        if pwd != confirm_pwd:
+            return "/change_password", dbc.Row(
+                dbc.Col(
+                    [html.H3("Your Passwords Don't Match!", style={"color": "red"})]
+                )
+            )
+
+        user.pwd = generate_password_hash(pwd).decode("utf-8")
+        db.session.add(user)
+        db.session.commit()
+
+        return "/login", html.Span("Password Updated", style={"color": "green"})
+    else:
+        return "/change_password", ""
 
 
 @app.callback(
@@ -218,6 +284,8 @@ def display_page(pathname):
             return create_account
         else:
             return create_account
+    elif pathname == "/change_password":
+        return change_password
     elif pathname == "/success":
         if current_user.is_authenticated:
             return main.layout
@@ -231,10 +299,28 @@ def display_page(pathname):
             return login
     else:
         if current_user.is_authenticated:
-            return main.layout
+            if pathname == "/":
+                return main.layout
+            elif pathname == "/my-bar":
+                return mybar.layout
         else:
             view = "Redirecting to login..."
             return login
+
+    return [
+        html.Div(
+            dbc.Container(
+                [
+                    html.H1("404: Not found", className="text-danger"),
+                    html.Hr(),
+                    html.P(f"The pathname {pathname} was not recognised..."),
+                ],
+                fluid=True,
+                className="py-3",
+            ),
+            className="p-3 bg-dark rounded-3",
+        )
+    ]
 
 
 # add callback for toggling the collapse on small screens

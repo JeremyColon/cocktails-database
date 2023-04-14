@@ -41,6 +41,13 @@ h2 {
     font-size: 2rem;
 }
 
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner .dash-header>div input[type="text"],
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner .dash-filter>div input[type="text"] {
+    flex: 1;
+    line-height: unset;
+    color: white;
+}
+
 /* ==========================================
                 NAV BAR
 ========================================== */
