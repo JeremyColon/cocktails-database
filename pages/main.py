@@ -145,6 +145,9 @@ layout = [
                                                                 dbc.Row(
                                                                     dbc.Col(
                                                                         [
+                                                                            html.H5(
+                                                                                "Show Cocktails Where I.."
+                                                                            ),
                                                                             dbc.Checklist(
                                                                                 options=[
                                                                                     {
@@ -156,7 +159,6 @@ layout = [
                                                                                     1
                                                                                 ],
                                                                                 id="all-ingredients-switch-input",
-                                                                                switch=True,
                                                                                 inline=True,
                                                                             ),
                                                                             dbc.Checklist(
@@ -170,7 +172,6 @@ layout = [
                                                                                     1
                                                                                 ],
                                                                                 id="some-ingredients-switch-input",
-                                                                                switch=True,
                                                                                 inline=True,
                                                                             ),
                                                                             dbc.Checklist(
@@ -184,10 +185,10 @@ layout = [
                                                                                     1
                                                                                 ],
                                                                                 id="no-ingredients-switch-input",
-                                                                                switch=True,
                                                                                 inline=True,
                                                                             ),
                                                                             html.Br(),
+                                                                            html.Hr(),
                                                                             dbc.Checklist(
                                                                                 options=[
                                                                                     {
@@ -197,7 +198,6 @@ layout = [
                                                                                 ],
                                                                                 value=[],
                                                                                 id="include-garnish-switch-input",
-                                                                                switch=True,
                                                                                 inline=True,
                                                                             ),
                                                                         ]
@@ -229,7 +229,6 @@ layout = [
                                                                                 ],
                                                                                 value=[],
                                                                                 id="favorites-switch-input",
-                                                                                switch=True,
                                                                                 inline=True,
                                                                             ),
                                                                             dbc.Checklist(
@@ -241,7 +240,6 @@ layout = [
                                                                                 ],
                                                                                 value=[],
                                                                                 id="bookmarks-switch-input",
-                                                                                switch=True,
                                                                                 inline=True,
                                                                             ),
                                                                             dbc.Checklist(
@@ -255,7 +253,6 @@ layout = [
                                                                                     1
                                                                                 ],
                                                                                 id="unrated-switch-input",
-                                                                                switch=True,
                                                                                 inline=True,
                                                                             ),
                                                                         ]
