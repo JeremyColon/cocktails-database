@@ -7,7 +7,7 @@ cffi==1.15.1
 charset-normalizer==2.0.12
 click==8.1.2
 dash==2.9.2
-dash-bootstrap-components==1.4.0
+dash-bootstrap-components==1.4.1
 dash-core-components==2.0.0
 dash-html-components==2.0.0
 dash-mantine-components==0.12.1
@@ -30,12 +30,13 @@ MarkupSafe==2.1.1
 multiprocess==0.70.12.2
 mypy-extensions==0.4.3
 numpy==1.22.3
+packaging==23.0
 pandas==1.4.2
 pathspec==0.9.0
 platformdirs==2.5.1
 plotly==5.14.1
 psutil==5.9.0
-psycopg2-binary==2.9.3
+psycopg2-binary==2.9.5
 pycparser==2.21
 pyIsEmail==2.0.1
 python-dateutil==2.8.2
