@@ -200,7 +200,6 @@ layout = [
                                             "backgroundColor": "#252e3f",
                                             "color": "white",
                                         },
-                                        hidden_columns=["ingredient_id"],
                                     )
                                 ],
                                 id="my-bar-table-col",
