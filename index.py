@@ -51,6 +51,14 @@ nav = dbc.Navbar(
                                 id="mybar-navlink",
                             ),
                             dbc.NavLink("Logout", href="/logout", active="exact"),
+                            dbc.NavLink(
+                                html.Span(
+                                    html.B("Buy me a drink!"),
+                                    style={"color": "darkgreen"},
+                                ),
+                                href="https://www.buymeacoffee.com/jeremycolon",
+                                target="_blank",
+                            ),
                         ],
                         className="ml-auto",
                         navbar=True,
@@ -142,7 +150,7 @@ def login_button_click(
     n_clicks_login, n_clicks_create, n_clicks_chg_pwd, email, password
 ):
     if n_clicks_login > 0:
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email.lower()).first()
         if not user:
             return (
                 "/login",
@@ -185,7 +193,7 @@ def login_button_click(
 )
 def create_account_button_click(n_clicks, pwd, confirm_pwd, email):
     if n_clicks > 0:
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email.lower()).first()
 
         verify_email = is_email(email, check_dns=True)
 
@@ -208,7 +216,9 @@ def create_account_button_click(n_clicks, pwd, confirm_pwd, email):
                 )
             )
 
-        newuser = User(pwd=generate_password_hash(pwd).decode("utf-8"), email=email)
+        newuser = User(
+            pwd=generate_password_hash(pwd).decode("utf-8"), email=email.lower()
+        )
         db.session.add(newuser)
         db.session.commit()
 

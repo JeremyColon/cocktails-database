@@ -508,7 +508,6 @@ layout = [
                                     id="open-offcanvas-scrollable",
                                     n_clicks=0,
                                 ),
-                                # width={"offset": 1},
                             ),
                         ],
                     ),
