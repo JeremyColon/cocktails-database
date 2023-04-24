@@ -23,6 +23,7 @@ from utils.helpers import (
 )
 
 from dash import html, dcc, callback_context
+import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 from dash.long_callback import DiskcacheLongCallbackManager
@@ -88,6 +89,10 @@ syrups_control = create_dropdown_from_lists(
 )
 
 liquor_control = create_dropdown_from_data(cocktails_db, "alcohol_type", "alcohol_type")
+
+all_ingredients_icon = html.I(className="fa-solid fa-martini-glass-citrus")
+some_ingredients_icon = html.I(className="fa-solid fa-martini-glass")
+none_ingredients_icon = html.I(className="fa-solid fa-martini-glass-empty")
 
 marks_font_size = 16
 
@@ -508,6 +513,136 @@ layout = [
                                     id="open-offcanvas-scrollable",
                                     n_clicks=0,
                                 ),
+                                width=2,
+                            ),
+                            dbc.Col(
+                                dmc.Group(
+                                    [
+                                        html.I(
+                                            className="fa-solid fa-circle-info",
+                                            style={"margin-top": "7px"},
+                                        ),
+                                        dbc.Modal(
+                                            [
+                                                dbc.ModalHeader("Favorite a Cocktail"),
+                                                dbc.ModalBody(
+                                                    html.P(
+                                                        "Save your favorite cocktails for later"
+                                                    )
+                                                ),
+                                            ],
+                                            id="modal-favorite-cocktail-info",
+                                            is_open=False,
+                                        ),
+                                        dbc.Button(
+                                            html.I(className="fa-regular fa-star"),
+                                            id="button-favorite-cocktail-info",
+                                            outline=False,
+                                            size="sm",
+                                        ),
+                                        dbc.Modal(
+                                            [
+                                                dbc.ModalHeader("Bookmark a Cocktail"),
+                                                dbc.ModalBody(
+                                                    html.P(
+                                                        "Bookmark cocktails that you want to try"
+                                                    )
+                                                ),
+                                            ],
+                                            id="modal-bookmark-cocktail-info",
+                                            is_open=False,
+                                        ),
+                                        dbc.Button(
+                                            html.I(className="fa-regular fa-bookmark"),
+                                            id="button-bookmark-cocktail-info",
+                                            outline=False,
+                                            size="sm",
+                                        ),
+                                        dbc.Modal(
+                                            [
+                                                dbc.ModalHeader(
+                                                    "Can you make this cocktail?"
+                                                ),
+                                                dbc.ModalBody(
+                                                    [
+                                                        dmc.Group(
+                                                            [
+                                                                all_ingredients_icon,
+                                                                html.Span(
+                                                                    ": You have all ingredients"
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dmc.Group(
+                                                            [
+                                                                some_ingredients_icon,
+                                                                html.Span(
+                                                                    ": You have some ingredients"
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dmc.Group(
+                                                            [
+                                                                none_ingredients_icon,
+                                                                html.Span(
+                                                                    ": You have no ingredients"
+                                                                ),
+                                                            ]
+                                                        ),
+                                                    ]
+                                                ),
+                                            ],
+                                            id="modal-can-make-cocktail-info",
+                                            is_open=False,
+                                        ),
+                                        dbc.Button(
+                                            some_ingredients_icon,
+                                            id="button-can-make-cocktail-info",
+                                            outline=False,
+                                            size="sm",
+                                        ),
+                                        dbc.Modal(
+                                            [
+                                                dbc.ModalHeader("Rate a Cocktail"),
+                                                dbc.ModalBody(
+                                                    [
+                                                        html.P(
+                                                            "Rate a cocktail from 0 to 10 based on whether or not <b>you would recommend it to a friend.</b>"
+                                                        ),
+                                                        html.P(
+                                                            "The aggregate rating is adopted from Net Promoter Score."
+                                                        ),
+                                                        html.P(
+                                                            "9 or 10: You are a promoter (Would recommend)"
+                                                        ),
+                                                        html.P(
+                                                            "7 or 8: You are neutral"
+                                                        ),
+                                                        html.P(
+                                                            "0-6: You are a detractor (Would not recommend)"
+                                                        ),
+                                                        html.P(
+                                                            "Cocktail NPS = (% of Promoters) - (% of Detractors)"
+                                                        ),
+                                                        html.P(
+                                                            "100 = All promoters; -100 = All detractors"
+                                                        ),
+                                                    ]
+                                                ),
+                                            ],
+                                            id="modal-rate-cocktail-info",
+                                            is_open=False,
+                                        ),
+                                        dbc.Button(
+                                            "Rate",
+                                            id="button-rate-cocktail-info",
+                                            outline=False,
+                                            size="sm",
+                                        ),
+                                    ],
+                                    align="right",
+                                ),
+                                width={"size": 3, "offset": 7},
                             ),
                         ],
                     ),
@@ -553,7 +688,7 @@ layout = [
     ],
     Input("reset-filters-button", "n_clicks"),
 )
-def toggle_offcanvas_scrollable(
+def reset_filters(
     reset_filters,
 ):
     if reset_filters:
@@ -1042,6 +1177,54 @@ def update_table(
 
 
 @app.callback(
+    Output("modal-favorite-cocktail-info", "is_open"),
+    Input("button-favorite-cocktail-info", "n_clicks"),
+    State("modal-favorite-cocktail-info", "is_open"),
+    prevent_initial_callback=True,
+)
+def toggle_favorite_info_modal(clicked, is_open):
+    if clicked:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("modal-bookmark-cocktail-info", "is_open"),
+    Input("button-bookmark-cocktail-info", "n_clicks"),
+    State("modal-bookmark-cocktail-info", "is_open"),
+    prevent_initial_callback=True,
+)
+def toggle_bookmark_info_modal(clicked, is_open):
+    if clicked:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("modal-can-make-cocktail-info", "is_open"),
+    Input("button-can-make-cocktail-info", "n_clicks"),
+    State("modal-can-make-cocktail-info", "is_open"),
+    prevent_initial_callback=True,
+)
+def toggle_can_make_cocktail_info_modal(clicked, is_open):
+    if clicked:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("modal-rate-cocktail-info", "is_open"),
+    Input("button-rate-cocktail-info", "n_clicks"),
+    State("modal-rate-cocktail-info", "is_open"),
+    prevent_initial_callback=True,
+)
+def toggle_rate_info_modal(clicked, is_open):
+    if clicked:
+        return not is_open
+    return is_open
+
+
+@app.callback(
     [
         Output({"type": "ingredient-modal", "index": MATCH}, "is_open"),
     ],
@@ -1053,7 +1236,7 @@ def update_table(
     ],
     prevent_initial_call=True,
 )
-def toggle_modal(clicked, is_open):
+def toggle_ingredient_modal(clicked, is_open):
     return [not is_open]
 
 
@@ -1075,7 +1258,7 @@ def toggle_modal(clicked, is_open):
     ],
     prevent_initial_call=True,
 )
-def toggle_modal(
+def toggle_cnps_modal(
     button_label, open_btn, save_btn, cancel_btn, user_rating, is_open, user_obj
 ):
     user_id = user_obj.get("id")
@@ -1161,7 +1344,7 @@ def update_favorites(favorite_button, user_obj):
     State("user-store", "data"),
     prevent_initial_call=True,
 )
-def update_favorites(bookmark_button, user_obj):
+def update_bookmarks(bookmark_button, user_obj):
     user_id = user_obj.get("id")
 
     ctx = callback_context

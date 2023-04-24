@@ -391,3 +391,10 @@ def run_query(sql, ret_columns=False):
         return results, columns
 
     return results
+
+
+def compare_two_lists_equality(coll1, coll2):
+    first_set = set(map(tuple, coll1))
+    second_set = set(map(tuple, coll2))
+
+    return first_set == second_set

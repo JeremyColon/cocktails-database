@@ -17,7 +17,13 @@ from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 
-from utils.helpers import run_query, update_bar, get_my_bar, get_available_cocktails
+from utils.helpers import (
+    run_query,
+    update_bar,
+    get_my_bar,
+    get_available_cocktails,
+    compare_two_lists_equality,
+)
 from utils.controls import create_dropdown_from_data
 
 
@@ -32,6 +38,7 @@ ingredient_names = create_dropdown_from_data(
 layout = [
     html.Div(
         [
+            dcc.Store(id="my-bar-store", storage_type="session"),
             dbc.Container(
                 [
                     # First row of controls for matchups data table
@@ -57,6 +64,7 @@ layout = [
                                                     leftIcon=html.I(
                                                         className="fa-sharp fa-solid fa-plus"
                                                     ),
+                                                    n_clicks=0,
                                                 ),
                                             ]
                                         )
@@ -228,7 +236,7 @@ layout = [
                     ),
                 ],
                 fluid=True,
-            )
+            ),
         ]
     )
 ]
@@ -244,6 +252,8 @@ layout = [
         Output("have-some-count-h3", "children"),
         Output("have-none-count-h3", "children"),
         Output("missing-ingredients-list", "children"),
+        Output("my-bar-store", "data"),
+        Output("my-bar-button", "n_clicks"),
     ],
     Input("my-bar-button", "n_clicks"),
     Input("my-bar-table", "data"),
@@ -251,6 +261,7 @@ layout = [
     [
         State("ingredients-dropdown", "value"),
         State("user-store", "data"),
+        State("my-bar-store", "data"),
     ],
 )
 def update_table(
@@ -259,28 +270,42 @@ def update_table(
     include_garnish,
     ingredients_to_add,
     user_obj,
+    my_bar_obj,
 ):
     user_id = user_obj.get("id")
 
     my_bar_df = get_my_bar(user_id, return_df=True)
 
-    if add_ingredient:
+    if my_bar_obj is not None:
+        if my_bar_obj.get("my_bar") is None or table_rows is None:
+            is_equal = False
+        else:
+            existing_bar = my_bar_obj.get("my_bar", None)
+            is_equal = compare_two_lists_equality(existing_bar, table_rows)
+    else:
+        is_equal = False
 
-        cleaned_ingredients = [re.sub("'", "''", i) for i in ingredients_to_add]
-        str_ingredient_to_add = "','".join(cleaned_ingredients)
+    if add_ingredient > 0 or not is_equal or table_rows:
+        if ingredients_to_add is not None:
 
-        ingredient_ids = run_query(
-            f"""
-            SELECT ingredient_id 
-            FROM ingredients 
-            WHERE mapped_ingredient IN ('{str_ingredient_to_add}')
-            """,
-        )
+            cleaned_ingredients = [re.sub("'", "''", i) for i in ingredients_to_add]
+            str_ingredient_to_add = "','".join(cleaned_ingredients)
+
+            ingredient_ids = run_query(
+                f"""
+                SELECT ingredient_id 
+                FROM ingredients 
+                WHERE mapped_ingredient IN ('{str_ingredient_to_add}')
+                """,
+            )
+        else:
+            ingredient_ids = []
 
         ingredient_list = list(my_bar_df["ingredient_id"].unique())
-        ingredient_list_table = pd.DataFrame(table_rows)["ingredient_id"]
         ingredient_list.extend([i[0] for i in ingredient_ids])
-        ingredient_list.extend(ingredient_list_table)
+        if table_rows is not None and add_ingredient == 0:
+            ingredient_list = pd.DataFrame(table_rows)["ingredient_id"].unique()
+
         update_bar(user_id, list(set(ingredient_list)))
 
         my_bar_df = get_my_bar(user_id, return_df=True)
@@ -329,6 +354,8 @@ def update_table(
             have_none,
             "Your top 5 missing ingredients are: "
             + ", ".join([f"{i+1}. {el.title()}" for i, el in enumerate(top_5_missing)]),
+            {"my_bar": table_rows},
+            0,
         )
 
     available_cocktails = get_available_cocktails(
@@ -369,4 +396,6 @@ def update_table(
         have_none,
         "Your top 5 missing ingredients are: "
         + ", ".join([f"{i+1}. {el.title()}" for i, el in enumerate(top_5_missing)]),
+        {"my_bar": table_rows},
+        0,
     )
