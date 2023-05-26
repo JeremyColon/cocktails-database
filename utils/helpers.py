@@ -1,4 +1,7 @@
 import os, pickle, re, pandas as pd, psycopg2, numpy as np
+import dash_bootstrap_components as dbc
+from dash import html
+from dash import dcc
 
 
 def get_env_creds():
@@ -398,3 +401,197 @@ def compare_two_lists_equality(coll1, coll2):
     second_set = set(map(tuple, coll2))
 
     return first_set == second_set
+
+
+def create_drink_card(
+    cocktail_id,
+    image,
+    link,
+    name,
+    user_rating,
+    favorite,
+    bookmark,
+    drink_button_class,
+    mapped_ingredients_in_bar,
+    mapped_ingredients_not_in_bar,
+    button_label,
+):
+
+    return dbc.Card(
+        [
+            html.A(dbc.CardImg(src=image, top=True), href=link, target="_blank"),
+            dbc.CardBody(
+                [
+                    html.H5(
+                        [
+                            name,
+                            html.Br(),
+                            html.Br(),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        dbc.Button(
+                                            html.I(className="fa-solid fa-star")
+                                            if favorite
+                                            else html.I(className="fa-regular fa-star"),
+                                            id={
+                                                "index": cocktail_id,
+                                                "type": "favorite-button",
+                                            },
+                                            outline=False,
+                                            size="sm",
+                                            n_clicks=0,
+                                        )
+                                    ),
+                                    dbc.Col(
+                                        dbc.Button(
+                                            html.I(className="fa-solid fa-bookmark")
+                                            if bookmark
+                                            else html.I(
+                                                className="fa-regular fa-bookmark"
+                                            ),
+                                            id={
+                                                "index": cocktail_id,
+                                                "type": "bookmark-button",
+                                            },
+                                            outline=False,
+                                            size="sm",
+                                            n_clicks=0,
+                                        )
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            dbc.Button(
+                                                html.I(className=drink_button_class),
+                                                id={
+                                                    "index": cocktail_id,
+                                                    "type": "ingredient-button",
+                                                },
+                                                size="sm",
+                                                n_clicks=0,
+                                            ),
+                                            dbc.Modal(
+                                                [
+                                                    dbc.ModalHeader(
+                                                        dbc.ModalTitle("Ingredients")
+                                                    ),
+                                                    dbc.ModalBody(
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    [
+                                                                        html.H5(
+                                                                            "What You Have"
+                                                                        ),
+                                                                        html.Ol(
+                                                                            [
+                                                                                html.Li(
+                                                                                    i
+                                                                                )
+                                                                                for i in mapped_ingredients_in_bar
+                                                                            ]
+                                                                        ),
+                                                                    ]
+                                                                ),
+                                                                dbc.Col(
+                                                                    [
+                                                                        html.H5(
+                                                                            "What You Don't Have"
+                                                                        ),
+                                                                        html.Ol(
+                                                                            [
+                                                                                html.Li(
+                                                                                    i
+                                                                                )
+                                                                                for i in mapped_ingredients_not_in_bar
+                                                                            ]
+                                                                        ),
+                                                                    ]
+                                                                ),
+                                                            ]
+                                                        )
+                                                    ),
+                                                ],
+                                                id={
+                                                    "index": cocktail_id,
+                                                    "type": "ingredient-modal",
+                                                },
+                                                is_open=False,
+                                            ),
+                                        ]
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            dbc.Button(
+                                                button_label,
+                                                id={
+                                                    "index": cocktail_id,
+                                                    "type": "cNPS-button",
+                                                },
+                                                size="sm",
+                                                n_clicks=0,
+                                            ),
+                                            dbc.Modal(
+                                                [
+                                                    dbc.ModalHeader(
+                                                        dbc.ModalTitle("Cocktail NPS")
+                                                    ),
+                                                    dbc.ModalBody(
+                                                        [
+                                                            html.H5(
+                                                                "On a scale of 0-10, how likely are you to recommend this cocktail to your friend?"
+                                                            ),
+                                                            dcc.Slider(
+                                                                id={
+                                                                    "index": cocktail_id,
+                                                                    "type": "cNPS-rating",
+                                                                },
+                                                                min=0,
+                                                                value=user_rating,
+                                                                max=10,
+                                                                step=1,
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    dbc.ModalFooter(
+                                                        [
+                                                            dbc.Button(
+                                                                "Cancel",
+                                                                id={
+                                                                    "index": cocktail_id,
+                                                                    "type": "cNPS-cancel",
+                                                                },
+                                                                className="ml-auto",
+                                                                n_clicks=0,
+                                                            ),
+                                                            dbc.Button(
+                                                                "Save",
+                                                                id={
+                                                                    "index": cocktail_id,
+                                                                    "type": "cNPS-save",
+                                                                },
+                                                                className="ms-auto",
+                                                                n_clicks=0,
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ],
+                                                id={
+                                                    "index": cocktail_id,
+                                                    "type": "cNPS-modal",
+                                                },
+                                                is_open=False,
+                                            ),
+                                        ],
+                                    ),
+                                ]
+                            ),
+                        ],
+                        # className=name,
+                        style={"text-align": "center"},
+                    ),
+                ],
+                id=f"cocktail-card-{cocktail_id}",
+            ),
+        ]
+    )

@@ -4,10 +4,12 @@ import os
 import re
 import json
 import pandas as pd
+import polars as pl
 import numpy as np
 import psycopg2
 import pathlib
 from math import ceil, isnan
+from .components.help_buttons import help_buttons
 from utils.controls import *
 from utils.helpers import (
     create_OR_filter_string,
@@ -20,6 +22,7 @@ from utils.helpers import (
     update_bookmark,
     update_rating,
     get_available_cocktails,
+    create_drink_card,
 )
 
 from dash import html, dcc, callback_context
@@ -28,6 +31,8 @@ import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 from dash.long_callback import DiskcacheLongCallbackManager
 from dash.dependencies import MATCH, Input, Output, State
+
+from datetime import datetime as dt
 
 ## Diskcache
 import diskcache
@@ -63,11 +68,7 @@ COCKTAILS_SQL = os.environ["COCKTAILS_SQL"]
 
 results, columns = run_query(COCKTAILS_SQL, True)
 cocktails_db = pd.DataFrame(results, columns=columns)
-cocktail_ids = cocktails_db["cocktail_id"].unique()
 recipe_count = cocktails_db.cocktail_id.max()
-
-avg_cocktail_ratings, columns = run_query("select * from vw_cocktail_ratings", True)
-avg_cocktail_ratings_df = pd.DataFrame(avg_cocktail_ratings, columns=columns)
 
 # Controls
 names = cocktails_db["recipe_name"].unique()
@@ -87,12 +88,30 @@ bitters_control = create_dropdown_from_lists(
 syrups_control = create_dropdown_from_lists(
     filter_lists.get("syrup"), filter_lists.get("syrup"), "str"
 )
+syrups_control = create_dropdown_from_lists(
+    filter_lists.get("syrup"), filter_lists.get("syrup"), "str"
+)
+sort_labels = [
+    "Average Rating",
+    "Bookmark",
+    "Cocktail NPS",
+    "Favorite",
+    "Name",
+    "% Ingredients In Bar",
+    "# of Ratings",
+]
+sort_values = [
+    "avg_rating",
+    "bookmark",
+    "cocktail_nps",
+    "favorite",
+    "recipe_name",
+    "perc_ingredients_in_bar",
+    "num_ratings",
+]
+sort_control = create_dropdown_from_lists(sort_labels, sort_values, "str")
 
 liquor_control = create_dropdown_from_data(cocktails_db, "alcohol_type", "alcohol_type")
-
-all_ingredients_icon = html.I(className="fa-solid fa-martini-glass-citrus")
-some_ingredients_icon = html.I(className="fa-solid fa-martini-glass")
-none_ingredients_icon = html.I(className="fa-solid fa-martini-glass-empty")
 
 marks_font_size = 16
 
@@ -141,6 +160,42 @@ layout = [
                                         )
                                     ),
                                     dbc.Row(
+                                        dbc.Col(
+                                            dbc.Card(
+                                                dbc.CardBody(
+                                                    [
+                                                        html.H5("Sort By..."),
+                                                        dcc.Dropdown(
+                                                            id="sort-by-dropdown",
+                                                            options=sort_control,
+                                                            value=None,
+                                                            multi=True,
+                                                            persistence=True,
+                                                            persistence_type="session",
+                                                        ),
+                                                        dbc.RadioItems(
+                                                            id="sort-by-radio",
+                                                            options=[
+                                                                {
+                                                                    "label": "Ascending",
+                                                                    "value": False,
+                                                                },
+                                                                {
+                                                                    "label": "Descending",
+                                                                    "value": True,
+                                                                },
+                                                            ],
+                                                            value=True,
+                                                            inline=True,
+                                                            persistence=True,
+                                                            persistence_type="session",
+                                                        ),
+                                                    ]
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    dbc.Row(
                                         [
                                             dbc.Col(
                                                 [
@@ -151,7 +206,7 @@ layout = [
                                                                     dbc.Col(
                                                                         [
                                                                             html.H5(
-                                                                                "Show Cocktails Where I.."
+                                                                                "Show Cocktails Where I..."
                                                                             ),
                                                                             dbc.Checklist(
                                                                                 options=[
@@ -509,152 +564,32 @@ layout = [
                         [
                             dbc.Col(
                                 dbc.Button(
-                                    "Open Filters",
+                                    "Control Panel",
                                     id="open-offcanvas-scrollable",
                                     n_clicks=0,
                                 ),
                                 width=2,
                             ),
                             dbc.Col(
-                                dmc.Group(
-                                    [
-                                        html.I(
-                                            className="fa-solid fa-circle-info",
-                                            style={"margin-top": "7px"},
-                                        ),
-                                        dbc.Modal(
-                                            [
-                                                dbc.ModalHeader("Favorite a Cocktail"),
-                                                dbc.ModalBody(
-                                                    html.P(
-                                                        "Save your favorite cocktails for later"
-                                                    )
-                                                ),
-                                            ],
-                                            id="modal-favorite-cocktail-info",
-                                            is_open=False,
-                                        ),
-                                        dbc.Button(
-                                            html.I(className="fa-regular fa-star"),
-                                            id="button-favorite-cocktail-info",
-                                            outline=False,
-                                            size="sm",
-                                        ),
-                                        dbc.Modal(
-                                            [
-                                                dbc.ModalHeader("Bookmark a Cocktail"),
-                                                dbc.ModalBody(
-                                                    html.P(
-                                                        "Bookmark cocktails that you want to try"
-                                                    )
-                                                ),
-                                            ],
-                                            id="modal-bookmark-cocktail-info",
-                                            is_open=False,
-                                        ),
-                                        dbc.Button(
-                                            html.I(className="fa-regular fa-bookmark"),
-                                            id="button-bookmark-cocktail-info",
-                                            outline=False,
-                                            size="sm",
-                                        ),
-                                        dbc.Modal(
-                                            [
-                                                dbc.ModalHeader(
-                                                    "Can you make this cocktail?"
-                                                ),
-                                                dbc.ModalBody(
-                                                    [
-                                                        dmc.Group(
-                                                            [
-                                                                all_ingredients_icon,
-                                                                html.Span(
-                                                                    ": You have all ingredients"
-                                                                ),
-                                                            ]
-                                                        ),
-                                                        dmc.Group(
-                                                            [
-                                                                some_ingredients_icon,
-                                                                html.Span(
-                                                                    ": You have some ingredients"
-                                                                ),
-                                                            ]
-                                                        ),
-                                                        dmc.Group(
-                                                            [
-                                                                none_ingredients_icon,
-                                                                html.Span(
-                                                                    ": You have no ingredients"
-                                                                ),
-                                                            ]
-                                                        ),
-                                                    ]
-                                                ),
-                                            ],
-                                            id="modal-can-make-cocktail-info",
-                                            is_open=False,
-                                        ),
-                                        dbc.Button(
-                                            some_ingredients_icon,
-                                            id="button-can-make-cocktail-info",
-                                            outline=False,
-                                            size="sm",
-                                        ),
-                                        dbc.Modal(
-                                            [
-                                                dbc.ModalHeader("Rate a Cocktail"),
-                                                dbc.ModalBody(
-                                                    [
-                                                        html.P(
-                                                            "Rate a cocktail from 0 to 10 based on whether or not <b>you would recommend it to a friend.</b>"
-                                                        ),
-                                                        html.P(
-                                                            "The aggregate rating is adopted from Net Promoter Score."
-                                                        ),
-                                                        html.P(
-                                                            "9 or 10: You are a promoter (Would recommend)"
-                                                        ),
-                                                        html.P(
-                                                            "7 or 8: You are neutral"
-                                                        ),
-                                                        html.P(
-                                                            "0-6: You are a detractor (Would not recommend)"
-                                                        ),
-                                                        html.P(
-                                                            "Cocktail NPS = (% of Promoters) - (% of Detractors)"
-                                                        ),
-                                                        html.P(
-                                                            "100 = All promoters; -100 = All detractors"
-                                                        ),
-                                                    ]
-                                                ),
-                                            ],
-                                            id="modal-rate-cocktail-info",
-                                            is_open=False,
-                                        ),
-                                        dbc.Button(
-                                            "Rate",
-                                            id="button-rate-cocktail-info",
-                                            outline=False,
-                                            size="sm",
-                                        ),
-                                    ],
-                                    align="right",
-                                ),
+                                help_buttons,
                                 width={"size": 3, "offset": 7},
                             ),
                         ],
                     ),
                     dbc.Row(html.Br()),
                     dbc.Row(html.H3("Loading all recipes..."), id="loading-row"),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                id="cocktails-col",
-                                width=12,
-                            )
-                        ]
+                    dmc.LoadingOverlay(
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    id="cocktails-col",
+                                    width=12,
+                                )
+                            ]
+                        ),
+                        overlayColor="lightgray",
+                        transitionDuration=250,
+                        exitTransitionDuration=250,
                     ),
                     dbc.Row(html.Br()),
                     html.Footer(
@@ -722,458 +657,6 @@ def toggle_offcanvas_scrollable(n1, is_open):
     if n1:
         return not is_open
     return is_open
-
-
-# Callback to update table
-@app.callback(
-    [
-        Output("loading-row", "children"),
-        Output("cocktails-col", "children"),
-        Output("offcanvas-scrollable", "title"),
-    ],
-    Input("apply-filters-button", "n_clicks"),
-    [
-        State("liquor-dropdown", "value"),
-        State("syrup-dropdown", "value"),
-        State("bitter-dropdown", "value"),
-        State("garnish-dropdown", "value"),
-        State("other-dropdown", "value"),
-        State("free-text-search", "value"),
-        State("filter-type", "value"),
-        State("all-ingredients-switch-input", "value"),
-        State("some-ingredients-switch-input", "value"),
-        State("no-ingredients-switch-input", "value"),
-        State("favorites-switch-input", "value"),
-        State("bookmarks-switch-input", "value"),
-        State("unrated-switch-input", "value"),
-        State("include-garnish-switch-input", "value"),
-        State("cocktail-nps-range-slider", "value"),
-        State("user-store", "data"),
-    ],
-)
-def update_table(
-    apply_filters,
-    liquor,
-    syrup,
-    bitter,
-    garnish,
-    other,
-    free_text,
-    filter_type,
-    show_have_all,
-    show_have_some,
-    show_have_none,
-    show_favorites,
-    show_bookmarks,
-    show_unrated_cocktails,
-    include_garnish,
-    cocktail_nps_range,
-    user_obj,
-):
-
-    user_id = user_obj.get("id")
-    filters = [liquor, syrup, bitter, garnish, other, free_text]
-
-    if len(include_garnish) > 0:
-        include_garnish = True
-    else:
-        include_garnish = False
-
-    available_cocktails_df = get_available_cocktails(
-        user_id, include_garnish=include_garnish
-    )
-
-    if filter_type == "and":
-        filtered_df = apply_AND_filters(filters, cocktails_db)
-    else:
-        filter_string = create_OR_filter_string(filters)
-        filtered_df = cocktails_db.loc[
-            cocktails_db["mapped_ingredient"].str.contains(
-                filter_string, regex=True, flags=re.IGNORECASE
-            )
-            | cocktails_db["recipe_name"].str.contains(
-                filter_string, regex=True, flags=re.IGNORECASE
-            ),
-            :,
-        ]
-
-    cocktail_ids_to_filter_on = avg_cocktail_ratings_df.loc[
-        (avg_cocktail_ratings_df["cocktail_nps"] >= cocktail_nps_range[0])
-        & (avg_cocktail_ratings_df["cocktail_nps"] <= cocktail_nps_range[1]),
-        "cocktail_id",
-    ].values.tolist()
-
-    if len(show_unrated_cocktails) > 0:
-        cocktails_to_remove = avg_cocktail_ratings_df.loc[
-            ~avg_cocktail_ratings_df["cocktail_id"].isin(cocktail_ids_to_filter_on),
-            "cocktail_id",
-        ].values
-        filtered_df = filtered_df.loc[
-            ~filtered_df["cocktail_id"].isin(cocktails_to_remove), :
-        ]
-    else:
-        filtered_df = filtered_df.loc[
-            filtered_df["cocktail_id"].isin(cocktail_ids_to_filter_on), :
-        ]
-
-    # TODO:  Check if switches for my bar are on or off then filter down.
-
-    favorites, columns = run_query(
-        f"SELECT * FROM user_favorites WHERE user_id={user_id}", True
-    )
-    favorites_df = pd.DataFrame(favorites, columns=columns)
-
-    user_ratings, columns = run_query(
-        f"SELECT cocktail_id, rating FROM user_ratings WHERE user_id={user_id}",
-        True,
-    )
-    user_ratings_df = pd.DataFrame(user_ratings, columns=columns)
-
-    bookmarks, columns = run_query(
-        f"SELECT * FROM user_bookmarks WHERE user_id={user_id}", True
-    )
-    bookmarks_df = pd.DataFrame(bookmarks, columns=columns)
-
-    join_type = "left" if len(show_favorites) == 0 else "inner"
-    filtered_w_favorites_df = filtered_df.merge(
-        favorites_df, on="cocktail_id", how=join_type
-    ).assign(
-        favorite=lambda row: np.where(
-            pd.isnull(row["favorite"]), False, row["favorite"]
-        )
-    )
-
-    join_type = "left" if len(show_bookmarks) == 0 else "inner"
-    filtered_final_df = (
-        filtered_w_favorites_df.merge(bookmarks_df, on="cocktail_id", how=join_type)
-        .assign(
-            bookmark=lambda row: np.where(
-                pd.isnull(row["bookmark"]), False, row["bookmark"]
-            )
-        )
-        .merge(
-            available_cocktails_df[
-                [
-                    "cocktail_id",
-                    "ingredients_False",
-                    "ingredients_True",
-                    "mapped_ingredients_False",
-                    "mapped_ingredients_True",
-                    "num_ingredients_False",
-                    "num_ingredients_True",
-                    "perc_ingredients_in_bar",
-                ]
-            ],
-            on="cocktail_id",
-            how="left",
-        )
-    )
-
-    if len(show_have_all) == 0:
-        filtered_final_df = filtered_final_df.loc[
-            filtered_final_df["perc_ingredients_in_bar"] < 1, :
-        ]
-
-    if len(show_have_some) == 0:
-        filtered_final_df = filtered_final_df.loc[
-            (filtered_final_df["perc_ingredients_in_bar"] == 1)
-            | (filtered_final_df["perc_ingredients_in_bar"] == 0)
-            | (pd.isnull(filtered_final_df["perc_ingredients_in_bar"])),
-            :,
-        ]
-
-    if len(show_have_none) == 0:
-        filtered_final_df = filtered_final_df.loc[
-            filtered_final_df["perc_ingredients_in_bar"] > 0, :
-        ]
-
-    if len(show_favorites) == 1:
-        filtered_final_df = filtered_final_df.loc[
-            filtered_final_df["favorite"] == True, :
-        ]
-
-    if len(show_bookmarks) == 1:
-        filtered_final_df = filtered_final_df.loc[
-            filtered_final_df["bookmark"] == True, :
-        ]
-
-    values = (
-        filtered_final_df[
-            ["cocktail_id", "recipe_name", "image", "link", "favorite", "bookmark"]
-        ]
-        .drop_duplicates()
-        .values.tolist()
-    )
-
-    recipe_count = len(values)
-
-    row_size = 5
-    rows = ceil(len(values) / row_size)
-    ret = list()
-    for i in range(rows):
-        cards = list()
-        start_val = i * row_size
-        end_val = (i + 1) * row_size
-        for j, value in enumerate(values[start_val:end_val]):
-            cocktail_id = value[0]
-            name = value[1]
-            image = value[2]
-            link = value[3]
-            favorite = value[4]
-            bookmark = value[5]
-            user_rating = user_ratings_df.loc[
-                user_ratings_df["cocktail_id"] == cocktail_id, "rating"
-            ].values
-            cocktail_nps = avg_cocktail_ratings_df.loc[
-                avg_cocktail_ratings_df["cocktail_id"] == cocktail_id, "cocktail_nps"
-            ].values
-            cocktail_nps = None if len(cocktail_nps) == 0 else cocktail_nps[0]
-            if cocktail_nps is not None:
-                button_label = f"{cocktail_nps}"
-            else:
-                button_label = "Rate"
-
-            available_cocktail = available_cocktails_df.loc[
-                available_cocktails_df["cocktail_id"] == cocktail_id,
-                [
-                    "ingredients_False",
-                    "ingredients_True",
-                    "mapped_ingredients_False",
-                    "mapped_ingredients_True",
-                    "num_ingredients_False",
-                    "num_ingredients_True",
-                    "perc_ingredients_in_bar",
-                ],
-            ]
-            perc_ingredients_in_bar = available_cocktail[
-                "perc_ingredients_in_bar"
-            ].values[0]
-
-            mapped_ingredients_in_bar = available_cocktail["ingredients_True"].to_list()
-            mapped_ingredients_not_in_bar = available_cocktail[
-                "ingredients_False"
-            ].to_list()
-
-            mapped_ingredients_in_bar = (
-                mapped_ingredients_in_bar[0]
-                if isinstance(mapped_ingredients_in_bar[0], list)
-                else []
-            )
-            mapped_ingredients_not_in_bar = (
-                mapped_ingredients_not_in_bar[0]
-                if isinstance(mapped_ingredients_not_in_bar[0], list)
-                else []
-            )
-
-            if perc_ingredients_in_bar == 0 or perc_ingredients_in_bar is np.nan:
-                drink_button_class = "fa-solid fa-martini-glass-empty"
-            elif perc_ingredients_in_bar < 1:
-                drink_button_class = "fa-solid fa-martini-glass"
-            else:
-                drink_button_class = "fa-solid fa-martini-glass-citrus"
-
-            user_rating = 8 if len(user_rating) == 0 else user_rating[0]
-            card = dbc.Card(
-                [
-                    html.A(
-                        dbc.CardImg(src=image, top=True), href=link, target="_blank"
-                    ),
-                    dbc.CardBody(
-                        [
-                            html.H5(
-                                [
-                                    name,
-                                    html.Br(),
-                                    html.Br(),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Button(
-                                                    html.I(className="fa-solid fa-star")
-                                                    if favorite
-                                                    else html.I(
-                                                        className="fa-regular fa-star"
-                                                    ),
-                                                    id={
-                                                        "index": cocktail_id,
-                                                        "type": "favorite-button",
-                                                    },
-                                                    outline=False,
-                                                    size="sm",
-                                                    n_clicks=0,
-                                                )
-                                            ),
-                                            dbc.Col(
-                                                dbc.Button(
-                                                    html.I(
-                                                        className="fa-solid fa-bookmark"
-                                                    )
-                                                    if bookmark
-                                                    else html.I(
-                                                        className="fa-regular fa-bookmark"
-                                                    ),
-                                                    id={
-                                                        "index": cocktail_id,
-                                                        "type": "bookmark-button",
-                                                    },
-                                                    outline=False,
-                                                    size="sm",
-                                                    n_clicks=0,
-                                                )
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Button(
-                                                        html.I(
-                                                            className=drink_button_class
-                                                        ),
-                                                        id={
-                                                            "index": cocktail_id,
-                                                            "type": "ingredient-button",
-                                                        },
-                                                        size="sm",
-                                                        n_clicks=0,
-                                                    ),
-                                                    dbc.Modal(
-                                                        [
-                                                            dbc.ModalHeader(
-                                                                dbc.ModalTitle(
-                                                                    "Ingredients"
-                                                                )
-                                                            ),
-                                                            dbc.ModalBody(
-                                                                dbc.Row(
-                                                                    [
-                                                                        dbc.Col(
-                                                                            [
-                                                                                html.H5(
-                                                                                    "What You Have"
-                                                                                ),
-                                                                                html.Ol(
-                                                                                    [
-                                                                                        html.Li(
-                                                                                            i
-                                                                                        )
-                                                                                        for i in mapped_ingredients_in_bar
-                                                                                    ]
-                                                                                ),
-                                                                            ]
-                                                                        ),
-                                                                        dbc.Col(
-                                                                            [
-                                                                                html.H5(
-                                                                                    "What You Don't Have"
-                                                                                ),
-                                                                                html.Ol(
-                                                                                    [
-                                                                                        html.Li(
-                                                                                            i
-                                                                                        )
-                                                                                        for i in mapped_ingredients_not_in_bar
-                                                                                    ]
-                                                                                ),
-                                                                            ]
-                                                                        ),
-                                                                    ]
-                                                                )
-                                                            ),
-                                                        ],
-                                                        id={
-                                                            "index": cocktail_id,
-                                                            "type": "ingredient-modal",
-                                                        },
-                                                        is_open=False,
-                                                    ),
-                                                ]
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Button(
-                                                        button_label,
-                                                        id={
-                                                            "index": cocktail_id,
-                                                            "type": "cNPS-button",
-                                                        },
-                                                        size="sm",
-                                                        n_clicks=0,
-                                                    ),
-                                                    dbc.Modal(
-                                                        [
-                                                            dbc.ModalHeader(
-                                                                dbc.ModalTitle(
-                                                                    "Cocktail NPS"
-                                                                )
-                                                            ),
-                                                            dbc.ModalBody(
-                                                                [
-                                                                    html.H5(
-                                                                        "On a scale of 0-10, how likely are you to recommend this cocktail to your friend?"
-                                                                    ),
-                                                                    dcc.Slider(
-                                                                        id={
-                                                                            "index": cocktail_id,
-                                                                            "type": "cNPS-rating",
-                                                                        },
-                                                                        min=0,
-                                                                        value=user_rating,
-                                                                        max=10,
-                                                                        step=1,
-                                                                    ),
-                                                                ],
-                                                            ),
-                                                            dbc.ModalFooter(
-                                                                [
-                                                                    dbc.Button(
-                                                                        "Cancel",
-                                                                        id={
-                                                                            "index": cocktail_id,
-                                                                            "type": "cNPS-cancel",
-                                                                        },
-                                                                        className="ml-auto",
-                                                                        n_clicks=0,
-                                                                    ),
-                                                                    dbc.Button(
-                                                                        "Save",
-                                                                        id={
-                                                                            "index": cocktail_id,
-                                                                            "type": "cNPS-save",
-                                                                        },
-                                                                        className="ms-auto",
-                                                                        n_clicks=0,
-                                                                    ),
-                                                                ],
-                                                            ),
-                                                        ],
-                                                        id={
-                                                            "index": cocktail_id,
-                                                            "type": "cNPS-modal",
-                                                        },
-                                                        is_open=False,
-                                                    ),
-                                                ],
-                                            ),
-                                        ]
-                                    ),
-                                ],
-                                # className=name,
-                                style={"text-align": "center"},
-                            ),
-                        ],
-                        id=f"cocktail-card-{cocktail_id}",
-                    ),
-                ]
-            )
-            cards.append(card)
-
-        card_group = dbc.CardGroup(cards)
-        row = dbc.Row(dbc.Col(card_group))
-        ret.append(row)
-
-    return [
-        None,
-        ret,
-        f"Filters (Showing {str(recipe_count)} Recipes)",
-    ]
 
 
 @app.callback(
@@ -1295,7 +778,6 @@ def update_favorites(favorite_button, user_obj):
     if value is None:
         raise PreventUpdate
     else:
-
         favorites, columns = run_query(
             f"SELECT * FROM user_favorites WHERE user_id={user_id}", True
         )
@@ -1356,7 +838,6 @@ def update_bookmarks(bookmark_button, user_obj):
     if value is None:
         raise PreventUpdate
     else:
-
         bookmarks, columns = run_query(
             f"SELECT * FROM user_bookmarks WHERE user_id={user_id}", True
         )
@@ -1394,3 +875,325 @@ def update_bookmarks(bookmark_button, user_obj):
     )
 
     return icon
+
+
+# Callback to update table
+@app.callback(
+    [
+        Output("loading-row", "children"),
+        Output("cocktails-col", "children"),
+        Output("offcanvas-scrollable", "title"),
+    ],
+    Input("apply-filters-button", "n_clicks"),
+    [
+        State("liquor-dropdown", "value"),
+        State("syrup-dropdown", "value"),
+        State("bitter-dropdown", "value"),
+        State("garnish-dropdown", "value"),
+        State("other-dropdown", "value"),
+        State("free-text-search", "value"),
+        State("filter-type", "value"),
+        State("all-ingredients-switch-input", "value"),
+        State("some-ingredients-switch-input", "value"),
+        State("no-ingredients-switch-input", "value"),
+        State("favorites-switch-input", "value"),
+        State("bookmarks-switch-input", "value"),
+        State("unrated-switch-input", "value"),
+        State("include-garnish-switch-input", "value"),
+        State("cocktail-nps-range-slider", "value"),
+        State("sort-by-dropdown", "value"),
+        State("sort-by-radio", "value"),
+        State("user-store", "data"),
+    ],
+)
+def update_table(
+    apply_filters,
+    liquor,
+    syrup,
+    bitter,
+    garnish,
+    other,
+    free_text,
+    filter_type,
+    show_have_all,
+    show_have_some,
+    show_have_none,
+    show_favorites,
+    show_bookmarks,
+    show_unrated_cocktails,
+    include_garnish,
+    cocktail_nps_range,
+    sort_by_cols,
+    sort_by_dir,
+    user_obj,
+):
+    user_id = user_obj.get("id")
+    filters = [liquor, syrup, bitter, garnish, other, free_text]
+
+    if len(include_garnish) > 0:
+        include_garnish = True
+    else:
+        include_garnish = False
+
+    if sort_by_cols is None:
+        sort_by_cols = "recipe_name"
+    if len(sort_by_cols) == 0:
+        sort_by_cols = "recipe_name"
+
+    available_cocktails_df = pl.from_pandas(
+        get_available_cocktails(user_id, include_garnish=include_garnish)
+    ).lazy()
+
+    avg_cocktail_ratings, columns = run_query("select * from vw_cocktail_ratings", True)
+    avg_cocktail_ratings_df = pd.DataFrame(avg_cocktail_ratings, columns=columns)
+
+    if filter_type == "and":
+        filtered_df = apply_AND_filters(filters, cocktails_db)
+    else:
+        filter_string = create_OR_filter_string(filters)
+        filtered_df = cocktails_db.loc[
+            cocktails_db["mapped_ingredient"].str.contains(
+                filter_string, regex=True, flags=re.IGNORECASE
+            )
+            | cocktails_db["recipe_name"].str.contains(
+                filter_string, regex=True, flags=re.IGNORECASE
+            ),
+            :,
+        ]
+
+    cocktail_ids_to_filter_on = avg_cocktail_ratings_df.loc[
+        (avg_cocktail_ratings_df["cocktail_nps"] >= cocktail_nps_range[0])
+        & (avg_cocktail_ratings_df["cocktail_nps"] <= cocktail_nps_range[1]),
+        "cocktail_id",
+    ].values.tolist()
+
+    if len(show_unrated_cocktails) > 0:
+        cocktails_to_remove = avg_cocktail_ratings_df.loc[
+            ~avg_cocktail_ratings_df["cocktail_id"].isin(cocktail_ids_to_filter_on),
+            "cocktail_id",
+        ].values
+        filtered_df = filtered_df.loc[
+            ~filtered_df["cocktail_id"].isin(cocktails_to_remove), :
+        ]
+    else:
+        filtered_df = filtered_df.loc[
+            filtered_df["cocktail_id"].isin(cocktail_ids_to_filter_on), :
+        ]
+
+    favorites, columns = run_query(
+        f"SELECT cocktail_id, favorite FROM user_favorites WHERE user_id={user_id}",
+        True,
+    )
+    favorites_df = pl.from_pandas(pd.DataFrame(favorites, columns=columns)).lazy()
+    user_ratings, columns = run_query(
+        f"SELECT cocktail_id, rating FROM user_ratings WHERE user_id={user_id}",
+        True,
+    )
+    user_ratings_df = pl.from_pandas(pd.DataFrame(user_ratings, columns=columns)).lazy()
+    bookmarks, columns = run_query(
+        f"SELECT cocktail_id, bookmark FROM user_bookmarks WHERE user_id={user_id}",
+        True,
+    )
+    bookmarks_df = pl.from_pandas(pd.DataFrame(bookmarks, columns=columns)).lazy()
+
+    join_type = "left" if len(show_favorites) == 0 else "inner"
+    filtered_w_favorites_df = (
+        pl.from_pandas(filtered_df)
+        .lazy()
+        .join(favorites_df, on="cocktail_id", how=join_type)
+        .select(
+            [
+                pl.all().exclude("favorite"),
+                pl.when(pl.col("favorite").is_null())
+                .then(False)
+                .otherwise(pl.col("favorite"))
+                .keep_name(),
+            ]
+        )
+    ).lazy()
+
+    join_type = "left" if len(show_bookmarks) == 0 else "inner"
+    filtered_final_df = (
+        filtered_w_favorites_df.join(bookmarks_df, on="cocktail_id", how=join_type)
+        .select(
+            [
+                pl.all().exclude("bookmark"),
+                pl.when(pl.col("bookmark").is_null())
+                .then(False)
+                .otherwise(pl.col("bookmark"))
+                .keep_name(),
+            ]
+        )
+        .join(
+            available_cocktails_df.select(
+                [
+                    pl.col("cocktail_id"),
+                    pl.col("ingredients_False"),
+                    pl.col("ingredients_True"),
+                    pl.col("mapped_ingredients_False"),
+                    pl.col("mapped_ingredients_True"),
+                    pl.col("num_ingredients_False"),
+                    pl.col("num_ingredients_True"),
+                    pl.col("perc_ingredients_in_bar"),
+                ]
+            ),
+            on="cocktail_id",
+            how="left",
+        )
+        .join(
+            pl.from_pandas(avg_cocktail_ratings_df).lazy(), on="cocktail_id", how="left"
+        )
+    )
+
+    if len(show_have_all) == 0:
+        filtered_final_df = filtered_final_df.filter(
+            (pl.col("perc_ingredients_in_bar") < 1)
+        )
+
+    if len(show_have_some) == 0:
+        filtered_final_df = filtered_final_df.filter(
+            (pl.col("perc_ingredients_in_bar") == 1)
+            | (pl.col("perc_ingredients_in_bar") == 0)
+            | (pl.col("perc_ingredients_in_bar") == 1).is_null()
+        )
+
+    if len(show_have_none) == 0:
+        filtered_final_df = filtered_final_df.filter(
+            (pl.col("perc_ingredients_in_bar") > 0)
+        )
+
+    if len(show_favorites) == 1:
+        filtered_final_df = filtered_final_df.filter((pl.col("favorite") == True))
+
+    if len(show_bookmarks) == 1:
+        filtered_final_df = filtered_final_df.filter((pl.col("bookmark") == True))
+
+    values = (
+        filtered_final_df.select(
+            [
+                pl.col("cocktail_id"),
+                pl.col("recipe_name"),
+                pl.col("image"),
+                pl.col("link"),
+                pl.col("favorite"),
+                pl.col("bookmark"),
+                pl.col("perc_ingredients_in_bar"),
+                pl.col("avg_rating"),
+                pl.col("cocktail_nps"),
+                pl.col("num_ratings"),
+            ]
+        )
+        .unique()
+        .sort(sort_by_cols, descending=sort_by_dir)
+        .collect()
+        .to_dicts()
+    )
+
+    recipe_count = len(values)
+
+    row_size = 5
+    rows = ceil(recipe_count / row_size)
+    ret = list()
+    for i in range(rows):
+        cards = list()
+        start_val = i * row_size
+        end_val = (i + 1) * row_size
+        for j, value in enumerate(values[start_val:end_val]):
+            cocktail_id = value.get("cocktail_id")
+            name = value.get("recipe_name")
+            image = value.get("image")
+            link = value.get("link")
+            favorite = value.get("favorite")
+            bookmark = value.get("bookmark")
+            user_rating = (
+                user_ratings_df.filter(pl.col("cocktail_id") == cocktail_id)
+                .select(pl.col("rating"))
+                .collect()
+                .to_numpy()
+            )
+
+            cocktail_nps = avg_cocktail_ratings_df.loc[
+                avg_cocktail_ratings_df["cocktail_id"] == cocktail_id, "cocktail_nps"
+            ].values
+            cocktail_nps = None if len(cocktail_nps) == 0 else cocktail_nps[0]
+            if cocktail_nps is not None:
+                button_label = f"{cocktail_nps}"
+            else:
+                button_label = "Rate"
+
+            available_cocktail = available_cocktails_df.filter(
+                pl.col("cocktail_id") == cocktail_id
+            ).select(
+                [
+                    pl.col("ingredients_False"),
+                    pl.col("ingredients_True"),
+                    pl.col("mapped_ingredients_False"),
+                    pl.col("mapped_ingredients_True"),
+                    pl.col("num_ingredients_False"),
+                    pl.col("num_ingredients_True"),
+                    pl.col("perc_ingredients_in_bar"),
+                ]
+            )
+            perc_ingredients_in_bar = [
+                el[0]
+                for el in available_cocktail.select(pl.col("perc_ingredients_in_bar"))
+                .collect()
+                .to_numpy()
+            ]
+
+            mapped_ingredients_in_bar = [
+                el[0]
+                for el in available_cocktail.select(pl.col("ingredients_True"))
+                .collect()
+                .to_numpy()
+            ]
+            mapped_ingredients_not_in_bar = [
+                el[0]
+                for el in available_cocktail.select(pl.col("ingredients_False"))
+                .collect()
+                .to_numpy()
+            ]
+
+            mapped_ingredients_in_bar = (
+                mapped_ingredients_in_bar[0]
+                if isinstance(mapped_ingredients_in_bar[0], list)
+                else []
+            )
+            mapped_ingredients_not_in_bar = (
+                mapped_ingredients_not_in_bar[0]
+                if isinstance(mapped_ingredients_not_in_bar[0], list)
+                else []
+            )
+
+            if perc_ingredients_in_bar == 0 or perc_ingredients_in_bar is np.nan:
+                drink_button_class = "fa-solid fa-martini-glass-empty"
+            elif perc_ingredients_in_bar[0] < 1:
+                drink_button_class = "fa-solid fa-martini-glass"
+            else:
+                drink_button_class = "fa-solid fa-martini-glass-citrus"
+
+            user_rating = 8 if len(user_rating) == 0 else user_rating[0]
+            card = create_drink_card(
+                cocktail_id,
+                image,
+                link,
+                name,
+                user_rating,
+                favorite,
+                bookmark,
+                drink_button_class,
+                mapped_ingredients_in_bar,
+                mapped_ingredients_not_in_bar,
+                button_label,
+            )
+            cards.append(card)
+
+        card_group = dbc.CardGroup(cards)
+        row = dbc.Row(dbc.Col(card_group))
+        ret.append(row)
+
+    return [
+        None,
+        ret,
+        f"Filters (Showing {str(recipe_count)} Recipes)",
+    ]
