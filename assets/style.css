@@ -48,6 +48,84 @@ h2 {
     color: white;
 }
 
+.dmc-range-slider {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    line-height: 1.55;
+    box-sizing: border-box;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    word-break: break-word;
+    cursor: default;
+    -webkit-tap-highlight-color: transparent;
+    color: #ffffff;
+    padding-bottom: 12px;
+}
+
+label.mantine-DateRangePicker-label {
+    color: #ffffff
+}
+
+label.mantine-RadioGroup-label {
+    color: #ffffff
+}
+
+label.mantine-MultiSelect-label {
+    color: #ffffff
+}
+
+label.mantine-NumberInput-label {
+    color: #ffffff
+}
+
+label.mantine-TextInput-label {
+    color: #ffffff
+}
+
+label.mantine-Select-label {
+    color: #ffffff
+}
+
+label.mantine-Textarea-label {
+    color: #ffffff
+}
+
+div.mantine-Accordion-label {
+    color: #ffffff
+}
+
+div.mantine-Text-root {
+    color: #ffffff
+}
+
+label.mantine-Checkbox-label {
+    color: #ffffff
+}
+
+div.mantine-Accordion-icon {
+    color: #ffffff
+}
+
+div.mantine-RadioGroup-label {
+    color: #ffffff
+}
+
+label.mantine-Radio-label {
+    color: #ffffff
+}
+
+div.mantine-CheckboxGroup-label {
+    color: #ffffff
+}
+
+button.mantine-Accordion-control:hover {
+    background-color: #d8d8d8;
+}
+
+.mantime-tab-colors {
+    color: #ffffff
+}
+
 /* ==========================================
                 NAV BAR
 ========================================== */

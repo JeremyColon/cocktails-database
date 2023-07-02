@@ -4,11 +4,9 @@ import os
 import re
 import json
 import pandas as pd
-import polars as pl
-import numpy as np
-import psycopg2
+from numpy import where, nan
 import pathlib
-from math import ceil, isnan
+from math import ceil
 from .components.help_buttons import help_buttons
 from utils.controls import *
 from utils.helpers import (
@@ -16,7 +14,6 @@ from utils.helpers import (
     apply_AND_filters,
     create_filter_lists,
     run_query,
-    get_favorite,
     get_cocktail_nps,
     update_favorite,
     update_bookmark,
@@ -24,6 +21,8 @@ from utils.helpers import (
     get_available_cocktails,
     create_drink_card,
 )
+from utils.filter_canvas import create_filter_canvas
+
 
 from dash import html, dcc, callback_context
 import dash_mantine_components as dmc
@@ -53,18 +52,6 @@ DB_PORT = os.environ["COCKTAILS_PORT"]
 DB_USER = os.environ["COCKTAILS_USER"]
 DB_NAME = os.environ["COCKTAILS_DB"]
 COCKTAILS_SQL = os.environ["COCKTAILS_SQL"]
-# with psycopg2.connect(
-#         database=DB_NAME,
-#         user=DB_USER,
-#         password=DB_PW,
-#         host=DB_HOST,
-#         port=DB_PORT,
-#     sslmode="require"
-#     ) as conn:
-#     with conn.cursor() as cursor:
-#         cursor.execute(COCKTAILS_SQL)
-#         columns = [desc[0] for desc in cursor.description]
-#         results = cursor.fetchall()
 
 results, columns = run_query(COCKTAILS_SQL, True)
 cocktails_db = pd.DataFrame(results, columns=columns)
@@ -124,441 +111,15 @@ layout = [
             dbc.Container(
                 [
                     dbc.Row(
-                        [
-                            dbc.Offcanvas(
-                                [
-                                    dbc.Row(
-                                        dbc.Col(
-                                            dbc.Card(
-                                                dbc.CardBody(
-                                                    [
-                                                        dbc.Row(
-                                                            [
-                                                                dbc.Col(
-                                                                    [
-                                                                        dbc.Button(
-                                                                            "Apply Filters",
-                                                                            id="apply-filters-button",
-                                                                            n_clicks=0,
-                                                                        )
-                                                                    ],
-                                                                ),
-                                                                dbc.Col(
-                                                                    [
-                                                                        dbc.Button(
-                                                                            "Reset All Filters",
-                                                                            id="reset-filters-button",
-                                                                            n_clicks=0,
-                                                                        )
-                                                                    ]
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ]
-                                                )
-                                            )
-                                        )
-                                    ),
-                                    dbc.Row(
-                                        dbc.Col(
-                                            dbc.Card(
-                                                dbc.CardBody(
-                                                    [
-                                                        html.H5("Sort By..."),
-                                                        dcc.Dropdown(
-                                                            id="sort-by-dropdown",
-                                                            options=sort_control,
-                                                            value=None,
-                                                            multi=True,
-                                                            persistence=True,
-                                                            persistence_type="session",
-                                                        ),
-                                                        dbc.RadioItems(
-                                                            id="sort-by-radio",
-                                                            options=[
-                                                                {
-                                                                    "label": "Ascending",
-                                                                    "value": False,
-                                                                },
-                                                                {
-                                                                    "label": "Descending",
-                                                                    "value": True,
-                                                                },
-                                                            ],
-                                                            value=True,
-                                                            inline=True,
-                                                            persistence=True,
-                                                            persistence_type="session",
-                                                        ),
-                                                    ]
-                                                )
-                                            )
-                                        )
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                dbc.Row(
-                                                                    dbc.Col(
-                                                                        [
-                                                                            html.H5(
-                                                                                "Show Cocktails Where I..."
-                                                                            ),
-                                                                            dbc.Checklist(
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "Have All Ingredients",
-                                                                                        "value": 1,
-                                                                                    },
-                                                                                ],
-                                                                                value=[
-                                                                                    1
-                                                                                ],
-                                                                                id="all-ingredients-switch-input",
-                                                                                inline=True,
-                                                                            ),
-                                                                            dbc.Checklist(
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "Have Some Ingredients",
-                                                                                        "value": 1,
-                                                                                    },
-                                                                                ],
-                                                                                value=[
-                                                                                    1
-                                                                                ],
-                                                                                id="some-ingredients-switch-input",
-                                                                                inline=True,
-                                                                            ),
-                                                                            dbc.Checklist(
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "Have No Ingredients",
-                                                                                        "value": 1,
-                                                                                    },
-                                                                                ],
-                                                                                value=[
-                                                                                    1
-                                                                                ],
-                                                                                id="no-ingredients-switch-input",
-                                                                                inline=True,
-                                                                            ),
-                                                                            html.Br(),
-                                                                            html.Hr(),
-                                                                            dbc.Checklist(
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "Include Garnishes?",
-                                                                                        "value": 1,
-                                                                                    },
-                                                                                ],
-                                                                                value=[],
-                                                                                id="include-garnish-switch-input",
-                                                                                inline=True,
-                                                                            ),
-                                                                        ]
-                                                                    ),
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ]
-                                            )
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                dbc.Row(
-                                                                    dbc.Col(
-                                                                        [
-                                                                            dbc.Checklist(
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "Show Favorites Only",
-                                                                                        "value": 1,
-                                                                                    },
-                                                                                ],
-                                                                                value=[],
-                                                                                id="favorites-switch-input",
-                                                                                inline=True,
-                                                                            ),
-                                                                            dbc.Checklist(
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "Show Bookmarks Only",
-                                                                                        "value": 1,
-                                                                                    },
-                                                                                ],
-                                                                                value=[],
-                                                                                id="bookmarks-switch-input",
-                                                                                inline=True,
-                                                                            ),
-                                                                            dbc.Checklist(
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "Include Unrated Cocktails",
-                                                                                        "value": 1,
-                                                                                    },
-                                                                                ],
-                                                                                value=[
-                                                                                    1
-                                                                                ],
-                                                                                id="unrated-switch-input",
-                                                                                inline=True,
-                                                                            ),
-                                                                        ]
-                                                                    ),
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ]
-                                            )
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5(
-                                                                    "Cocktail NPS Range"
-                                                                ),
-                                                                dcc.RangeSlider(
-                                                                    id="cocktail-nps-range-slider",
-                                                                    min=-100,
-                                                                    max=100,
-                                                                    step=10,
-                                                                    value=[-100, 100],
-                                                                    allowCross=False,
-                                                                    pushable=10,
-                                                                    marks={
-                                                                        i: {
-                                                                            "label": "{}".format(
-                                                                                i
-                                                                                if i
-                                                                                % 20
-                                                                                == 0
-                                                                                else ""
-                                                                            )
-                                                                        }
-                                                                        for i in range(
-                                                                            -100,
-                                                                            101,
-                                                                            10,
-                                                                        )
-                                                                    },
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            )
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5("Liquor"),
-                                                                dcc.Dropdown(
-                                                                    id="liquor-dropdown",
-                                                                    options=liquor_control,
-                                                                    value=None,
-                                                                    multi=True,
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            )
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5("Syrup"),
-                                                                dcc.Dropdown(
-                                                                    id="syrup-dropdown",
-                                                                    options=syrups_control,
-                                                                    value=None,
-                                                                    multi=True,
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            ),
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5("Bitters"),
-                                                                dcc.Dropdown(
-                                                                    id="bitter-dropdown",
-                                                                    options=bitters_control,
-                                                                    value=None,
-                                                                    multi=True,
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            ),
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5("Garnish"),
-                                                                dcc.Dropdown(
-                                                                    id="garnish-dropdown",
-                                                                    options=garnish_control,
-                                                                    value=None,
-                                                                    multi=True,
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            )
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5(
-                                                                    "Other Ingredients"
-                                                                ),
-                                                                dcc.Dropdown(
-                                                                    id="other-dropdown",
-                                                                    options=other_control,
-                                                                    value=None,
-                                                                    multi=True,
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            )
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                html.H5(
-                                                                    "Free Text Search"
-                                                                ),
-                                                                dbc.Input(
-                                                                    id="free-text-search",
-                                                                    placeholder="RegEx search here...",
-                                                                    type="text",
-                                                                    debounce=True,
-                                                                    persistence=True,
-                                                                    persistence_type="session",
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            ),
-                                        ]
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Card(
-                                                        dbc.CardBody(
-                                                            [
-                                                                dbc.Row(
-                                                                    [
-                                                                        dbc.Col(
-                                                                            [
-                                                                                html.H5(
-                                                                                    "Filter Type"
-                                                                                ),
-                                                                                dbc.RadioItems(
-                                                                                    id="filter-type",
-                                                                                    options=[
-                                                                                        {
-                                                                                            "label": "AND",
-                                                                                            "value": "and",
-                                                                                        },
-                                                                                        {
-                                                                                            "label": "OR",
-                                                                                            "value": "or",
-                                                                                        },
-                                                                                    ],
-                                                                                    value="and",
-                                                                                    persistence=True,
-                                                                                    persistence_type="session",
-                                                                                ),
-                                                                            ],
-                                                                        ),
-                                                                    ],
-                                                                ),
-                                                            ]
-                                                        )
-                                                    )
-                                                ],
-                                            ),
-                                        ]
-                                    ),
-                                ],
-                                id="offcanvas-scrollable",
-                                scrollable=True,
-                                title=f"Filters (Showing {recipe_count} Recipes)",
-                                is_open=False,
-                            ),
-                        ]
+                        create_filter_canvas(
+                            sort_control,
+                            liquor_control,
+                            syrups_control,
+                            garnish_control,
+                            other_control,
+                            bitters_control,
+                            recipe_count,
+                        )
                     ),
                     dbc.Row(
                         [
@@ -612,14 +173,12 @@ layout = [
         Output("other-dropdown", "value"),
         Output("free-text-search", "value"),
         Output("filter-type", "value"),
-        Output("all-ingredients-switch-input", "value"),
-        Output("some-ingredients-switch-input", "value"),
-        Output("no-ingredients-switch-input", "value"),
-        Output("favorites-switch-input", "value"),
-        Output("bookmarks-switch-input", "value"),
-        Output("unrated-switch-input", "value"),
-        Output("include-garnish-switch-input", "value"),
+        Output("ingredients-checklist", "value"),
+        Output("favorites-bookmarks-unrated-checklist", "value"),
+        Output("include-garnish-checkbox", "value"),
         Output("cocktail-nps-range-slider", "value"),
+        Output("sort-by-dropdown", "value"),
+        Output("sort-by-radio", "value"),
     ],
     Input("reset-filters-button", "n_clicks"),
 )
@@ -635,14 +194,20 @@ def reset_filters(
             None,
             None,
             "and",
-            [1],
-            [1],
-            [1],
-            [],
-            [],
-            [1],
-            [],
+            [
+                "have_all",
+                "have_some",
+                "have_none",
+            ],
+            [
+                "favorites_only",
+                "bookmarks_only",
+                "include_unrated",
+            ],
+            ["include_garnishes"],
             [-100, 100],
+            None,
+            True,
         )
     else:
         raise PreventUpdate
@@ -788,7 +353,7 @@ def update_favorites(favorite_button, user_obj):
             .drop_duplicates()
             .merge(favorites_df, on="cocktail_id", how="left")
             .assign(
-                favorite=lambda row: np.where(
+                favorite=lambda row: where(
                     pd.isnull(row["favorite"]), False, row["favorite"]
                 )
             )
@@ -848,7 +413,7 @@ def update_bookmarks(bookmark_button, user_obj):
             .drop_duplicates()
             .merge(bookmarks_df, on="cocktail_id", how="left")
             .assign(
-                bookmark=lambda row: np.where(
+                bookmark=lambda row: where(
                     pd.isnull(row["bookmark"]), False, row["bookmark"]
                 )
             )
@@ -893,13 +458,9 @@ def update_bookmarks(bookmark_button, user_obj):
         State("other-dropdown", "value"),
         State("free-text-search", "value"),
         State("filter-type", "value"),
-        State("all-ingredients-switch-input", "value"),
-        State("some-ingredients-switch-input", "value"),
-        State("no-ingredients-switch-input", "value"),
-        State("favorites-switch-input", "value"),
-        State("bookmarks-switch-input", "value"),
-        State("unrated-switch-input", "value"),
-        State("include-garnish-switch-input", "value"),
+        State("ingredients-checklist", "value"),
+        State("favorites-bookmarks-unrated-checklist", "value"),
+        State("include-garnish-checkbox", "value"),
         State("cocktail-nps-range-slider", "value"),
         State("sort-by-dropdown", "value"),
         State("sort-by-radio", "value"),
@@ -915,12 +476,8 @@ def update_table(
     other,
     free_text,
     filter_type,
-    show_have_all,
-    show_have_some,
-    show_have_none,
-    show_favorites,
-    show_bookmarks,
-    show_unrated_cocktails,
+    show_ingredients,
+    show_cocktails,
     include_garnish,
     cocktail_nps_range,
     sort_by_cols,
@@ -940,9 +497,9 @@ def update_table(
     if len(sort_by_cols) == 0:
         sort_by_cols = "recipe_name"
 
-    available_cocktails_df = pl.from_pandas(
-        get_available_cocktails(user_id, include_garnish=include_garnish)
-    ).lazy()
+    available_cocktails_df = get_available_cocktails(
+        user_id, include_garnish=include_garnish
+    )
 
     avg_cocktail_ratings, columns = run_query("select * from vw_cocktail_ratings", True)
     avg_cocktail_ratings_df = pd.DataFrame(avg_cocktail_ratings, columns=columns)
@@ -967,7 +524,11 @@ def update_table(
         "cocktail_id",
     ].values.tolist()
 
-    if len(show_unrated_cocktails) > 0:
+    show_unrated_cocktails = "include_unrated" in show_cocktails
+    show_favorites = "favorites_only" in show_cocktails
+    show_bookmarks = "bookmarks_only" in show_cocktails
+
+    if show_unrated_cocktails:
         cocktails_to_remove = avg_cocktail_ratings_df.loc[
             ~avg_cocktail_ratings_df["cocktail_id"].isin(cocktail_ids_to_filter_on),
             "cocktail_id",
@@ -984,109 +545,105 @@ def update_table(
         f"SELECT cocktail_id, favorite FROM user_favorites WHERE user_id={user_id}",
         True,
     )
-    favorites_df = pl.from_pandas(pd.DataFrame(favorites, columns=columns)).lazy()
+    favorites_df = pd.DataFrame(favorites, columns=columns)
     user_ratings, columns = run_query(
         f"SELECT cocktail_id, rating FROM user_ratings WHERE user_id={user_id}",
         True,
     )
-    user_ratings_df = pl.from_pandas(pd.DataFrame(user_ratings, columns=columns)).lazy()
+    user_ratings_df = pd.DataFrame(user_ratings, columns=columns)
     bookmarks, columns = run_query(
         f"SELECT cocktail_id, bookmark FROM user_bookmarks WHERE user_id={user_id}",
         True,
     )
-    bookmarks_df = pl.from_pandas(pd.DataFrame(bookmarks, columns=columns)).lazy()
+    bookmarks_df = pd.DataFrame(bookmarks, columns=columns)
 
-    join_type = "left" if len(show_favorites) == 0 else "inner"
-    filtered_w_favorites_df = (
-        pl.from_pandas(filtered_df)
-        .lazy()
-        .join(favorites_df, on="cocktail_id", how=join_type)
-        .select(
-            [
-                pl.all().exclude("favorite"),
-                pl.when(pl.col("favorite").is_null())
-                .then(False)
-                .otherwise(pl.col("favorite"))
-                .keep_name(),
-            ]
-        )
-    ).lazy()
-
-    join_type = "left" if len(show_bookmarks) == 0 else "inner"
-    filtered_final_df = (
-        filtered_w_favorites_df.join(bookmarks_df, on="cocktail_id", how=join_type)
-        .select(
-            [
-                pl.all().exclude("bookmark"),
-                pl.when(pl.col("bookmark").is_null())
-                .then(False)
-                .otherwise(pl.col("bookmark"))
-                .keep_name(),
-            ]
-        )
-        .join(
-            available_cocktails_df.select(
-                [
-                    pl.col("cocktail_id"),
-                    pl.col("ingredients_False"),
-                    pl.col("ingredients_True"),
-                    pl.col("mapped_ingredients_False"),
-                    pl.col("mapped_ingredients_True"),
-                    pl.col("num_ingredients_False"),
-                    pl.col("num_ingredients_True"),
-                    pl.col("perc_ingredients_in_bar"),
-                ]
-            ),
-            on="cocktail_id",
-            how="left",
-        )
-        .join(
-            pl.from_pandas(avg_cocktail_ratings_df).lazy(), on="cocktail_id", how="left"
-        )
+    join_type = "left" if not show_favorites else "inner"
+    filtered_w_favorites_df = filtered_df.merge(
+        favorites_df, on="cocktail_id", how=join_type
+    )
+    filtered_w_favorites_df["favorite"] = where(
+        pd.isnull(filtered_w_favorites_df["favorite"]),
+        False,
+        filtered_w_favorites_df["favorite"],
     )
 
-    if len(show_have_all) == 0:
-        filtered_final_df = filtered_final_df.filter(
-            (pl.col("perc_ingredients_in_bar") < 1)
-        )
+    join_type = "left" if not show_bookmarks else "inner"
+    filtered_final_df = filtered_w_favorites_df.merge(
+        bookmarks_df, on="cocktail_id", how=join_type
+    )
+    filtered_final_df["bookmark"] = where(
+        pd.isnull(filtered_final_df["bookmark"]),
+        False,
+        filtered_final_df["bookmark"],
+    )
 
-    if len(show_have_some) == 0:
-        filtered_final_df = filtered_final_df.filter(
-            (pl.col("perc_ingredients_in_bar") == 1)
-            | (pl.col("perc_ingredients_in_bar") == 0)
-            | (pl.col("perc_ingredients_in_bar") == 1).is_null()
-        )
+    filtered_final_df = filtered_final_df.merge(
+        available_cocktails_df[
+            [
+                "cocktail_id",
+                "ingredients_False",
+                "ingredients_True",
+                "mapped_ingredients_False",
+                "mapped_ingredients_True",
+                "num_ingredients_False",
+                "num_ingredients_True",
+                "perc_ingredients_in_bar",
+            ]
+        ],
+        on="cocktail_id",
+        how="left",
+    ).merge(avg_cocktail_ratings_df, on="cocktail_id", how="left")
 
-    if len(show_have_none) == 0:
-        filtered_final_df = filtered_final_df.filter(
-            (pl.col("perc_ingredients_in_bar") > 0)
-        )
+    show_have_all = "have_all" in show_ingredients
+    show_have_some = "have_some" in show_ingredients
+    show_have_none = "have_none" in show_ingredients
 
-    if len(show_favorites) == 1:
-        filtered_final_df = filtered_final_df.filter((pl.col("favorite") == True))
+    if not show_have_all:
+        filtered_final_df = filtered_final_df.loc[
+            filtered_final_df["perc_ingredients_in_bar"] < 1, :
+        ]
 
-    if len(show_bookmarks) == 1:
-        filtered_final_df = filtered_final_df.filter((pl.col("bookmark") == True))
+    if not show_have_some:
+        filtered_final_df = filtered_final_df.loc[
+            (filtered_final_df["perc_ingredients_in_bar"] == 1)
+            | (filtered_final_df["perc_ingredients_in_bar"] == 0)
+            | pd.isnull(filtered_final_df["perc_ingredients_in_bar"]),
+            :,
+        ]
+
+    if not show_have_none:
+        filtered_final_df = filtered_final_df.loc[
+            filtered_final_df["perc_ingredients_in_bar"] > 0, :
+        ]
+
+    if show_favorites:
+        filtered_final_df = filtered_final_df.loc[
+            filtered_final_df["favorite"] == True, :
+        ]
+
+    if show_bookmarks:
+        filtered_final_df = filtered_final_df.loc[
+            filtered_final_df["bookmark"] == True, :
+        ]
 
     values = (
-        filtered_final_df.select(
+        filtered_final_df[
             [
-                pl.col("cocktail_id"),
-                pl.col("recipe_name"),
-                pl.col("image"),
-                pl.col("link"),
-                pl.col("favorite"),
-                pl.col("bookmark"),
-                pl.col("perc_ingredients_in_bar"),
-                pl.col("avg_rating"),
-                pl.col("cocktail_nps"),
-                pl.col("num_ratings"),
+                "cocktail_id",
+                "recipe_name",
+                "image",
+                "link",
+                "favorite",
+                "bookmark",
+                "perc_ingredients_in_bar",
+                "avg_rating",
+                "cocktail_nps",
+                "num_ratings",
             ]
-        )
-        .unique()
-        .sort(sort_by_cols, descending=sort_by_dir)
-        .collect()
-        .to_dicts()
+        ]
+        .drop_duplicates()
+        .sort_values(sort_by_cols, ascending=sort_by_dir)
+        .to_dict(orient="records")
     )
 
     recipe_count = len(values)
@@ -1105,12 +662,9 @@ def update_table(
             link = value.get("link")
             favorite = value.get("favorite")
             bookmark = value.get("bookmark")
-            user_rating = (
-                user_ratings_df.filter(pl.col("cocktail_id") == cocktail_id)
-                .select(pl.col("rating"))
-                .collect()
-                .to_numpy()
-            )
+            user_rating = user_ratings_df.loc[
+                user_ratings_df["cocktail_id"] == cocktail_id, "rating"
+            ].values.tolist()
 
             cocktail_nps = avg_cocktail_ratings_df.loc[
                 avg_cocktail_ratings_df["cocktail_id"] == cocktail_id, "cocktail_nps"
@@ -1121,51 +675,31 @@ def update_table(
             else:
                 button_label = "Rate"
 
-            available_cocktail = available_cocktails_df.filter(
-                pl.col("cocktail_id") == cocktail_id
-            ).select(
+            available_cocktail = available_cocktails_df.loc[
+                available_cocktails_df["cocktail_id"] == cocktail_id,
                 [
-                    pl.col("ingredients_False"),
-                    pl.col("ingredients_True"),
-                    pl.col("mapped_ingredients_False"),
-                    pl.col("mapped_ingredients_True"),
-                    pl.col("num_ingredients_False"),
-                    pl.col("num_ingredients_True"),
-                    pl.col("perc_ingredients_in_bar"),
-                ]
-            )
-            perc_ingredients_in_bar = [
-                el[0]
-                for el in available_cocktail.select(pl.col("perc_ingredients_in_bar"))
-                .collect()
-                .to_numpy()
+                    "ingredients_False",
+                    "ingredients_True",
+                    "mapped_ingredients_False",
+                    "mapped_ingredients_True",
+                    "num_ingredients_False",
+                    "num_ingredients_True",
+                    "perc_ingredients_in_bar",
+                ],
             ]
 
-            mapped_ingredients_in_bar = [
-                el[0]
-                for el in available_cocktail.select(pl.col("ingredients_True"))
-                .collect()
-                .to_numpy()
-            ]
-            mapped_ingredients_not_in_bar = [
-                el[0]
-                for el in available_cocktail.select(pl.col("ingredients_False"))
-                .collect()
-                .to_numpy()
-            ]
+            perc_ingredients_in_bar = available_cocktail[
+                "perc_ingredients_in_bar"
+            ].values.tolist()
 
-            mapped_ingredients_in_bar = (
-                mapped_ingredients_in_bar[0]
-                if isinstance(mapped_ingredients_in_bar[0], list)
-                else []
-            )
-            mapped_ingredients_not_in_bar = (
-                mapped_ingredients_not_in_bar[0]
-                if isinstance(mapped_ingredients_not_in_bar[0], list)
-                else []
-            )
+            mapped_ingredients_in_bar = available_cocktail[
+                "ingredients_True"
+            ].values.tolist()
+            mapped_ingredients_not_in_bar = available_cocktail[
+                "ingredients_False"
+            ].values.tolist()
 
-            if perc_ingredients_in_bar == 0 or perc_ingredients_in_bar is np.nan:
+            if perc_ingredients_in_bar == 0 or perc_ingredients_in_bar is nan:
                 drink_button_class = "fa-solid fa-martini-glass-empty"
             elif perc_ingredients_in_bar[0] < 1:
                 drink_button_class = "fa-solid fa-martini-glass"
