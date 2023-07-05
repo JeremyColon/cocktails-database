@@ -1,21 +1,14 @@
 from app import app
 
-import pathlib
-import datetime as dt
-import pandas as pd
-import numpy as np
-import os
-import re
-from math import ceil
-from datetime import datetime as dt
+from pandas import DataFrame
+from re import sub
 
 from dash.dependencies import Input, Output, State
-from dash import dcc
-from dash import html
+from dash.dcc import Store
+from dash.html import Div, Br, H5, H6, H3, I, Span
 from dash.dash_table import DataTable
-from dash.exceptions import PreventUpdate
-import dash_bootstrap_components as dbc
-import dash_mantine_components as dmc
+from dash_bootstrap_components import Container, Row, Col, Card, CardBody
+from dash_mantine_components import MultiSelect, Checkbox, Button
 
 from utils.helpers import (
     run_query,
@@ -28,7 +21,7 @@ from utils.controls import create_dropdown_from_data
 
 
 ingredients, columns = run_query("select * from ingredients", True)
-ingredients_df = pd.DataFrame(ingredients, columns=columns)
+ingredients_df = DataFrame(ingredients, columns=columns)
 
 # Controls
 ingredient_names = create_dropdown_from_data(
@@ -36,64 +29,74 @@ ingredient_names = create_dropdown_from_data(
 )
 
 layout = [
-    html.Div(
+    Div(
         [
-            dcc.Store(id="my-bar-store", storage_type="session"),
-            dbc.Container(
+            Store(id="my-bar-store", storage_type="session"),
+            Container(
                 [
                     # First row of controls for matchups data table
-                    dbc.Row(
+                    Row(
                         [
-                            dbc.Col(
+                            Col(
                                 [
-                                    dbc.Card(
-                                        dbc.CardBody(
+                                    Card(
+                                        CardBody(
                                             [
-                                                html.H5("Ingredients to Add"),
-                                                dmc.MultiSelect(
+                                                H5("Ingredients to Add"),
+                                                MultiSelect(
                                                     id="ingredients-dropdown",
                                                     data=ingredient_names,
                                                     value=None,
                                                     searchable=True,
                                                 ),
-                                                html.Br(),
-                                                html.Br(),
-                                                dmc.Button(
-                                                    "Add to My Bar",
-                                                    id="my-bar-button",
-                                                    leftIcon=html.I(
-                                                        className="fa-sharp fa-solid fa-plus"
-                                                    ),
-                                                    n_clicks=0,
-                                                ),
                                             ]
                                         )
                                     )
                                 ],
-                                width=6,
-                            ),
-                            dbc.Col(
+                            )
+                        ]
+                    ),
+                    Row(
+                        Col(
+                            [
+                                Button(
+                                    "Add to My Bar",
+                                    id="my-bar-button",
+                                    leftIcon=I(className="fa-sharp fa-solid fa-plus"),
+                                    n_clicks=0,
+                                    color="orange",
+                                ),
+                            ],
+                            width={
+                                "size": 2,
+                            },
+                        ),
+                    ),
+                    Br(),
+                    Row(
+                        [
+                            Col(
                                 [
-                                    dbc.Row(
+                                    Row(
                                         [
-                                            dbc.Col(
-                                                dbc.Card(
-                                                    dbc.CardBody(
+                                            Col(
+                                                Card(
+                                                    CardBody(
                                                         [
-                                                            html.H6(
+                                                            H6(
                                                                 "All ingredients to",
                                                                 style={
                                                                     "text-align": "center"
                                                                 },
                                                             ),
-                                                            html.H3(
+                                                            H3(
                                                                 "",
                                                                 id="have-all-count-h3",
                                                                 style={
                                                                     "text-align": "center"
                                                                 },
                                                             ),
-                                                            html.H6(
+                                                            H6(
                                                                 "cocktails",
                                                                 style={
                                                                     "text-align": "center"
@@ -103,24 +106,24 @@ layout = [
                                                     )
                                                 ),
                                             ),
-                                            dbc.Col(
-                                                dbc.Card(
-                                                    dbc.CardBody(
+                                            Col(
+                                                Card(
+                                                    CardBody(
                                                         [
-                                                            html.H6(
+                                                            H6(
                                                                 "Some ingredients to",
                                                                 style={
                                                                     "text-align": "center"
                                                                 },
                                                             ),
-                                                            html.H3(
+                                                            H3(
                                                                 "",
                                                                 id="have-some-count-h3",
                                                                 style={
                                                                     "text-align": "center"
                                                                 },
                                                             ),
-                                                            html.H6(
+                                                            H6(
                                                                 "cocktails",
                                                                 style={
                                                                     "text-align": "center"
@@ -130,24 +133,24 @@ layout = [
                                                     )
                                                 ),
                                             ),
-                                            dbc.Col(
-                                                dbc.Card(
-                                                    dbc.CardBody(
+                                            Col(
+                                                Card(
+                                                    CardBody(
                                                         [
-                                                            html.H6(
+                                                            H6(
                                                                 "No ingredients to",
                                                                 style={
                                                                     "text-align": "center"
                                                                 },
                                                             ),
-                                                            html.H3(
+                                                            H3(
                                                                 "",
                                                                 id="have-none-count-h3",
                                                                 style={
                                                                     "text-align": "center"
                                                                 },
                                                             ),
-                                                            html.H6(
+                                                            H6(
                                                                 "cocktails",
                                                                 style={
                                                                     "text-align": "center"
@@ -158,49 +161,49 @@ layout = [
                                                 ),
                                             ),
                                         ]
-                                    ),
-                                    dbc.Row(
-                                        dbc.Card(
-                                            dbc.CardBody(
-                                                dbc.Checklist(
-                                                    options=[
-                                                        {
-                                                            "label": "Include Garnishes?",
-                                                            "value": 1,
-                                                        },
-                                                    ],
-                                                    value=[],
-                                                    id="mybar-include-garnish-switch-input",
-                                                    switch=True,
-                                                    inline=True,
-                                                ),
-                                            )
-                                        )
-                                    ),
+                                    )
                                 ],
-                                width=6,
+                                width=12,
                             ),
                         ]
                     ),
-                    dbc.Row(
-                        dbc.Card(
-                            dbc.CardBody(
-                                [
-                                    html.Span(
-                                        "",
-                                        id="missing-ingredients-list",
-                                        style={"text-align": "center"},
-                                    )
-                                ]
-                            )
-                        )
-                    ),
-                    html.Br(),
-                    html.Br(),
-                    # Data table showing high-level individual matchup data
-                    dbc.Row(
+                    Row(
                         [
-                            dbc.Col(
+                            Col(
+                                Card(
+                                    CardBody(
+                                        [
+                                            Span(
+                                                "",
+                                                id="missing-ingredients-list",
+                                                style={
+                                                    "color": "white",
+                                                },
+                                            )
+                                        ]
+                                    )
+                                ),
+                                width=9,
+                            ),
+                            Col(
+                                Card(
+                                    CardBody(
+                                        Checkbox(
+                                            id="mybar-include-garnish-switch-input",
+                                            label="Include Garnishes?",
+                                            size="md",
+                                        )
+                                    )
+                                ),
+                                width=3,
+                            ),
+                        ]
+                    ),
+                    Br(),
+                    # Data table showing high-level individual matchup data
+                    Row(
+                        [
+                            Col(
                                 [
                                     DataTable(
                                         id="my-bar-table",
@@ -257,7 +260,7 @@ layout = [
     ],
     Input("my-bar-button", "n_clicks"),
     Input("my-bar-table", "data"),
-    Input("mybar-include-garnish-switch-input", "value"),
+    Input("mybar-include-garnish-switch-input", "checked"),
     [
         State("ingredients-dropdown", "value"),
         State("user-store", "data"),
@@ -287,8 +290,7 @@ def update_table(
 
     if add_ingredient > 0 or not is_equal or table_rows:
         if ingredients_to_add is not None:
-
-            cleaned_ingredients = [re.sub("'", "''", i) for i in ingredients_to_add]
+            cleaned_ingredients = [sub("'", "''", i) for i in ingredients_to_add]
             str_ingredient_to_add = "','".join(cleaned_ingredients)
 
             ingredient_ids = run_query(
@@ -304,16 +306,12 @@ def update_table(
         ingredient_list = list(my_bar_df["ingredient_id"].unique())
         ingredient_list.extend([i[0] for i in ingredient_ids])
         if table_rows is not None and add_ingredient == 0:
-            ingredient_list = pd.DataFrame(table_rows)["ingredient_id"].unique()
+            ingredient_list = DataFrame(table_rows)["ingredient_id"].unique()
 
         update_bar(user_id, list(set(ingredient_list)))
 
         my_bar_df = get_my_bar(user_id, return_df=True)
 
-        if len(include_garnish) > 0:
-            include_garnish = True
-        else:
-            include_garnish = False
         available_cocktails = get_available_cocktails(
             user_id, include_garnish=include_garnish
         )

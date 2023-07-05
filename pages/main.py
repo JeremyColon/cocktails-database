@@ -1,11 +1,6 @@
 # Import required libraries
 from app import app
-import os
-import re
-import json
-import pandas as pd
 from numpy import where, nan
-import pathlib
 from math import ceil
 from .components.help_buttons import help_buttons
 from utils.controls import *
@@ -19,42 +14,34 @@ from utils.helpers import (
     update_bookmark,
     update_rating,
     get_available_cocktails,
-    create_drink_card,
+    create_all_drink_cards,
 )
 from utils.filter_canvas import create_filter_canvas
+from os import environ
+from re import IGNORECASE
+from json import loads
+from pandas import DataFrame, isnull
 
 
-from dash import html, dcc, callback_context
-import dash_mantine_components as dmc
-import dash_bootstrap_components as dbc
+from dash import callback_context
+from dash.html import Div, Br, H3, Footer, I
+from dash.dcc import Store
+from dash_mantine_components import Button, LoadingOverlay
+from dash_bootstrap_components import Container, Row, Col, CardGroup
 from dash.exceptions import PreventUpdate
-from dash.long_callback import DiskcacheLongCallbackManager
 from dash.dependencies import MATCH, Input, Output, State
-
-from datetime import datetime as dt
-
-## Diskcache
-import diskcache
-
-cache = diskcache.Cache("./cache")
-long_callback_manager = DiskcacheLongCallbackManager(cache)
-
-# dash.register_page(__name__, path="/")
 
 server = app.server
 
-# get relative data folder
-PATH = pathlib.Path(__file__)
-
-DB_HOST = os.environ["COCKTAILS_HOST"]
-DB_PW = os.environ["COCKTAILS_PWD"]
-DB_PORT = os.environ["COCKTAILS_PORT"]
-DB_USER = os.environ["COCKTAILS_USER"]
-DB_NAME = os.environ["COCKTAILS_DB"]
-COCKTAILS_SQL = os.environ["COCKTAILS_SQL"]
+DB_HOST = environ["COCKTAILS_HOST"]
+DB_PW = environ["COCKTAILS_PWD"]
+DB_PORT = environ["COCKTAILS_PORT"]
+DB_USER = environ["COCKTAILS_USER"]
+DB_NAME = environ["COCKTAILS_DB"]
+COCKTAILS_SQL = environ["COCKTAILS_SQL"]
 
 results, columns = run_query(COCKTAILS_SQL, True)
-cocktails_db = pd.DataFrame(results, columns=columns)
+cocktails_db = DataFrame(results, columns=columns)
 recipe_count = cocktails_db.cocktail_id.max()
 
 # Controls
@@ -104,13 +91,13 @@ marks_font_size = 16
 
 # Create app layout
 layout = [
-    html.Div(
+    Div(
         [
-            html.Div(id="hidden-div", style={"display": "none"}),
-            dcc.Store("favorites-store", storage_type="session"),
-            dbc.Container(
+            Div(id="hidden-div", style={"display": "none"}),
+            Store("favorites-store", storage_type="session"),
+            Container(
                 [
-                    dbc.Row(
+                    Row(
                         create_filter_canvas(
                             sort_control,
                             liquor_control,
@@ -121,28 +108,30 @@ layout = [
                             recipe_count,
                         )
                     ),
-                    dbc.Row(
+                    Row(
                         [
-                            dbc.Col(
-                                dbc.Button(
+                            Col(
+                                Button(
                                     "Control Panel",
                                     id="open-offcanvas-scrollable",
                                     n_clicks=0,
+                                    color="orange",
                                 ),
                                 width=2,
                             ),
-                            dbc.Col(
+                            Col(
                                 help_buttons,
                                 width={"size": 3, "offset": 7},
                             ),
                         ],
+                        justify="end",
                     ),
-                    dbc.Row(html.Br()),
-                    dbc.Row(html.H3("Loading all recipes..."), id="loading-row"),
-                    dmc.LoadingOverlay(
-                        dbc.Row(
+                    Row(Br()),
+                    Row(H3("Loading all recipes..."), id="loading-row"),
+                    LoadingOverlay(
+                        Row(
                             [
-                                dbc.Col(
+                                Col(
                                     id="cocktails-col",
                                     width=12,
                                 )
@@ -152,8 +141,8 @@ layout = [
                         transitionDuration=250,
                         exitTransitionDuration=250,
                     ),
-                    dbc.Row(html.Br()),
-                    html.Footer(
+                    Row(Br()),
+                    Footer(
                         "All recipes have been pulled from, and link to, www.liquor.com"
                     ),
                 ],
@@ -230,10 +219,10 @@ def toggle_offcanvas_scrollable(n1, is_open):
     State("modal-favorite-cocktail-info", "is_open"),
     prevent_initial_callback=True,
 )
-def toggle_favorite_info_modal(clicked, is_open):
+def toggle_favorite_info_modal(clicked, opened):
     if clicked:
-        return not is_open
-    return is_open
+        return not opened
+    return opened
 
 
 @app.callback(
@@ -242,10 +231,10 @@ def toggle_favorite_info_modal(clicked, is_open):
     State("modal-bookmark-cocktail-info", "is_open"),
     prevent_initial_callback=True,
 )
-def toggle_bookmark_info_modal(clicked, is_open):
+def toggle_bookmark_info_modal(clicked, opened):
     if clicked:
-        return not is_open
-    return is_open
+        return not opened
+    return opened
 
 
 @app.callback(
@@ -254,10 +243,10 @@ def toggle_bookmark_info_modal(clicked, is_open):
     State("modal-can-make-cocktail-info", "is_open"),
     prevent_initial_callback=True,
 )
-def toggle_can_make_cocktail_info_modal(clicked, is_open):
+def toggle_can_make_cocktail_info_modal(clicked, opened):
     if clicked:
-        return not is_open
-    return is_open
+        return not opened
+    return opened
 
 
 @app.callback(
@@ -266,10 +255,10 @@ def toggle_can_make_cocktail_info_modal(clicked, is_open):
     State("modal-rate-cocktail-info", "is_open"),
     prevent_initial_callback=True,
 )
-def toggle_rate_info_modal(clicked, is_open):
+def toggle_rate_info_modal(clicked, opened):
     if clicked:
-        return not is_open
-    return is_open
+        return not opened
+    return opened
 
 
 @app.callback(
@@ -284,8 +273,8 @@ def toggle_rate_info_modal(clicked, is_open):
     ],
     prevent_initial_call=True,
 )
-def toggle_ingredient_modal(clicked, is_open):
-    return [not is_open]
+def toggle_ingredient_modal(clicked, opened):
+    return [not opened]
 
 
 @app.callback(
@@ -307,19 +296,19 @@ def toggle_ingredient_modal(clicked, is_open):
     prevent_initial_call=True,
 )
 def toggle_cnps_modal(
-    button_label, open_btn, save_btn, cancel_btn, user_rating, is_open, user_obj
+    button_label, open_btn, save_btn, cancel_btn, user_rating, opened, user_obj
 ):
     user_id = user_obj.get("id")
     ctx = callback_context
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    cocktail_id = json.loads(button_id).get("index")
+    cocktail_id = loads(button_id).get("index")
     if open_btn or cancel_btn or save_btn:
         if save_btn:
             update_rating(user_id, cocktail_id, user_rating)
             cNPS = get_cocktail_nps(cocktail_id)
             button_label = f"{cNPS[0][0]} ({user_rating})"
-        return not is_open, button_label
-    return is_open, button_label
+        return not opened, button_label
+    return opened, button_label
 
 
 @app.callback(
@@ -337,7 +326,7 @@ def update_favorites(favorite_button, user_obj):
     ctx = callback_context
 
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    cocktail_id = json.loads(button_id).get("index")
+    cocktail_id = loads(button_id).get("index")
     value = ctx.triggered[0]["value"]
 
     if value is None:
@@ -346,7 +335,7 @@ def update_favorites(favorite_button, user_obj):
         favorites, columns = run_query(
             f"SELECT * FROM user_favorites WHERE user_id={user_id}", True
         )
-        favorites_df = pd.DataFrame(favorites, columns=columns)
+        favorites_df = DataFrame(favorites, columns=columns)
 
         cocktails_favorites = (
             cocktails_db[["cocktail_id", "recipe_name"]]
@@ -354,7 +343,7 @@ def update_favorites(favorite_button, user_obj):
             .merge(favorites_df, on="cocktail_id", how="left")
             .assign(
                 favorite=lambda row: where(
-                    pd.isnull(row["favorite"]), False, row["favorite"]
+                    isnull(row["favorite"]), False, row["favorite"]
                 )
             )
         )
@@ -374,9 +363,9 @@ def update_favorites(favorite_button, user_obj):
     update_favorite(user_obj.get("id"), cocktail_id, favorite, False, None)
 
     icon = (
-        html.I(className="fa-solid fa-star")
+        I(className="fa-solid fa-star")
         if favorite
-        else html.I(className="fa-regular fa-star")
+        else I(className="fa-regular fa-star")
     )
 
     return icon
@@ -397,7 +386,7 @@ def update_bookmarks(bookmark_button, user_obj):
     ctx = callback_context
 
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    cocktail_id = json.loads(button_id).get("index")
+    cocktail_id = loads(button_id).get("index")
     value = ctx.triggered[0]["value"]
 
     if value is None:
@@ -406,7 +395,7 @@ def update_bookmarks(bookmark_button, user_obj):
         bookmarks, columns = run_query(
             f"SELECT * FROM user_bookmarks WHERE user_id={user_id}", True
         )
-        bookmarks_df = pd.DataFrame(bookmarks, columns=columns)
+        bookmarks_df = DataFrame(bookmarks, columns=columns)
 
         cocktails_bookmarks = (
             cocktails_db[["cocktail_id", "recipe_name"]]
@@ -414,7 +403,7 @@ def update_bookmarks(bookmark_button, user_obj):
             .merge(bookmarks_df, on="cocktail_id", how="left")
             .assign(
                 bookmark=lambda row: where(
-                    pd.isnull(row["bookmark"]), False, row["bookmark"]
+                    isnull(row["bookmark"]), False, row["bookmark"]
                 )
             )
         )
@@ -434,9 +423,9 @@ def update_bookmarks(bookmark_button, user_obj):
     update_bookmark(user_obj.get("id"), cocktail_id, bookmark, False, None)
 
     icon = (
-        html.I(className="fa-solid fa-bookmark")
+        I(className="fa-solid fa-bookmark")
         if bookmark
-        else html.I(className="fa-regular fa-bookmark")
+        else I(className="fa-regular fa-bookmark")
     )
 
     return icon
@@ -502,7 +491,7 @@ def update_table(
     )
 
     avg_cocktail_ratings, columns = run_query("select * from vw_cocktail_ratings", True)
-    avg_cocktail_ratings_df = pd.DataFrame(avg_cocktail_ratings, columns=columns)
+    avg_cocktail_ratings_df = DataFrame(avg_cocktail_ratings, columns=columns)
 
     if filter_type == "and":
         filtered_df = apply_AND_filters(filters, cocktails_db)
@@ -510,10 +499,10 @@ def update_table(
         filter_string = create_OR_filter_string(filters)
         filtered_df = cocktails_db.loc[
             cocktails_db["mapped_ingredient"].str.contains(
-                filter_string, regex=True, flags=re.IGNORECASE
+                filter_string, regex=True, flags=IGNORECASE
             )
             | cocktails_db["recipe_name"].str.contains(
-                filter_string, regex=True, flags=re.IGNORECASE
+                filter_string, regex=True, flags=IGNORECASE
             ),
             :,
         ]
@@ -545,24 +534,24 @@ def update_table(
         f"SELECT cocktail_id, favorite FROM user_favorites WHERE user_id={user_id}",
         True,
     )
-    favorites_df = pd.DataFrame(favorites, columns=columns)
+    favorites_df = DataFrame(favorites, columns=columns)
     user_ratings, columns = run_query(
         f"SELECT cocktail_id, rating FROM user_ratings WHERE user_id={user_id}",
         True,
     )
-    user_ratings_df = pd.DataFrame(user_ratings, columns=columns)
+    user_ratings_df = DataFrame(user_ratings, columns=columns)
     bookmarks, columns = run_query(
         f"SELECT cocktail_id, bookmark FROM user_bookmarks WHERE user_id={user_id}",
         True,
     )
-    bookmarks_df = pd.DataFrame(bookmarks, columns=columns)
+    bookmarks_df = DataFrame(bookmarks, columns=columns)
 
     join_type = "left" if not show_favorites else "inner"
     filtered_w_favorites_df = filtered_df.merge(
         favorites_df, on="cocktail_id", how=join_type
     )
     filtered_w_favorites_df["favorite"] = where(
-        pd.isnull(filtered_w_favorites_df["favorite"]),
+        isnull(filtered_w_favorites_df["favorite"]),
         False,
         filtered_w_favorites_df["favorite"],
     )
@@ -572,7 +561,7 @@ def update_table(
         bookmarks_df, on="cocktail_id", how=join_type
     )
     filtered_final_df["bookmark"] = where(
-        pd.isnull(filtered_final_df["bookmark"]),
+        isnull(filtered_final_df["bookmark"]),
         False,
         filtered_final_df["bookmark"],
     )
@@ -607,7 +596,7 @@ def update_table(
         filtered_final_df = filtered_final_df.loc[
             (filtered_final_df["perc_ingredients_in_bar"] == 1)
             | (filtered_final_df["perc_ingredients_in_bar"] == 0)
-            | pd.isnull(filtered_final_df["perc_ingredients_in_bar"]),
+            | isnull(filtered_final_df["perc_ingredients_in_bar"]),
             :,
         ]
 
@@ -626,105 +615,14 @@ def update_table(
             filtered_final_df["bookmark"] == True, :
         ]
 
-    values = (
-        filtered_final_df[
-            [
-                "cocktail_id",
-                "recipe_name",
-                "image",
-                "link",
-                "favorite",
-                "bookmark",
-                "perc_ingredients_in_bar",
-                "avg_rating",
-                "cocktail_nps",
-                "num_ratings",
-            ]
-        ]
-        .drop_duplicates()
-        .sort_values(sort_by_cols, ascending=sort_by_dir)
-        .to_dict(orient="records")
+    ret = create_all_drink_cards(
+        filtered_final_df=filtered_final_df,
+        user_ratings_df=user_ratings_df,
+        avg_cocktail_ratings_df=avg_cocktail_ratings_df,
+        available_cocktails_df=available_cocktails_df,
+        sort_by_cols=sort_by_cols,
+        sort_by_dir=sort_by_dir,
     )
-
-    recipe_count = len(values)
-
-    row_size = 5
-    rows = ceil(recipe_count / row_size)
-    ret = list()
-    for i in range(rows):
-        cards = list()
-        start_val = i * row_size
-        end_val = (i + 1) * row_size
-        for j, value in enumerate(values[start_val:end_val]):
-            cocktail_id = value.get("cocktail_id")
-            name = value.get("recipe_name")
-            image = value.get("image")
-            link = value.get("link")
-            favorite = value.get("favorite")
-            bookmark = value.get("bookmark")
-            user_rating = user_ratings_df.loc[
-                user_ratings_df["cocktail_id"] == cocktail_id, "rating"
-            ].values.tolist()
-
-            cocktail_nps = avg_cocktail_ratings_df.loc[
-                avg_cocktail_ratings_df["cocktail_id"] == cocktail_id, "cocktail_nps"
-            ].values
-            cocktail_nps = None if len(cocktail_nps) == 0 else cocktail_nps[0]
-            if cocktail_nps is not None:
-                button_label = f"{cocktail_nps}"
-            else:
-                button_label = "Rate"
-
-            available_cocktail = available_cocktails_df.loc[
-                available_cocktails_df["cocktail_id"] == cocktail_id,
-                [
-                    "ingredients_False",
-                    "ingredients_True",
-                    "mapped_ingredients_False",
-                    "mapped_ingredients_True",
-                    "num_ingredients_False",
-                    "num_ingredients_True",
-                    "perc_ingredients_in_bar",
-                ],
-            ]
-
-            perc_ingredients_in_bar = available_cocktail[
-                "perc_ingredients_in_bar"
-            ].values.tolist()
-
-            mapped_ingredients_in_bar = available_cocktail[
-                "ingredients_True"
-            ].values.tolist()
-            mapped_ingredients_not_in_bar = available_cocktail[
-                "ingredients_False"
-            ].values.tolist()
-
-            if perc_ingredients_in_bar == 0 or perc_ingredients_in_bar is nan:
-                drink_button_class = "fa-solid fa-martini-glass-empty"
-            elif perc_ingredients_in_bar[0] < 1:
-                drink_button_class = "fa-solid fa-martini-glass"
-            else:
-                drink_button_class = "fa-solid fa-martini-glass-citrus"
-
-            user_rating = 8 if len(user_rating) == 0 else user_rating[0]
-            card = create_drink_card(
-                cocktail_id,
-                image,
-                link,
-                name,
-                user_rating,
-                favorite,
-                bookmark,
-                drink_button_class,
-                mapped_ingredients_in_bar,
-                mapped_ingredients_not_in_bar,
-                button_label,
-            )
-            cards.append(card)
-
-        card_group = dbc.CardGroup(cards)
-        row = dbc.Row(dbc.Col(card_group))
-        ret.append(row)
 
     return [
         None,

@@ -25,6 +25,7 @@ def create_multiselect(
     searchable: bool = True,
     persistence: bool = True,
     persistence_type: str = "session",
+    color: str = "orange",
 ):
     return (
         MultiSelect(
@@ -36,5 +37,6 @@ def create_multiselect(
             searchable=searchable,
             persistence=persistence,
             persistence_type=persistence_type,
+            style={"color": color},
         ),
     )

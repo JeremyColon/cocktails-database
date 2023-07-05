@@ -44,6 +44,7 @@ def create_filter_canvas(
                                                         "Apply Filters",
                                                         id="apply-filters-button",
                                                         n_clicks=0,
+                                                        color="orange",
                                                     )
                                                 ],
                                             ),
@@ -53,6 +54,7 @@ def create_filter_canvas(
                                                         "Reset All Filters",
                                                         id="reset-filters-button",
                                                         n_clicks=0,
+                                                        color="orange",
                                                     )
                                                 ]
                                             ),
@@ -76,8 +78,16 @@ def create_filter_canvas(
                                     RadioGroup(
                                         id="sort-by-radio",
                                         children=[
-                                            Radio(label="Ascending", value=True),
-                                            Radio(label="Descending", value=False),
+                                            Radio(
+                                                label="Ascending",
+                                                value=True,
+                                                color="orange",
+                                            ),
+                                            Radio(
+                                                label="Descending",
+                                                value=False,
+                                                color="orange",
+                                            ),
                                         ],
                                         value=True,
                                         size="md",
@@ -110,14 +120,17 @@ def create_filter_canvas(
                                                                 Checkbox(
                                                                     label="Have All Ingredients",
                                                                     value="have_all",
+                                                                    color="orange",
                                                                 ),
                                                                 Checkbox(
                                                                     label="Have Some Ingredients",
                                                                     value="have_some",
+                                                                    color="orange",
                                                                 ),
                                                                 Checkbox(
                                                                     label="Have No Ingredients",
                                                                     value="have_none",
+                                                                    color="orange",
                                                                 ),
                                                             ],
                                                             value=[
@@ -139,6 +152,7 @@ def create_filter_canvas(
                                                             children=Checkbox(
                                                                 label="Include Garnishes?",
                                                                 value="include_garnishes",
+                                                                color="orange",
                                                             ),
                                                             value=["include_garnishes"],
                                                             persistence=True,
@@ -174,14 +188,17 @@ def create_filter_canvas(
                                                                 Checkbox(
                                                                     label="Show Favorites Only",
                                                                     value="favorites_only",
+                                                                    color="orange",
                                                                 ),
                                                                 Checkbox(
                                                                     label="Show Bookmarks Only",
                                                                     value="bookmarks_only",
+                                                                    color="orange",
                                                                 ),
                                                                 Checkbox(
                                                                     label="Include Unrated Cocktails",
                                                                     value="include_unrated",
+                                                                    color="orange",
                                                                 ),
                                                             ],
                                                             value=[
@@ -233,6 +250,7 @@ def create_filter_canvas(
                                                     )
                                                 ],
                                                 minRange=9,
+                                                color="orange",
                                                 pb=25,
                                                 showLabelOnHover=False,
                                                 persistence=True,
@@ -370,9 +388,12 @@ def create_filter_canvas(
                                                                     Radio(
                                                                         "AND",
                                                                         value="and",
+                                                                        color="orange",
                                                                     ),
                                                                     Radio(
-                                                                        "OR", value="or"
+                                                                        "OR",
+                                                                        value="or",
+                                                                        color="orange",
                                                                     ),
                                                                 ],
                                                                 value="and",
