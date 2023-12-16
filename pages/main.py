@@ -622,7 +622,7 @@ def update_table(
         sort_by_dir=sort_by_dir,
     )
 
-    ret_recipe_count = filtered_final_df.shape[0]
+    ret_recipe_count = len(filtered_final_df["cocktail_id"].unique())
 
     return [
         None,
