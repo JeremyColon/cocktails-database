@@ -622,8 +622,10 @@ def update_table(
         sort_by_dir=sort_by_dir,
     )
 
+    ret_recipe_count = filtered_final_df.shape[0]
+
     return [
         None,
         ret,
-        f"Filters (Showing {str(recipe_count)} Recipes)",
+        f"Filters (Showing {str(ret_recipe_count)} Recipes)",
     ]
