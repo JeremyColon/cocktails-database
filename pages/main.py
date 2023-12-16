@@ -189,8 +189,6 @@ def reset_filters(
                 "have_none",
             ],
             [
-                "favorites_only",
-                "bookmarks_only",
                 "include_unrated",
             ],
             ["include_garnishes"],

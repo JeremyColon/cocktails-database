@@ -290,6 +290,10 @@ def get_available_cocktails(user_id, include_garnish=True, return_df=True):
     my_bar = get_my_bar(user_id, True)
     my_ingredients = my_bar["ingredient_id"].to_list()
     my_ingredients_str = ",".join(map(str, my_ingredients))
+    if len(my_ingredients) == 0:
+        ingredient_where = "where ingredient_id < 0"
+    else:
+        ingredient_where = f"where ingredient_id IN ({my_ingredients_str})"
 
     if include_garnish:
         sql_str = ""
@@ -301,7 +305,7 @@ def get_available_cocktails(user_id, include_garnish=True, return_df=True):
             with my_bar as (
                 select distinct ingredient_id, ingredient, mapped_ingredient
                 from ingredients
-                where ingredient_id IN ({my_ingredients_str})
+                {ingredient_where}
             ), my_cocktails as (
             select c.*,
                    i.ingredient, 
@@ -338,9 +342,21 @@ def get_available_cocktails(user_id, include_garnish=True, return_df=True):
         aggfunc="max",
     ).reset_index()
 
+    empty_list = [[] for s in range(pivoted.shape[0])]
+    if ("ingredients", True) not in pivoted.columns:
+        pivoted[("ingredients", True)] = empty_list
+        pivoted[("mapped_ingredients", True)] = empty_list
+        pivoted[("num_ingredients", True)] = 0
+
+    if ("ingredients", False) not in pivoted.columns:
+        pivoted[("ingredients", False)] = empty_list
+        pivoted[("mapped_ingredients", False)] = empty_list
+        pivoted[("num_ingredients", False)] = 0
+
     pivoted.columns = [
         "_".join(map(str, col)) if col[1] != "" else col[0] for col in pivoted.columns
     ]
+
     pivoted["perc_ingredients_in_bar"] = where(
         isnull(pivoted["num_ingredients_True"]), 0, pivoted["num_ingredients_True"]
     ) / (
