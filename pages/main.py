@@ -1,7 +1,6 @@
 # Import required libraries
 from app import app
-from numpy import where, nan
-from math import ceil
+from numpy import where
 from .components.help_buttons import help_buttons
 from utils.controls import *
 from utils.helpers import (
@@ -14,7 +13,7 @@ from utils.helpers import (
     update_bookmark,
     update_rating,
     get_available_cocktails,
-    create_all_drink_cards,
+    drink_cards_creator,
 )
 from utils.filter_canvas import create_filter_canvas
 from os import environ
@@ -27,7 +26,7 @@ from dash import callback_context
 from dash.html import Div, Br, H3, Footer, I
 from dash.dcc import Store
 from dash_mantine_components import Button, LoadingOverlay
-from dash_bootstrap_components import Container, Row, Col, CardGroup
+from dash_bootstrap_components import Container, Row, Col
 from dash.exceptions import PreventUpdate
 from dash.dependencies import MATCH, Input, Output, State
 
@@ -115,13 +114,15 @@ layout = [
                                     "Control Panel",
                                     id="open-offcanvas-scrollable",
                                     n_clicks=0,
-                                    color="orange",
+                                    variant="gradient",
+                                    gradient={"from": "orange", "to": "red"},
                                 ),
                                 width=2,
                             ),
                             Col(
                                 help_buttons,
-                                width={"size": 3, "offset": 7},
+                                # width={"size": 4, "offset": 6},
+                                align="right",
                             ),
                         ],
                         justify="end",
@@ -192,7 +193,7 @@ def reset_filters(
                 "include_unrated",
             ],
             ["include_garnishes"],
-            [-100, 100],
+            [-10, 10],
             None,
             True,
         )
@@ -212,9 +213,9 @@ def toggle_offcanvas_scrollable(n1, is_open):
 
 
 @app.callback(
-    Output("modal-favorite-cocktail-info", "is_open"),
+    Output("modal-favorite-cocktail-info", "opened"),
     Input("button-favorite-cocktail-info", "n_clicks"),
-    State("modal-favorite-cocktail-info", "is_open"),
+    State("modal-favorite-cocktail-info", "opened"),
     prevent_initial_callback=True,
 )
 def toggle_favorite_info_modal(clicked, opened):
@@ -224,9 +225,9 @@ def toggle_favorite_info_modal(clicked, opened):
 
 
 @app.callback(
-    Output("modal-bookmark-cocktail-info", "is_open"),
+    Output("modal-bookmark-cocktail-info", "opened"),
     Input("button-bookmark-cocktail-info", "n_clicks"),
-    State("modal-bookmark-cocktail-info", "is_open"),
+    State("modal-bookmark-cocktail-info", "opened"),
     prevent_initial_callback=True,
 )
 def toggle_bookmark_info_modal(clicked, opened):
@@ -236,9 +237,9 @@ def toggle_bookmark_info_modal(clicked, opened):
 
 
 @app.callback(
-    Output("modal-can-make-cocktail-info", "is_open"),
+    Output("modal-can-make-cocktail-info", "opened"),
     Input("button-can-make-cocktail-info", "n_clicks"),
-    State("modal-can-make-cocktail-info", "is_open"),
+    State("modal-can-make-cocktail-info", "opened"),
     prevent_initial_callback=True,
 )
 def toggle_can_make_cocktail_info_modal(clicked, opened):
@@ -613,7 +614,7 @@ def update_table(
             filtered_final_df["bookmark"] == True, :
         ]
 
-    ret = create_all_drink_cards(
+    ret = drink_cards_creator(
         filtered_final_df=filtered_final_df,
         user_ratings_df=user_ratings_df,
         avg_cocktail_ratings_df=avg_cocktail_ratings_df,

@@ -62,6 +62,14 @@ h2 {
     padding-bottom: 12px;
 }
 
+div.mantine-Paper-root {
+    background-color: #33383E;
+}
+
+button.mantine-Accordion-control:hover {
+    background-color: #d8d8d881;
+}
+
 label.mantine-DateRangePicker-label {
     color: #ffffff
 }

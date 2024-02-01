@@ -1,10 +1,11 @@
-from dash.html import I, P, Span
+from dash.html import I, P, Span, B
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 
-all_ingredients_icon = I(className="fa-solid fa-martini-glass-citrus")
-some_ingredients_icon = I(className="fa-solid fa-martini-glass")
-none_ingredients_icon = I(className="fa-solid fa-martini-glass-empty")
+icon_style = {"color": "white"}
+all_ingredients_icon = I(className="fa-solid fa-martini-glass-citrus", style=icon_style)
+some_ingredients_icon = I(className="fa-solid fa-martini-glass", style=icon_style)
+none_ingredients_icon = I(className="fa-solid fa-martini-glass-empty", style=icon_style)
 
 help_buttons = (
     dmc.Group(
@@ -13,67 +14,68 @@ help_buttons = (
                 className="fa-solid fa-circle-info",
                 style={"margin-top": "7px"},
             ),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader("Favorite a Cocktail"),
-                    dbc.ModalBody(P("Save your favorite cocktails for later")),
-                ],
+            dmc.Modal(
+                title="Favorite a Cocktail",
                 id="modal-favorite-cocktail-info",
-                is_open=False,
+                zIndex=10000,
+                children=[
+                    dmc.Text("Save your favorite cocktails for later!"),
+                    dmc.Space(h=20),
+                ],
             ),
-            dbc.Button(
+            dmc.Button(
                 I(className="fa-regular fa-star"),
                 id="button-favorite-cocktail-info",
-                outline=False,
+                variant="gradient",
+                gradient={"from": "orange", "to": "red"},
                 size="sm",
             ),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader("Bookmark a Cocktail"),
-                    dbc.ModalBody(P("Bookmark cocktails that you want to try")),
-                ],
+            dmc.Modal(
+                title="Bookmark a Cocktail",
                 id="modal-bookmark-cocktail-info",
-                is_open=False,
+                zIndex=10000,
+                children=[
+                    dmc.Text("Bookmark cocktails that you want to try!"),
+                    dmc.Space(h=20),
+                ],
             ),
-            dbc.Button(
+            dmc.Button(
                 I(className="fa-regular fa-bookmark"),
                 id="button-bookmark-cocktail-info",
-                outline=False,
+                variant="gradient",
+                gradient={"from": "orange", "to": "red"},
                 size="sm",
             ),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader("Can you make this cocktail?"),
-                    dbc.ModalBody(
+            dmc.Modal(
+                title="Can you make this cocktail?",
+                id="modal-can-make-cocktail-info",
+                zIndex=10000,
+                children=[
+                    dmc.Group(
                         [
-                            dmc.Group(
-                                [
-                                    all_ingredients_icon,
-                                    Span(": You have all ingredients"),
-                                ]
-                            ),
-                            dmc.Group(
-                                [
-                                    some_ingredients_icon,
-                                    Span(": You have some ingredients"),
-                                ]
-                            ),
-                            dmc.Group(
-                                [
-                                    none_ingredients_icon,
-                                    Span(": You have no ingredients"),
-                                ]
-                            ),
+                            all_ingredients_icon,
+                            dmc.Text(": You have all ingredients"),
+                        ]
+                    ),
+                    dmc.Group(
+                        [
+                            some_ingredients_icon,
+                            dmc.Text(": You have some ingredients"),
+                        ]
+                    ),
+                    dmc.Group(
+                        [
+                            none_ingredients_icon,
+                            dmc.Text(": You have no ingredients"),
                         ]
                     ),
                 ],
-                id="modal-can-make-cocktail-info",
-                is_open=False,
             ),
-            dbc.Button(
+            dmc.Button(
                 some_ingredients_icon,
                 id="button-can-make-cocktail-info",
-                outline=False,
+                variant="gradient",
+                gradient={"from": "orange", "to": "red"},
                 size="sm",
             ),
             dbc.Modal(
@@ -82,7 +84,12 @@ help_buttons = (
                     dbc.ModalBody(
                         [
                             P(
-                                "Rate a cocktail from 0 to 10 based on whether or not <b>you would recommend it to a friend.</b>"
+                                [
+                                    Span(
+                                        "Rate a cocktail from 0 to 10 based on whether or not "
+                                    ),
+                                    B("you would recommend it to a friend"),
+                                ]
                             ),
                             P(
                                 "The aggregate rating is adopted from Net Promoter Score."
@@ -90,18 +97,21 @@ help_buttons = (
                             P("9 or 10: You are a promoter (Would recommend)"),
                             P("7 or 8: You are neutral"),
                             P("0-6: You are a detractor (Would not recommend)"),
-                            P("Cocktail NPS = (% of Promoters) - (% of Detractors)"),
-                            P("100 = All promoters; -100 = All detractors"),
+                            P(
+                                "Cocktail NPS = 10* [(% of Promoters) - (% of Detractors)]"
+                            ),
+                            P("10 = All promoters; -10 = All detractors"),
                         ]
                     ),
                 ],
                 id="modal-rate-cocktail-info",
                 is_open=False,
             ),
-            dbc.Button(
+            dmc.Button(
                 "Rate",
                 id="button-rate-cocktail-info",
-                outline=False,
+                variant="gradient",
+                gradient={"from": "orange", "to": "red"},
                 size="sm",
             ),
         ],

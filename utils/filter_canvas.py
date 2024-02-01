@@ -44,7 +44,11 @@ def create_filter_canvas(
                                                         "Apply Filters",
                                                         id="apply-filters-button",
                                                         n_clicks=0,
-                                                        color="orange",
+                                                        variant="gradient",
+                                                        gradient={
+                                                            "from": "orange",
+                                                            "to": "red",
+                                                        },
                                                     )
                                                 ],
                                             ),
@@ -54,7 +58,11 @@ def create_filter_canvas(
                                                         "Reset All Filters",
                                                         id="reset-filters-button",
                                                         n_clicks=0,
-                                                        color="orange",
+                                                        variant="gradient",
+                                                        gradient={
+                                                            "from": "orange",
+                                                            "to": "red",
+                                                        },
                                                     )
                                                 ]
                                             ),
@@ -232,24 +240,24 @@ def create_filter_canvas(
                                             ),
                                             RangeSlider(
                                                 id="cocktail-nps-range-slider",
-                                                min=-100,
-                                                max=100,
-                                                step=10,
-                                                value=[-100, 100],
+                                                min=-10,
+                                                max=10,
+                                                step=1,
+                                                value=[-10, 10],
                                                 marks=[
                                                     {
                                                         "value": i,
                                                         "label": "{}".format(
-                                                            i if i % 20 == 0 else ""
+                                                            i if i % 2 == 0 else ""
                                                         ),
                                                     }
                                                     for i in range(
-                                                        -100,
-                                                        101,
-                                                        10,
+                                                        -10,
+                                                        11,
+                                                        1,
                                                     )
                                                 ],
-                                                minRange=9,
+                                                minRange=1,
                                                 color="orange",
                                                 pb=25,
                                                 showLabelOnHover=False,

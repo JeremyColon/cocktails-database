@@ -12,6 +12,7 @@ from dash_bootstrap_components import (
     Card,
     CardBody,
     Button,
+    ButtonGroup,
     CardImg,
     Modal,
     ModalHeader,
@@ -19,8 +20,9 @@ from dash_bootstrap_components import (
     ModalTitle,
     ModalFooter,
 )
-from dash.html import A, Br, Ol, Li, I, H5
+from dash.html import A, Br, Ol, Li, I, H5, H3, H2
 from dash.dcc import Slider
+from utils.controls import create_dropdown_from_lists
 
 
 def get_env_creds():
@@ -433,14 +435,14 @@ def compare_two_lists_equality(coll1, coll2):
     return first_set == second_set
 
 
-def create_all_drink_cards(
+def drink_cards_creator(
     filtered_final_df: DataFrame,
     user_ratings_df: DataFrame,
     avg_cocktail_ratings_df: DataFrame,
     available_cocktails_df: DataFrame,
     sort_by_cols: list,
     sort_by_dir: str,
-) -> list:
+):
     values = (
         filtered_final_df[
             [
@@ -465,6 +467,27 @@ def create_all_drink_cards(
 
     row_size = 5
     rows = ceil(recipe_count / row_size)
+
+    ret = create_all_drink_cards(
+        rows,
+        row_size,
+        values,
+        user_ratings_df,
+        avg_cocktail_ratings_df,
+        available_cocktails_df,
+    )
+
+    return ret
+
+
+def create_all_drink_cards(
+    rows: int,
+    row_size: int,
+    values: list,
+    user_ratings_df: DataFrame,
+    avg_cocktail_ratings_df: DataFrame,
+    available_cocktails_df: DataFrame,
+) -> list:
     ret = list()
     for i in range(rows):
         cards = list()
@@ -580,162 +603,276 @@ def create_drink_card(
                             Row(
                                 [
                                     Col(
-                                        Button(
-                                            I(className="fa-solid fa-star")
-                                            if favorite
-                                            else I(className="fa-regular fa-star"),
-                                            id={
-                                                "index": cocktail_id,
-                                                "type": "favorite-button",
-                                            },
-                                            outline=False,
-                                            size="sm",
-                                            n_clicks=0,
-                                        )
-                                    ),
-                                    Col(
-                                        Button(
-                                            I(className="fa-solid fa-bookmark")
-                                            if bookmark
-                                            else I(className="fa-regular fa-bookmark"),
-                                            id={
-                                                "index": cocktail_id,
-                                                "type": "bookmark-button",
-                                            },
-                                            outline=False,
-                                            size="sm",
-                                            n_clicks=0,
-                                        )
-                                    ),
-                                    Col(
-                                        [
-                                            Button(
-                                                I(className=drink_button_class),
-                                                id={
-                                                    "index": cocktail_id,
-                                                    "type": "ingredient-button",
-                                                },
-                                                size="sm",
-                                                n_clicks=0,
-                                            ),
-                                            Modal(
-                                                [
-                                                    ModalHeader(
-                                                        ModalTitle("Ingredients")
+                                        ButtonGroup(
+                                            [
+                                                Button(
+                                                    I(className="fa-solid fa-star")
+                                                    if favorite
+                                                    else I(
+                                                        className="fa-regular fa-star"
                                                     ),
-                                                    ModalBody(
-                                                        Row(
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "favorite-button",
+                                                    },
+                                                    # outline=False,
+                                                    # size="sm",
+                                                    n_clicks=0,
+                                                ),
+                                                Button(
+                                                    I(className="fa-solid fa-bookmark")
+                                                    if bookmark
+                                                    else I(
+                                                        className="fa-regular fa-bookmark"
+                                                    ),
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "bookmark-button",
+                                                    },
+                                                    # outline=False,
+                                                    # size="sm",
+                                                    n_clicks=0,
+                                                ),
+                                                Button(
+                                                    I(className=drink_button_class),
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "ingredient-button",
+                                                    },
+                                                    # size="sm",
+                                                    n_clicks=0,
+                                                ),
+                                                Modal(
+                                                    [
+                                                        ModalHeader(
+                                                            ModalTitle("Ingredients")
+                                                        ),
+                                                        ModalBody(
+                                                            Row(
+                                                                [
+                                                                    Col(
+                                                                        [
+                                                                            H5(
+                                                                                "What You Have"
+                                                                            ),
+                                                                            Ol(
+                                                                                [
+                                                                                    Li(
+                                                                                        i
+                                                                                    )
+                                                                                    for i in mapped_ingredients_in_bar
+                                                                                ]
+                                                                            ),
+                                                                        ]
+                                                                    ),
+                                                                    Col(
+                                                                        [
+                                                                            H5(
+                                                                                "What You Don't Have"
+                                                                            ),
+                                                                            Ol(
+                                                                                [
+                                                                                    Li(
+                                                                                        i
+                                                                                    )
+                                                                                    for i in mapped_ingredients_not_in_bar
+                                                                                ]
+                                                                            ),
+                                                                        ]
+                                                                    ),
+                                                                ]
+                                                            )
+                                                        ),
+                                                    ],
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "ingredient-modal",
+                                                    },
+                                                    is_open=False,
+                                                ),
+                                                Button(
+                                                    button_label,
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "cNPS-button",
+                                                    },
+                                                    # size="sm",
+                                                    n_clicks=0,
+                                                ),
+                                                Modal(
+                                                    [
+                                                        ModalHeader(
+                                                            ModalTitle("Cocktail NPS")
+                                                        ),
+                                                        ModalBody(
                                                             [
-                                                                Col(
-                                                                    [
-                                                                        H5(
-                                                                            "What You Have"
-                                                                        ),
-                                                                        Ol(
-                                                                            [
-                                                                                Li(i)
-                                                                                for i in mapped_ingredients_in_bar
-                                                                            ]
-                                                                        ),
-                                                                    ]
+                                                                H5(
+                                                                    "On a scale of 0-10, how likely are you to recommend this cocktail to your friend?"
                                                                 ),
-                                                                Col(
-                                                                    [
-                                                                        H5(
-                                                                            "What You Don't Have"
-                                                                        ),
-                                                                        Ol(
-                                                                            [
-                                                                                Li(i)
-                                                                                for i in mapped_ingredients_not_in_bar
-                                                                            ]
-                                                                        ),
-                                                                    ]
+                                                                Slider(
+                                                                    id={
+                                                                        "index": cocktail_id,
+                                                                        "type": "cNPS-rating",
+                                                                    },
+                                                                    min=0,
+                                                                    value=user_rating,
+                                                                    max=10,
+                                                                    step=1,
                                                                 ),
-                                                            ]
-                                                        )
-                                                    ),
-                                                ],
-                                                id={
-                                                    "index": cocktail_id,
-                                                    "type": "ingredient-modal",
-                                                },
-                                                is_open=False,
-                                            ),
-                                        ]
-                                    ),
-                                    Col(
-                                        [
-                                            Button(
-                                                button_label,
-                                                id={
-                                                    "index": cocktail_id,
-                                                    "type": "cNPS-button",
-                                                },
-                                                size="sm",
-                                                n_clicks=0,
-                                            ),
-                                            Modal(
-                                                [
-                                                    ModalHeader(
-                                                        ModalTitle("Cocktail NPS")
-                                                    ),
-                                                    ModalBody(
-                                                        [
-                                                            H5(
-                                                                "On a scale of 0-10, how likely are you to recommend this cocktail to your friend?"
-                                                            ),
-                                                            Slider(
-                                                                id={
-                                                                    "index": cocktail_id,
-                                                                    "type": "cNPS-rating",
-                                                                },
-                                                                min=0,
-                                                                value=user_rating,
-                                                                max=10,
-                                                                step=1,
-                                                            ),
-                                                        ],
-                                                    ),
-                                                    ModalFooter(
-                                                        [
-                                                            Button(
-                                                                "Cancel",
-                                                                id={
-                                                                    "index": cocktail_id,
-                                                                    "type": "cNPS-cancel",
-                                                                },
-                                                                className="ml-auto",
-                                                                n_clicks=0,
-                                                            ),
-                                                            Button(
-                                                                "Save",
-                                                                id={
-                                                                    "index": cocktail_id,
-                                                                    "type": "cNPS-save",
-                                                                },
-                                                                className="ms-auto",
-                                                                n_clicks=0,
-                                                            ),
-                                                        ],
-                                                    ),
-                                                ],
-                                                id={
-                                                    "index": cocktail_id,
-                                                    "type": "cNPS-modal",
-                                                },
-                                                is_open=False,
-                                            ),
-                                        ],
+                                                            ],
+                                                        ),
+                                                        ModalFooter(
+                                                            [
+                                                                Button(
+                                                                    "Cancel",
+                                                                    id={
+                                                                        "index": cocktail_id,
+                                                                        "type": "cNPS-cancel",
+                                                                    },
+                                                                    className="ml-auto",
+                                                                    n_clicks=0,
+                                                                ),
+                                                                Button(
+                                                                    "Save",
+                                                                    id={
+                                                                        "index": cocktail_id,
+                                                                        "type": "cNPS-save",
+                                                                    },
+                                                                    className="ms-auto",
+                                                                    n_clicks=0,
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ],
+                                                    id={
+                                                        "index": cocktail_id,
+                                                        "type": "cNPS-modal",
+                                                    },
+                                                    is_open=False,
+                                                ),
+                                            ],
+                                            size="sm",
+                                        )
                                     ),
                                 ]
                             ),
                         ],
-                        # className=name,
                         style={"text-align": "center"},
                     ),
                 ],
                 id=f"cocktail-card-{cocktail_id}",
             ),
         ]
+    )
+
+
+def delete_ingredients(selected_rows: list, user_id: int) -> None:
+    ids_to_delete = {el.get("ingredient_id") for el in selected_rows}
+    ingredient_list = run_query(
+        f"""
+                    select unnest(ingredient_list) as ingredient_id
+                    from user_bar
+                    where user_id = {user_id}
+            """,
+        False,
+    )
+    new_ingredient_list = {el[0] for el in ingredient_list} - ids_to_delete
+    update_bar(user_id, list(new_ingredient_list))
+    return None
+
+
+def my_bar_outputs(my_bar_df, user_id, include_garnish):
+    available_cocktails = get_available_cocktails(
+        user_id, include_garnish=include_garnish
+    )
+
+    have_all = available_cocktails.loc[
+        available_cocktails["perc_ingredients_in_bar"] == 1, :
+    ].shape[0]
+
+    have_some = available_cocktails.loc[
+        (available_cocktails["perc_ingredients_in_bar"] < 1)
+        & (available_cocktails["perc_ingredients_in_bar"] > 0),
+        :,
+    ].shape[0]
+
+    have_none = available_cocktails.loc[
+        available_cocktails["perc_ingredients_in_bar"] == 0, :
+    ].shape[0]
+
+    missing_ingredients = (
+        available_cocktails.loc[available_cocktails["perc_ingredients_in_bar"] < 1, :]
+        .explode("mapped_ingredients_False")
+        .groupby(["mapped_ingredients_False"])
+        .agg({"cocktail_id": "nunique"})
+        .reset_index()
+        .sort_values("cocktail_id", ascending=False)
+    )
+    missing_ingredients_sorted = sorted(
+        missing_ingredients["mapped_ingredients_False"].to_list()
+    )
+    missing_ingredients_data = create_dropdown_from_lists(
+        missing_ingredients_sorted, missing_ingredients_sorted, "str"
+    )
+
+    missing_ret_records = missing_ingredients.to_dict("records")
+    missing_columnDefs = [
+        {
+            "field": missing_ingredients.columns[0],
+            "headerName": "Ingredient",
+        },
+        {
+            "field": missing_ingredients.columns[1],
+            "headerName": "# of Cocktails",
+        },
+    ]
+
+    # Assign returned dataframe records and columns for DataTable
+    my_bar_ret_records = my_bar_df.to_dict("records")
+    my_bar_columnDefs = [
+        {
+            "field": str(col),
+            "headerName": sub("_", " ", str(col)).title(),
+            "filter": "agNumberColumnFilter"
+            if str(col) == "ingredient_id"
+            else "agTextColumnFilter",
+            "checkboxSelection": True if i == 0 else False,
+            "headerCheckboxSelection": True if i == 0 else False,
+            "headerCheckboxSelectionFilteredOnly": True if i == 0 else False,
+            "headerCheckboxSelectionCurrentPageOnly": True if i == 0 else False,
+        }
+        for i, col in enumerate(my_bar_df.columns)
+    ]
+
+    return (
+        my_bar_ret_records,
+        my_bar_columnDefs,
+        missing_ret_records,
+        missing_columnDefs,
+        have_all,
+        have_some,
+        have_none,
+        missing_ingredients_data,
+    )
+
+
+def ingredient_cocktail_count_card_content(id: str, type_str: str) -> Card:
+    return Card(
+        CardBody(
+            [
+                H5(
+                    f"{type_str} ingredients to",
+                    style={"text-align": "center"},
+                ),
+                H2(
+                    "",
+                    id=id,
+                    style={"text-align": "center"},
+                ),
+                H5(
+                    "cocktails",
+                    style={"text-align": "center"},
+                ),
+            ]
+        )
     )
