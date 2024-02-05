@@ -537,6 +537,8 @@ def create_all_drink_cards(
                 "ingredients_False"
             ].values.tolist()
 
+            print(perc_ingredients_in_bar)
+
             if perc_ingredients_in_bar == 0 or perc_ingredients_in_bar is nan:
                 drink_button_class = "fa-solid fa-martini-glass-empty"
             elif perc_ingredients_in_bar[0] < 1:
