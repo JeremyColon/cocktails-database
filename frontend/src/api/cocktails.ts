@@ -15,6 +15,7 @@ export interface Cocktail {
   image: string | null
   link: string | null
   alcohol_type: string | null
+  source: string | null
   nps: number
   avg_rating: number
   num_ratings: number

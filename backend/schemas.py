@@ -20,6 +20,7 @@ class TokenResponse(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: str
+    is_admin: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -55,6 +56,7 @@ class CocktailOut(BaseModel):
     image: str | None
     link: str | None
     alcohol_type: str | None
+    source: str | None
     date_added: datetime | None
     nps: float
     avg_rating: float

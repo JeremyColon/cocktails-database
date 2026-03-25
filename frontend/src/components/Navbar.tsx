@@ -36,7 +36,8 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             <NavLink to="/" end className={navLink}>Browse</NavLink>
             {user && <NavLink to="/mybar" className={navLink}>My Bar</NavLink>}
-            <a
+            {user?.is_admin && <NavLink to="/admin" className={navLink}>Admin</NavLink>}
+            <
               href="https://venmo.com/jeremy-colon"
               target="_blank"
               rel="noopener noreferrer"
@@ -72,6 +73,9 @@ export default function Navbar() {
           <NavLink to="/" end className={navLink} onClick={() => setOpen(false)}>Browse</NavLink>
           {user && (
             <NavLink to="/mybar" className={navLink} onClick={() => setOpen(false)}>My Bar</NavLink>
+          )}
+          {user?.is_admin && (
+            <NavLink to="/admin" className={navLink} onClick={() => setOpen(false)}>Admin</NavLink>
           )}
           <a
             href="https://venmo.com/jeremy-colon"

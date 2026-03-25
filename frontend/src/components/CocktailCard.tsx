@@ -74,6 +74,16 @@ export default function CocktailCard({ cocktail: c }: Props) {
             {c.alcohol_type}
           </span>
         )}
+        {/* Source favicon badge */}
+        {c.source && (
+          <img
+            src={`https://www.google.com/s2/favicons?domain=${c.source}&sz=32`}
+            alt={c.source}
+            title={c.source}
+            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 p-0.5 shadow-sm"
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+          />
+        )}
         {/* Can-make bar */}
         {user && c.ingredients.length > 0 && (
           <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/50">

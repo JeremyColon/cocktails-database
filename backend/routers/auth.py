@@ -33,6 +33,14 @@ def _validate_email_domain(email: str) -> None:
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
+def _user_response(user: User) -> dict:
+    return {
+        "id": user.id,
+        "email": user.email,
+        "is_admin": user.id == settings.admin_user_id,
+    }
+
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     _validate_email_domain(body.email)
@@ -45,7 +53,7 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     db.add(user)
     await db.commit()
     await db.refresh(user)
-    return user
+    return _user_response(user)
 
 
 @router.post("/login", response_model=UserResponse)
@@ -65,7 +73,7 @@ async def login(body: LoginRequest, response: Response, db: AsyncSession = Depen
         secure=settings.secure_cookies,
         max_age=60 * 60,  # 1 hour, matches token expiry
     )
-    return user
+    return _user_response(user)
 
 
 @router.post("/logout")
@@ -76,7 +84,7 @@ async def logout(response: Response):
 
 @router.get("/me", response_model=UserResponse)
 async def me(user: User = Depends(get_current_user)):
-    return user
+    return _user_response(user)
 
 
 @router.put("/password")

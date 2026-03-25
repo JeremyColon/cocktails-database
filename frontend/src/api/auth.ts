@@ -3,6 +3,7 @@ import { api } from './client'
 export interface User {
   id: number
   email: string
+  is_admin: boolean
 }
 
 export const authApi = {

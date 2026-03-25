@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import CocktailBrowser from './pages/CocktailBrowser'
 import MyBar from './pages/MyBar'
 import Login from './pages/Login'
+import Admin from './pages/Admin'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,6 +20,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   if (loading) return null
   if (!user) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (!user || !user.is_admin) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
@@ -41,6 +49,9 @@ function AppRoutes() {
         <Route path="/login"  element={<Login />} />
         <Route path="/mybar"  element={
           <ProtectedRoute><MyBar /></ProtectedRoute>
+        } />
+        <Route path="/admin"  element={
+          <AdminRoute><Admin /></AdminRoute>
         } />
         <Route path="*"       element={<Navigate to="/" replace />} />
       </Routes>

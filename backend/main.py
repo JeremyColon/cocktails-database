@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.cache import close_cache, init_cache
 from backend.config import settings
-from backend.routers import auth, bar, cocktails
+from backend.routers import admin, auth, bar, cocktails
 from backend.scraper.scheduler import scheduler
 
 _dist = Path(__file__).parent.parent / "frontend" / "dist"
@@ -40,6 +40,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(cocktails.router)
 app.include_router(bar.router)
+app.include_router(admin.router)
 
 
 @app.get("/health")

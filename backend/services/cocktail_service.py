@@ -226,6 +226,7 @@ async def get_cocktails(
             c.image,
             c.link,
             c.alcohol_type,
+            c.source,
             c.date_added,
             COALESCE(vr.cocktail_nps, 0)   AS nps,
             COALESCE(vr.avg_rating, 0)     AS avg_rating,
