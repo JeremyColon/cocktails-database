@@ -36,9 +36,11 @@ class Cocktail(Base):
     image: Mapped[str | None] = mapped_column(Text)
     link: Mapped[str | None] = mapped_column(Text)
     # alcohol_type and source/scraped_at are added by migration 001
+    # date_added is added by migration 002
     alcohol_type: Mapped[str | None] = mapped_column(Text)
     source: Mapped[str] = mapped_column(Text, default="liquor.com")
-    scraped_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False))
+    scraped_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True))
+    date_added: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
 
     ingredients: Mapped[list["CocktailIngredient"]] = relationship(
         back_populates="cocktail"

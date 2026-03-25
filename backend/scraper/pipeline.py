@@ -77,9 +77,10 @@ async def _upsert_recipe(normalized: dict, db: AsyncSession) -> bool:
     now = datetime.now(timezone.utc)
 
     # Upsert cocktail — conflict on (lower(recipe_name), source)
+    # date_added is intentionally excluded from the UPDATE so it is set once and never changed.
     cocktail_sql = """
-        INSERT INTO cocktails (recipe_name, image, link, alcohol_type, source, scraped_at)
-        VALUES (:recipe_name, :image, :link, :alcohol_type, :source, :scraped_at)
+        INSERT INTO cocktails (recipe_name, image, link, alcohol_type, source, scraped_at, date_added)
+        VALUES (:recipe_name, :image, :link, :alcohol_type, :source, :scraped_at, :scraped_at)
         ON CONFLICT (lower(recipe_name), source)
         DO UPDATE SET
             image      = EXCLUDED.image,

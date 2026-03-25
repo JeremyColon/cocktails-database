@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, EmailStr, field_validator
 
 
@@ -53,6 +55,7 @@ class CocktailOut(BaseModel):
     image: str | None
     link: str | None
     alcohol_type: str | None
+    date_added: datetime | None
     nps: float
     avg_rating: float
     num_ratings: int
@@ -112,7 +115,7 @@ class CocktailFilterParams(BaseModel):
     @field_validator("sort_by")
     @classmethod
     def validate_sort_by(cls, v: str) -> str:
-        allowed = {"recipe_name", "nps", "avg_rating", "num_ratings"}
+        allowed = {"recipe_name", "nps", "avg_rating", "num_ratings", "date_added"}
         if v not in allowed:
             raise ValueError(f"sort_by must be one of {allowed}")
         return v

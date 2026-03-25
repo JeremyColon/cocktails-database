@@ -249,6 +249,7 @@ export default function FilterPanel({ filters, setFilters, total }: Props) {
                 onChange={e => update({ sort_by: e.target.value as CocktailFilters['sort_by'] })}
               >
                 <option value="recipe_name">Name</option>
+                <option value="date_added">Newest</option>
                 <option value="avg_rating">Rating</option>
                 <option value="nps">NPS</option>
                 <option value="num_ratings"># Ratings</option>

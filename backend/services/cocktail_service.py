@@ -14,6 +14,7 @@ _SORT_COLUMNS = {
     "nps": "nps",
     "avg_rating": "avg_rating",
     "num_ratings": "num_ratings",
+    "date_added": "c.date_added",
 }
 
 
@@ -225,6 +226,7 @@ async def get_cocktails(
             c.image,
             c.link,
             c.alcohol_type,
+            c.date_added,
             COALESCE(vr.cocktail_nps, 0)   AS nps,
             COALESCE(vr.avg_rating, 0)     AS avg_rating,
             COALESCE(vr.num_ratings, 0)    AS num_ratings,

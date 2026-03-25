@@ -53,7 +53,7 @@ export interface CocktailFilters {
   bookmarks_only?: boolean
   can_make?: 'all' | 'some' | 'none'
   include_garnish?: boolean
-  sort_by?: 'recipe_name' | 'nps' | 'avg_rating' | 'num_ratings'
+  sort_by?: 'recipe_name' | 'nps' | 'avg_rating' | 'num_ratings' | 'date_added'
   sort_dir?: 'asc' | 'desc'
   page?: number
   page_size?: number
