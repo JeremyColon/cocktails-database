@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     # Set to False in local dev (HTTP). Set to True in production (HTTPS).
     secure_cookies: bool = False
 
+    # CORS — comma-separated list of allowed origins.
+    # Example: ALLOWED_ORIGINS="https://your-app.herokuapp.com"
+    allowed_origins: list[str] = ["http://localhost:5173", "http://localhost:8000"]
+
     # Redis (optional — caching disabled if not set)
     redis_url: str = ""
 
