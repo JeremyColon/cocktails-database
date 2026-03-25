@@ -1,3 +1,5 @@
+import dns.resolver
+import disposable_email_domains
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,11 +15,28 @@ from backend.dependencies import (
 from backend.models import User
 from backend.schemas import LoginRequest, RegisterRequest, UserResponse
 
+
+def _validate_email_domain(email: str) -> None:
+    domain = email.split("@")[-1].lower()
+
+    if domain in disposable_email_domains.blocklist:
+        raise HTTPException(status_code=400, detail="Disposable email addresses are not allowed")
+
+    try:
+        dns.resolver.resolve(domain, "MX")
+    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.NoNameservers):
+        raise HTTPException(status_code=400, detail="Email domain does not appear to be valid")
+    except Exception:
+        # DNS timeout or other transient error — let it through rather than blocking legitimate signups
+        pass
+
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
+    _validate_email_domain(body.email)
+
     result = await db.execute(select(User).where(User.email == body.email.lower()))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
