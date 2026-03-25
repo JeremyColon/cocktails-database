@@ -194,12 +194,12 @@ def create_filter_canvas(
                                                             pb=15,
                                                             children=[
                                                                 Checkbox(
-                                                                    label="Show Favorites Only",
+                                                                    label="Show Favorites",
                                                                     value="favorites_only",
                                                                     color="orange",
                                                                 ),
                                                                 Checkbox(
-                                                                    label="Show Bookmarks Only",
+                                                                    label="Show Bookmarks",
                                                                     value="bookmarks_only",
                                                                     color="orange",
                                                                 ),

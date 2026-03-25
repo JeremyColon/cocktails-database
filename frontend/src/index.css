@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Manrope', sans-serif;
+    background-color: #fbf5ec;
+    color: #1E1209;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Teko', sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* Smooth scroll */
+  html { scroll-behavior: smooth; }
+
+  /* Custom scrollbar — warm toned */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f5e9d3; }
+  ::-webkit-scrollbar-thumb { background: #C07D10; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #A86A08; }
+}
+
+@layer components {
+  .btn-amber {
+    @apply bg-amber px-5 py-2.5 text-white font-body font-semibold rounded-lg
+           transition-colors duration-150 hover:bg-amber-hover
+           focus:outline-none focus:ring-2 focus:ring-amber focus:ring-offset-2 focus:ring-offset-parchment-100;
+  }
+
+  .btn-outline {
+    @apply border border-amber text-amber px-5 py-2.5 font-body font-semibold rounded-lg
+           transition-colors duration-150 hover:bg-amber-muted
+           focus:outline-none focus:ring-2 focus:ring-amber focus:ring-offset-2;
+  }
+
+  .btn-ghost {
+    @apply text-bark px-3 py-2 rounded-lg font-body text-sm
+           transition-colors duration-150 hover:bg-parchment-200 hover:text-mahogany;
+  }
+
+  .input-field {
+    @apply w-full border border-parchment-400 bg-white rounded-lg px-4 py-2.5
+           font-body text-mahogany placeholder-bark-light
+           focus:outline-none focus:ring-2 focus:ring-amber focus:border-transparent
+           transition-shadow duration-150;
+  }
+
+  .card-cocktail {
+    @apply bg-white rounded-xl shadow-card hover:shadow-card-hover
+           transition-all duration-200 overflow-hidden;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-body font-semibold;
+  }
+
+  .badge-amber {
+    @apply badge bg-amber text-white;
+  }
+
+  .badge-outline {
+    @apply badge border border-parchment-400 text-bark;
+  }
+}

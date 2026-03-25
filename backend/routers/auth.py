@@ -1,0 +1,76 @@
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.config import settings
+from backend.database import get_db
+from backend.dependencies import (
+    create_access_token,
+    get_current_user,
+    hash_password,
+    verify_password,
+)
+from backend.models import User
+from backend.schemas import LoginRequest, RegisterRequest, UserResponse
+
+router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == body.email.lower()))
+    if result.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    user = User(email=body.email.lower(), pwd=hash_password(body.password))
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@router.post("/login", response_model=UserResponse)
+async def login(body: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == body.email.lower()))
+    user = result.scalar_one_or_none()
+
+    if not user or not verify_password(body.password, user.pwd):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    token = create_access_token({"sub": str(user.id)})
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=settings.secure_cookies,
+        max_age=60 * 60,  # 1 hour, matches token expiry
+    )
+    return user
+
+
+@router.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"detail": "Logged out"}
+
+
+@router.get("/me", response_model=UserResponse)
+async def me(user: User = Depends(get_current_user)):
+    return user
+
+
+@router.put("/password")
+async def change_password(
+    body: RegisterRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.email == body.email.lower()))
+    target = result.scalar_one_or_none()
+    if not target or target.id != user.id:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    target.pwd = hash_password(body.password)
+    await db.commit()
+    return {"detail": "Password updated"}

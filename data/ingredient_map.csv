@@ -139,7 +139,7 @@
 138,silver tequila,blanco tequila,tequila
 139,tapatio blanco tequila,blanco tequila,tequila
 140,blanco tequila,blanco tequila,tequila
-141,martini bianco vermouth,blanco vermouth,vermouth
+141,martini bianco vermouth,blanc vermouth,vermouth
 142,dolin blanc vermouth de chambéry,blanc vermouth,vermouth
 143,dolin blanc vermouth,blanc vermouth,vermouth
 144,blended scotch (such as chivas),blended scotch,scotch
@@ -356,7 +356,7 @@
 355,creme de banane,creme de banane,liqueur
 356,creme de cacao,creme de cacao,liqueur
 357,giffard creme de cacao,creme de cacao,liqueur
-358,marie brizard white creme de cacao,creme de cacao,liqueur
+358,marie brizard white creme de cacao,white creme de cacao,liqueur
 359,creme de cassis,creme de cassis,liqueur
 360,lejay crème de cassis,creme de cassis,liqueur
 361,andes creme de menthe,creme de menthe,liqueur
@@ -476,11 +476,11 @@
 475,gin or vodka,gin,gin
 476,hendrick’s gin,gin,gin
 477,ki no bi gin (or other herbaceous dry gin),gin,gin
-478,plymouth sloe gin,gin,gin
-479,ransom old tom gin,gin,gin
+478,plymouth sloe gin,sloe gin,liqueur
+479,ransom old tom gin,old tom gin,gin
 480,scapegrace black gin,gin,gin
-481,sloe gin,gin,gin
-482,sloe gin,gin,gin
+481,sloe gin,sloe gin,liqueur
+482,sloe gin,sloe gin,liqueur
 483,tanqueray gin,gin,gin
 484,tanqueray london dry gin,gin,gin
 485,tanqueray no. 10 gin,gin,gin
@@ -619,8 +619,8 @@
 618,"lager beer, chilled, to top",lager,beer
 619,budweiser,lager,beer
 620,lager beer,lager,beer
-621,la gitana manzanilla sherry,la gitana manzanilla sherry,sherry
-622,la ina fino sherry,la ina fino sherry,sherry
+621,la gitana manzanilla sherry,manzanilla sherry,sherry
+622,la ina fino sherry,fino sherry,sherry
 623,lavender sprig,lavender,NULL
 624,lavender,lavender,NULL
 625,lavender bitters,lavender bitters,NULL
@@ -864,8 +864,7 @@
 863,pepper slices,pepper slices,NULL
 864,pernod absinthe,pernod,liqueur
 865,pernod,pernod,liqueur
-866,peychaud's bitters,peychaud's bitters,NULL
-867,peychaud’s bitters,peychaud’s bitters,NULL
+866,peychaud’s bitters,peychaud’s bitters,bitters
 868,pho broth*,pho broth,NULL
 869,pickle brine,pickle brine,NULL
 870,pickled peach juice*,pickled peach juice,NULL
@@ -948,7 +947,7 @@
 947,ruby port,ruby port,port wine
 948,gold rum,rum,rum
 949,151-proof rum,rum,rum
-950,aged rum,rum,rum
+950,aged rum,aged rum,rum
 951,appleton estate 12 year rum,rum,rum
 952,appleton estate rum,rum,rum
 953,appleton reserve rum,rum,rum
@@ -958,34 +957,34 @@
 957,blackstrap rum,rum,rum
 958,cabbage rum*,rum,rum
 959,caña brava 7-year-old grand reserve añeja rum,rum,rum
-960,dark jamaican rum,rum,rum
-961,demerara rum,rum,rum
+960,dark jamaican rum,dark rum,rum
+961,demerara rum,dark rum,rum
 962,don papa rum,rum,rum
 963,don q cristal rum,rum,rum
 964,don q gold rum,rum,rum
-965,dr. bird jamaican rum,rum,rum
-966,dr. birds jamaican rum,rum,rum
+965,dr. bird jamaican rum,dark rum,rum
+966,dr. birds jamaican rum,dark rum,rum
 967,el dorado 15-year-old special reserve rum,rum,rum
 968,el dorado special reserve 15-year-old rum,rum,rum
 969,flor de caña 7-year-old grand reserve rum,rum,rum
 970,foursquare 2004 single-blended rum,rum,rum
 971,gosling’s black seal rum,rum,rum
-972,j. wray & nephew overproof rum,rum,rum
-973,light rum,rum,rum
-974,overproof demerara rum (such as plantation oftd),rum,rum
-975,overproof jamaican rum,rum,rum
-976,overproof rum (preferably smith & cross),rum,rum
-977,plantation dark rum,rum,rum
-978,plantation five-year-old rum,rum,rum
+972,j. wray & nephew overproof rum,overproof rum,rum
+973,light rum,light rum,rum
+974,overproof demerara rum (such as plantation oftd),overproof rum,rum
+975,overproof jamaican rum,overproof rum,rum
+976,overproof rum (preferably smith & cross),overproof rum,rum
+977,plantation dark rum,dark rum,rum
+978,plantation five-year-old rum,aged rum,rum
 979,rhum clément v.s.o.p. martinique rhum agricole vieux,rum,rum
 980,rum,rum,rum
-981,smith & cross jamaican rum,rum,rum
-982,smith and cross jamaican rum,rum,rum
-983,spiced rum,rum,rum
+981,smith & cross jamaican rum,dark rum,rum
+982,smith and cross jamaican rum,dark rum,rum
+983,spiced rum,spiced rum,rum
 984,tanduay gold asian rum,rum,rum
 985,white or aged rum,rum,rum
-986,worthy park overproof rum,rum,rum
-987,wray & nephew overproof rum (with optional blue food coloring),rum,rum
+986,worthy park overproof rum,overproof rum,rum
+987,wray & nephew overproof rum (with optional blue food coloring),overproof rum,rum
 988,zacapa 23 rum,rum,rum
 989,american rye whiskey,rye whiskey,whiskey
 990,canadian club rye whiskey,rye whiskey,whiskey
@@ -1055,15 +1054,15 @@
 1054,serrano-chile-infused shochu*,serrano-chile-infused shochu,NULL
 1055,serrano-infused triple sec*,serrano-infused triple sec,NULL
 1056,serrano peppers,serrano peppers,NULL
-1057,lustau fino sherry,sherry,sherry
-1058,manzanilla sherry,sherry,sherry
-1059,oloroso sherry,sherry,sherry
-1060,pedro ximénez sherry,sherry,sherry
-1061,pedro ximenez sherry (preferably lustau),sherry,sherry
+1057,lustau fino sherry,fino sherry,sherry
+1058,manzanilla sherry,manzanilla sherry,sherry
+1059,oloroso sherry,oloroso sherry,sherry
+1060,pedro ximénez sherry,pedro ximénez sherry,sherry
+1061,pedro ximenez sherry (preferably lustau),pedro ximénez sherry,sherry
 1062,sherry,sherry,sherry
-1063,barbadillo pedro ximénez sherry,sherry,sherry
-1064,dry sack 15-year-old oloroso sherry,sherry,sherry
-1065,lustau fino jarana sherry,sherry,sherry
+1063,barbadillo pedro ximénez sherry,pedro ximénez sherry,sherry
+1064,dry sack 15-year-old oloroso sherry,oloroso sherry,sherry
+1065,lustau fino jarana sherry,fino sherry,sherry
 1066,shichimi togarashi (for rim),shichimi togarashi,NULL
 1067,mizu shochu,shochu,shochu
 1068,plus 5 teaspoons shochu (goto prefers iichiko saiten),shochu,shochu
@@ -1165,7 +1164,7 @@
 1164,tarragon simple syrup*,tarragon simple syrup,NULL
 1165,tartaric acid solution,tartaric acid solution,NULL
 1166,taylor fladgate 10-year-old tawny port,tawny port,port wine
-1167,taylor fladgate lbv port,tawny port,port wine
+1167,taylor fladgate lbv port,lbv port,port wine
 1168,feist tawny port,tawny port,port wine
 1169,tawny port (such as ferreira),tawny port,port wine
 1170,"0-year-old tawny port, to float",tawny port,port wine
@@ -1214,13 +1213,13 @@
 1213,verjus blanc,verjus,NULL
 1214,verjus (such as wolffer),verjus,NULL
 1215,verjus,verjus,NULL
-1216,cocchi torino sweet vermouth,vermouth,vermouth
-1217,noilly prat ambré vermouth,vermouth,vermouth
+1216,cocchi torino sweet vermouth,sweet vermouth,vermouth
+1217,noilly prat ambré vermouth,dry vermouth,vermouth
 1218,vermouth,vermouth,vermouth
-1219,vermouth,vermouth,vermouth
+1219,vermouth,blanc vermouth,vermouth
 1220,blanc vermouth,vermouth,vermouth
-1221,carpano antica formula vermouth,vermouth,vermouth
-1222,carpano antica sweet vermouth,vermouth,vermouth
+1221,carpano antica formula vermouth,sweet vermouth,vermouth
+1222,carpano antica sweet vermouth,sweet vermouth,vermouth
 1223,citron vodka,vodka,vodka
 1224,absolut elyx vodka,vodka,vodka
 1225,absolut vodka,vodka,vodka
@@ -1244,34 +1243,34 @@
 1243,whipped cream,whipped cream,NULL
 1244,garnish: whipped coconut cream,whipped cream,NULL
 1245,garnish: whipped cream,whipped cream,NULL
-1246,jameson irish whiskey,whiskey,whiskey
-1247,knappogue castle 12 year old single malt irish whiskey,whiskey,whiskey
-1248,lot 40 canadian whisky,whiskey,whiskey
+1246,jameson irish whiskey,irish whiskey,whiskey
+1247,knappogue castle 12 year old single malt irish whiskey,irish whiskey,whiskey
+1248,lot 40 canadian whisky,canadian whisky,whiskey
 1249,mellow corn whiskey,whiskey,whiskey
-1250,michael collins blended irish whiskey,whiskey,whiskey
-1251,michter's single barrel rye whiskey,whiskey,whiskey
-1252,single pot still irish whiskey,whiskey,whiskey
-1253,"tennessee whiskey, barrel proof",whiskey,whiskey
-1254,tullamore d.e.w. 12-year-old irish whiskey,whiskey,whiskey
-1255,west cork distillers 0-year-old single-malt irish whiskey,whiskey,whiskey
+1250,michael collins blended irish whiskey,irish whiskey,whiskey
+1251,michter's single barrel rye whiskey,rye whiskey,whiskey
+1252,single pot still irish whiskey,irish whiskey,whiskey
+1253,"tennessee whiskey, barrel proof",tennessee whiskey,whiskey
+1254,tullamore d.e.w. 12-year-old irish whiskey,irish whiskey,whiskey
+1255,west cork distillers 0-year-old single-malt irish whiskey,irish whiskey,whiskey
 1256,whiskey,whiskey,whiskey
 1257,whisky,whiskey,whiskey
-1258,redbreast 1-year-old irish whiskey,whiskey,whiskey
-1259,alberta premium canadian whisky,whiskey,whiskey
+1258,redbreast 1-year-old irish whiskey,irish whiskey,whiskey
+1259,alberta premium canadian whisky,canadian whisky,whiskey
 1260,blended whiskey (such as firestone & robertson tx),whiskey,whiskey
-1261,bushmills irish whiskey,whiskey,whiskey
-1262,canadian whisky,whiskey,whiskey
-1263,connemara cask-strength peated irish whiskey,whiskey,whiskey
+1261,bushmills irish whiskey,irish whiskey,whiskey
+1262,canadian whisky,canadian whisky,whiskey
+1263,connemara cask-strength peated irish whiskey,irish whiskey,whiskey
 1264,corsair triple smoke american malt whiskey,whiskey,whiskey
 1265,crown royal whisky (canada),whiskey,whiskey
-1266,george dickel superior no. 12 tennessee whiskey,whiskey,whiskey
+1266,george dickel superior no. 12 tennessee whiskey,tennessee whiskey,whiskey
 1267,high west silver oat whiskey,whiskey,whiskey
-1268,irish whiskey,whiskey,whiskey
-1269,jameson black barrel irish whiskey,whiskey,whiskey
+1268,irish whiskey,irish whiskey,whiskey
+1269,jameson black barrel irish whiskey,irish whiskey,whiskey
 1270,jameson black barrel whiskey,whiskey,whiskey
 1271,jameson caskmates whiskey,whiskey,whiskey
-1272,powers irish whiskey,whiskey,whiskey
-1273,powers 12 year old special reserve irish whiskey,whiskey,whiskey
+1272,powers irish whiskey,irish whiskey,whiskey
+1273,powers 12 year old special reserve irish whiskey,irish whiskey,whiskey
 1274,fee brothers whiskey barrel bitters,whiskey barrel bitters,NULL
 1275,white,white,NULL
 1276,white creme de cacao,white creme de cacao,liqueur

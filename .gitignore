@@ -130,3 +130,5 @@ dmypy.json
 
 # Testing
 testing/
+backend_env/
+frontend/node_modules/
