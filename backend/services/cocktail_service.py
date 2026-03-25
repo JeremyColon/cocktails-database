@@ -308,6 +308,8 @@ async def get_cocktails(
                 image=r["image"],
                 link=r["link"],
                 alcohol_type=r["alcohol_type"],
+                source=r["source"],
+                date_added=r["date_added"],
                 nps=r["nps"],
                 avg_rating=r["avg_rating"],
                 num_ratings=r["num_ratings"],
