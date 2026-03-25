@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, X, GlassWater, LogOut, Coffee } from 'lucide-react'
+import { Menu, X, GlassWater, LogOut, DollarSign } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
@@ -37,12 +37,12 @@ export default function Navbar() {
             <NavLink to="/" end className={navLink}>Browse</NavLink>
             {user && <NavLink to="/mybar" className={navLink}>My Bar</NavLink>}
             <a
-              href="https://www.buymeacoffee.com/jeremycolon"
+              href="https://venmo.com/jeremy-colon"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 font-body text-sm text-parchment-300 hover:text-amber transition-colors"
             >
-              <Coffee className="w-4 h-4" />
+              <DollarSign className="w-4 h-4" />
               Buy me a drink
             </a>
             {user ? (
@@ -74,7 +74,7 @@ export default function Navbar() {
             <NavLink to="/mybar" className={navLink} onClick={() => setOpen(false)}>My Bar</NavLink>
           )}
           <a
-            href="https://www.buymeacoffee.com/jeremycolon"
+            href="https://venmo.com/jeremy-colon"
             target="_blank"
             rel="noopener noreferrer"
             className="font-body text-sm text-parchment-300 hover:text-amber transition-colors"
