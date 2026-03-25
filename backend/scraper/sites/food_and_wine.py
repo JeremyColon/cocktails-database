@@ -1,9 +1,8 @@
 """
 Food & Wine scraper adapter.
 
-Discovery: cocktail tag/category pages → collect recipe hrefs
-Parsing:   individual recipe pages using schema.org JSON-LD (most reliable)
-           with BeautifulSoup fallback
+Discovery: sitemap-based (category pages are JS-rendered and return no links)
+Parsing:   schema.org JSON-LD (preferred) with BeautifulSoup fallback
 """
 import json
 import logging
@@ -19,17 +18,13 @@ logger = logging.getLogger(__name__)
 
 _BASE_URL = "https://www.foodandwine.com"
 
-# Category pages that list cocktail recipes
-CATEGORY_URLS: list[str] = [
-    "https://www.foodandwine.com/cocktails-spirits/cocktails",
-    "https://www.foodandwine.com/cocktails-spirits/whiskey",
-    "https://www.foodandwine.com/cocktails-spirits/vodka",
-    "https://www.foodandwine.com/cocktails-spirits/tequila",
-    "https://www.foodandwine.com/cocktails-spirits/rum",
-    "https://www.foodandwine.com/cocktails-spirits/gin",
+# Both sitemaps are scanned; URLs are filtered to likely recipe pages.
+_SITEMAP_URLS = [
+    "https://www.foodandwine.com/sitemap_1.xml",
+    "https://www.foodandwine.com/sitemap_2.xml",
 ]
 
-# Map F&W URL keywords → alcohol_type values used in the DB
+# Map URL keywords → alcohol_type values used in the DB
 _TYPE_MAP = {
     "whiskey": "other whiskey",
     "bourbon": "bourbon",
@@ -44,57 +39,41 @@ _TYPE_MAP = {
 }
 
 
+def _is_recipe_url(url: str) -> bool:
+    """Return True for URLs that are likely individual cocktail recipes."""
+    u = url.lower()
+    if "cocktail" not in u:
+        return False
+    # New F&W format: ...-recipe-XXXXXXX
+    # Old format: /recipes/...-cocktail  or  /cocktails/...
+    return "-recipe-" in u or "/recipes/" in u or "/cocktails/" in u
+
+
+def _is_recipe_type(type_val) -> bool:
+    """Handle @type as either a string or a list."""
+    if isinstance(type_val, list):
+        return "Recipe" in type_val
+    return type_val == "Recipe"
+
+
 class FoodAndWineScraper(BaseScraper):
     source = "food_and_wine"
 
     async def get_recipe_links(self) -> list[str]:
         links: list[str] = []
         async with get_session() as session:
-            for cat_url in CATEGORY_URLS:
+            for sitemap_url in _SITEMAP_URLS:
                 try:
-                    page_links = await self._scrape_category(session, cat_url)
-                    links.extend(page_links)
+                    resp = await session.get(sitemap_url)
+                    urls = re.findall(r"<loc>(.*?)</loc>", resp.text)
+                    recipe_urls = [u for u in urls if _is_recipe_url(u)]
+                    links.extend(recipe_urls)
                     logger.info(
-                        f"[food_and_wine] {cat_url}: {len(page_links)} recipes found"
+                        f"[food_and_wine] {sitemap_url}: {len(recipe_urls)} recipe URLs found"
                     )
                 except Exception as e:
-                    logger.error(f"[food_and_wine] Failed to scrape {cat_url}: {e}")
+                    logger.error(f"[food_and_wine] Failed to fetch {sitemap_url}: {e}")
         return list(dict.fromkeys(links))
-
-    async def _scrape_category(self, session, url: str) -> list[str]:
-        links: list[str] = []
-        current_url = url
-
-        while current_url:
-            resp = await session.get(current_url)
-            soup = BeautifulSoup(resp.text, "html.parser")
-
-            # F&W recipe cards typically use article/card elements with recipe links
-            for a in soup.select(
-                "a[href*='/recipe/'], "
-                "a[href*='/cocktails/'], "
-                ".card__title a, "
-                "h3.card__title a"
-            ):
-                href = a.get("href", "")
-                if href.startswith("/"):
-                    href = _BASE_URL + href
-                if href and _BASE_URL in href and href not in links:
-                    links.append(href)
-
-            # F&W uses a "Load More" button / page query param for pagination
-            next_link = soup.select_one(
-                "a[rel='next'], a.pagination__next, [data-page]"
-            )
-            if next_link and next_link.get("href"):
-                next_href = next_link["href"]
-                current_url = (
-                    _BASE_URL + next_href if next_href.startswith("/") else next_href
-                )
-            else:
-                current_url = None
-
-        return links
 
     async def parse_recipe(self, url: str) -> RawRecipe | None:
         async with get_session() as session:
@@ -106,7 +85,6 @@ class FoodAndWineScraper(BaseScraper):
 
         soup = BeautifulSoup(resp.text, "html.parser")
 
-        # Prefer schema.org JSON-LD — most reliable across site redesigns
         recipe = _parse_json_ld(soup)
         if recipe:
             recipe.link = url
@@ -114,7 +92,6 @@ class FoodAndWineScraper(BaseScraper):
             recipe.alcohol_type = recipe.alcohol_type or _infer_type_from_url(url)
             return recipe
 
-        # Fallback: parse HTML directly
         return _parse_html(soup, url, self.source)
 
 
@@ -126,13 +103,13 @@ def _parse_json_ld(soup: BeautifulSoup) -> RawRecipe | None:
         except (json.JSONDecodeError, AttributeError):
             continue
 
-        # JSON-LD can be an array or a single object
+        # JSON-LD can be a single object or a list of objects
         if isinstance(data, list):
-            data = next((d for d in data if d.get("@type") == "Recipe"), None)
-        if not isinstance(data, dict) or data.get("@type") != "Recipe":
+            data = next((d for d in data if isinstance(d, dict) and _is_recipe_type(d.get("@type"))), None)
+        if not isinstance(data, dict) or not _is_recipe_type(data.get("@type")):
             continue
 
-        name = data.get("name", "").strip()
+        name = (data.get("name") or data.get("headline") or "").strip()
         if not name:
             continue
 
@@ -149,10 +126,13 @@ def _parse_json_ld(soup: BeautifulSoup) -> RawRecipe | None:
             qty, unit, ing_name = _parse_ingredient_text(raw)
             ingredients.append(RawIngredient(name=ing_name, quantity=qty, unit=unit))
 
+        if not ingredients:
+            continue
+
         return RawRecipe(
             name=name,
-            link="",      # caller fills this in
-            source="",    # caller fills this in
+            link="",   # caller fills this in
+            source="", # caller fills this in
             image=image,
             ingredients=ingredients,
         )
