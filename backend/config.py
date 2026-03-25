@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,9 +21,16 @@ class Settings(BaseSettings):
     # Set to False in local dev (HTTP). Set to True in production (HTTPS).
     secure_cookies: bool = False
 
-    # CORS — comma-separated list of allowed origins.
+    # CORS — comma-separated string or JSON list of allowed origins.
     # Example: ALLOWED_ORIGINS="https://your-app.herokuapp.com"
     allowed_origins: list[str] = ["http://localhost:5173", "http://localhost:8000"]
+
+    @field_validator("allowed_origins", mode="before")
+    @classmethod
+    def parse_origins(cls, v: object) -> object:
+        if isinstance(v, str):
+            return [o.strip() for o in v.split(",") if o.strip()]
+        return v
 
     # Redis (optional — caching disabled if not set)
     redis_url: str = ""
