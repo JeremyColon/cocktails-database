@@ -37,7 +37,7 @@ export default function Navbar() {
             <NavLink to="/" end className={navLink}>Browse</NavLink>
             {user && <NavLink to="/mybar" className={navLink}>My Bar</NavLink>}
             {user?.is_admin && <NavLink to="/admin" className={navLink}>Admin</NavLink>}
-            <
+            <a
               href="https://venmo.com/jeremy-colon"
               target="_blank"
               rel="noopener noreferrer"
