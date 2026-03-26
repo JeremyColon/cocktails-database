@@ -301,9 +301,6 @@ async def get_cocktails(
 
     results = []
     for r in rows:
-        if r["cocktail_id"] is None:
-            import logging
-            logging.error("DEBUG cocktail_id=None row keys=%s values=%s", list(r.keys()), list(r.values()))
         results.append(
             CocktailOut(
                 cocktail_id=r["cocktail_id"],
