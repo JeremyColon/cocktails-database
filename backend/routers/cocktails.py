@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,7 +26,9 @@ async def list_cocktails(
     db: AsyncSession = Depends(get_db),
     user: User | None = Depends(get_optional_user),
 ):
-    return await get_cocktails(params, db, user_id=user.id if user else None)
+    uid = user.id if user else None
+    logging.warning("DEBUG list_cocktails user_id=%s favorites=%s can_make=%s", uid, params.favorites_only, params.can_make)
+    return await get_cocktails(params, db, user_id=uid)
 
 
 @router.get("/ingredients")
