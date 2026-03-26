@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # JWT
     secret_key: str = "change-me-in-production"
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 10080  # 7 days
 
     # Set to False in local dev (HTTP). Set to True in production (HTTPS).
     secure_cookies: bool = False
