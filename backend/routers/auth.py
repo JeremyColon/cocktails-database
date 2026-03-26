@@ -71,7 +71,7 @@ async def login(body: LoginRequest, response: Response, db: AsyncSession = Depen
         httponly=True,
         samesite="lax",
         secure=settings.secure_cookies,
-        max_age=60 * 60,  # 1 hour, matches token expiry
+        max_age=settings.access_token_expire_minutes * 60,
     )
     return _user_response(user)
 
