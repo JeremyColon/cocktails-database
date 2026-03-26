@@ -83,7 +83,7 @@ async def _upsert_recipe(normalized: dict, db: AsyncSession) -> bool:
         VALUES (:recipe_name, :image, :link, :alcohol_type, :source, :scraped_at, :scraped_at)
         ON CONFLICT (lower(recipe_name), source)
         DO UPDATE SET
-            image      = EXCLUDED.image,
+            image      = COALESCE(EXCLUDED.image, cocktails.image),
             link       = EXCLUDED.link,
             scraped_at = EXCLUDED.scraped_at
         RETURNING cocktail_id, (xmax = 0) AS is_new

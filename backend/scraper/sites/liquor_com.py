@@ -4,6 +4,7 @@ liquor.com scraper adapter.
 Discovery: category index pages → paginate → collect recipe hrefs
 Parsing:   individual recipe pages → name, image, ingredients (name, qty, unit)
 """
+import json
 import logging
 import re
 
@@ -98,12 +99,33 @@ class LiquorComScraper(BaseScraper):
             return None
         name = name_el.get_text(strip=True)
 
-        # Hero image
-        img_el = soup.select_one(
-            "img.recipe__image, img.img-fluid, "
-            "div.recipe__image img, picture img"
-        )
-        image = img_el.get("src") if img_el else None
+        # Hero image — try JSON-LD first (most reliable), then lazy-load attrs, then src
+        image = None
+        for tag in soup.find_all("script", type="application/ld+json"):
+            try:
+                data = json.loads(tag.string or "")
+                items = data if isinstance(data, list) else [data]
+                for item in items:
+                    if item.get("@type") in ("Recipe", "recipe"):
+                        raw_img = item.get("image")
+                        if isinstance(raw_img, list):
+                            raw_img = raw_img[0]
+                        if isinstance(raw_img, dict):
+                            raw_img = raw_img.get("url")
+                        if raw_img:
+                            image = raw_img
+                            break
+            except (json.JSONDecodeError, AttributeError):
+                pass
+            if image:
+                break
+        if not image:
+            img_el = soup.select_one(
+                "img.recipe__image, img.img-fluid, "
+                "div.recipe__image img, picture img"
+            )
+            if img_el:
+                image = img_el.get("data-src") or img_el.get("src")
 
         # Infer alcohol_type from URL path (used as fallback)
         alcohol_type = _infer_alcohol_type_from_url(url)
