@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -45,8 +44,7 @@ async def get_current_user(
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exc
-    except JWTError as e:
-        logging.warning("DEBUG JWT decode failed: %s | token_prefix=%s", e, access_token[:20] if access_token else None)
+    except JWTError:
         raise credentials_exc
 
     result = await db.execute(select(User).where(User.id == int(user_id)))

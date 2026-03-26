@@ -1,6 +1,4 @@
-import logging
-
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,15 +20,11 @@ router = APIRouter(prefix="/api/cocktails", tags=["cocktails"])
 
 @router.post("", response_model=CocktailListResponse)
 async def list_cocktails(
-    request: Request,
     params: CocktailFilterParams,
     db: AsyncSession = Depends(get_db),
     user: User | None = Depends(get_optional_user),
 ):
-    uid = user.id if user else None
-    cookie_keys = list(request.cookies.keys())
-    logging.warning("DEBUG list_cocktails user_id=%s favorites=%s can_make=%s cookies=%s", uid, params.favorites_only, params.can_make, cookie_keys)
-    return await get_cocktails(params, db, user_id=uid)
+    return await get_cocktails(params, db, user_id=user.id if user else None)
 
 
 @router.get("/ingredients")
