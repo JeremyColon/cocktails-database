@@ -2,20 +2,12 @@ import { useState, useRef, type Dispatch, type SetStateAction } from 'react'
 import { X, SlidersHorizontal, RotateCcw } from 'lucide-react'
 import { useFilterOptions } from '../hooks/useCocktails'
 import { useAuth } from '../context/AuthContext'
-import type { CocktailFilters } from '../api/cocktails'
+import { type CocktailFilters, DEFAULT_FILTERS } from '../api/cocktails'
 
 interface Props {
   filters: CocktailFilters
   setFilters: Dispatch<SetStateAction<CocktailFilters>>
   total: number
-}
-
-const DEFAULT_FILTERS: CocktailFilters = {
-  page: 1,
-  page_size: 24,
-  sort_by: 'recipe_name',
-  sort_dir: 'asc',
-  include_garnish: true,
 }
 
 // ── Chip-style multi-select (small lists like Spirit) ─────────────────────────
@@ -161,6 +153,7 @@ export default function FilterPanel({ filters, setFilters, total }: Props) {
     filters.search,
     filters.favorites_only,
     filters.bookmarks_only,
+    filters.cart_only,
     filters.can_make,
     filters.nps_min != null || filters.nps_max != null,
   ].filter(Boolean).length
@@ -315,6 +308,7 @@ export default function FilterPanel({ filters, setFilters, total }: Props) {
                 {[
                   { key: 'favorites_only', label: 'Favorites' },
                   { key: 'bookmarks_only', label: 'Bookmarks' },
+                  { key: 'cart_only', label: "Tonight's cart" },
                 ].map(({ key, label }) => (
                   <label key={key} className="flex items-center gap-2.5 cursor-pointer group">
                     <input

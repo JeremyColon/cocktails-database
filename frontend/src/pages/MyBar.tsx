@@ -1,22 +1,33 @@
 import { useState, useMemo, useRef } from 'react'
-import { Trash2, GlassWater, TrendingUp, X, Plus } from 'lucide-react'
+import { Trash2, GlassWater, TrendingUp, X, Plus, ChevronDown, Check, Zap, Share2, Link2, Users } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import { useBar, useBarStats, useAddToBar, useRemoveFromBar } from '../hooks/useBar'
+import { useBar, useBarStats, useAddToBar, useRemoveFromBar, useBarStarters, useShareBar, useBarLinkStatus, useCreateLinkInvite, useUnlink } from '../hooks/useBar'
 import { cocktailsApi, type IngredientSearchResult } from '../api/cocktails'
+import type { StarterKit as StarterKitType } from '../api/bar'
 
 export default function MyBar() {
   const { data: bar, isLoading: barLoading } = useBar()
   const [includeGarnish, setIncludeGarnish] = useState(true)
   const { data: stats } = useBarStats(includeGarnish)
+  const { data: starters } = useBarStarters()
 
   const addToBar = useAddToBar()
   const removeFromBar = useRemoveFromBar()
 
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<number[]>([])
+  const [starterTab, setStarterTab] = useState<'kits' | 'popular'>('kits')
+  const [shareToken, setShareToken] = useState<string | null>(null)
+  const [shareCopied, setShareCopied] = useState(false)
+  const [linkToken, setLinkToken] = useState<string | null>(null)
+  const [linkCopied, setLinkCopied] = useState(false)
+  const shareBar = useShareBar()
+  const { data: linkStatus } = useBarLinkStatus()
+  const createLinkInvite = useCreateLinkInvite()
+  const unlink = useUnlink()
 
-  const barIds = useMemo(
-    () => new Set(bar?.ingredients.map(i => i.ingredient_id) ?? []),
+  const barMappedNames = useMemo(
+    () => new Set(bar?.ingredients.map(i => (i.mapped_ingredient ?? i.ingredient).toLowerCase()) ?? []),
     [bar]
   )
 
@@ -47,7 +58,48 @@ export default function MyBar() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-      <h1 className="font-display text-5xl text-mahogany leading-none mb-2">My Bar</h1>
+      <div className="flex items-start justify-between gap-4 mb-2">
+        <h1 className="font-display text-5xl text-mahogany leading-none">My Bar</h1>
+        <div className="shrink-0 pt-1">
+          {shareToken ? (
+            <div className="flex items-center gap-2 bg-parchment-100 rounded-lg px-3 py-2">
+              <span className="font-body text-xs text-bark max-w-48 truncate">
+                {`${window.location.origin}/bar/import?token=${shareToken}`}
+              </span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/bar/import?token=${shareToken}`)
+                  setShareCopied(true)
+                  setTimeout(() => setShareCopied(false), 1500)
+                }}
+                className="shrink-0 text-bark hover:text-amber transition-colors"
+                title="Copy link"
+              >
+                {shareCopied ? <Check className="w-4 h-4 text-green-600" /> : <Link2 className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={() => setShareToken(null)}
+                className="shrink-0 text-bark hover:text-mahogany transition-colors"
+                title="Dismiss"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={async () => {
+                const result = await shareBar.mutateAsync()
+                setShareToken(result.token)
+              }}
+              disabled={shareBar.isPending}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber/10 text-amber font-body text-sm font-semibold hover:bg-amber/20 transition-colors disabled:opacity-40"
+            >
+              <Share2 className="w-4 h-4" />
+              {shareBar.isPending ? 'Generating…' : 'Share my bar'}
+            </button>
+          )}
+        </div>
+      </div>
       <p className="font-body text-bark mb-8">Track what you have and see what you can make.</p>
 
       {/* Stat cards */}
@@ -131,7 +183,7 @@ export default function MyBar() {
                   : 'No ingredients match your search.'}
               </div>
             ) : (
-              <div className="space-y-1.5 max-h-[610px] overflow-y-auto p-3">
+              <div className="space-y-1.5 max-h-[820px] overflow-y-auto p-3">
                 {filteredBar.map(ing => (
                   <label
                     key={ing.ingredient_id}
@@ -164,15 +216,77 @@ export default function MyBar() {
           </div>
         </div>
 
-        {/* Add ingredients + top missing */}
+        {/* Add ingredients */}
         <div className="lg:col-span-2 space-y-6">
+          <h2 className="font-display text-2xl text-mahogany">Add Ingredients</h2>
+
+          {starters && (
+            <div>
+              <h3 className="font-body text-sm font-semibold text-mahogany mb-2 flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-amber" />
+                Bulk add
+              </h3>
+
+              <div className="flex gap-1 mb-3 bg-parchment-100 rounded-lg p-1">
+                {(['kits', 'popular'] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setStarterTab(tab)}
+                    className={`flex-1 py-1.5 text-xs font-body font-semibold rounded-md transition-colors ${
+                      starterTab === tab
+                        ? 'bg-white text-mahogany shadow-sm'
+                        : 'text-bark hover:text-mahogany'
+                    }`}
+                  >
+                    {tab === 'kits' ? 'Starter Kits' : 'Most Popular'}
+                  </button>
+                ))}
+              </div>
+
+              {starterTab === 'kits' && (
+                <div className="space-y-2">
+                  {starters.kits.map(kit => (
+                    <KitRow
+                      key={kit.name}
+                      kit={kit}
+                      barMappedNames={barMappedNames}
+                      onAdd={ids => addToBar.mutateAsync(ids)}
+                      loading={addToBar.isPending}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {starterTab === 'popular' && (
+                <div className="flex flex-wrap gap-1.5">
+                  {starters.top_ingredients.map(ing => {
+                    const inBar = barMappedNames.has(ing.mapped_ingredient.toLowerCase())
+                    return (
+                      <button
+                        key={ing.ingredient_id}
+                        onClick={() => !inBar && addToBar.mutateAsync([ing.ingredient_id])}
+                        disabled={inBar || addToBar.isPending}
+                        title={`${ing.cocktail_count} cocktails`}
+                        className={`inline-flex items-center gap-1 text-xs font-body px-2.5 py-1 rounded-full border transition-colors ${
+                          inBar
+                            ? 'bg-green-50 text-green-700 border-green-200 cursor-default'
+                            : 'bg-white text-mahogany border-parchment-300 hover:border-amber hover:text-amber cursor-pointer'
+                        }`}
+                      >
+                        {inBar && <Check className="w-2.5 h-2.5" />}
+                        {ing.mapped_ingredient}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           <div>
-            <h2 className="font-display text-2xl text-mahogany mb-3">Add Ingredients</h2>
-            <p className="font-body text-xs text-bark mb-3">
-              Search and add ingredients to your bar.
-            </p>
+            <h3 className="font-body text-sm font-semibold text-mahogany mb-2">Search & add</h3>
             <AddIngredientSearch
-              barIds={barIds}
+              barMappedNames={barMappedNames}
               onAdd={ids => addToBar.mutateAsync(ids)}
               loading={addToBar.isPending}
             />
@@ -180,13 +294,10 @@ export default function MyBar() {
 
           {stats?.top_missing && stats.top_missing.length > 0 && (
             <div>
-              <h2 className="font-display text-2xl text-mahogany mb-3 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-amber" />
-                Top Missing
-              </h2>
-              <p className="font-body text-xs text-bark mb-3">
-                Adding these would unlock the most cocktails.
-              </p>
+              <h3 className="font-body text-sm font-semibold text-mahogany mb-2 flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-amber" />
+                Top missing
+              </h3>
               <div className="space-y-2">
                 {stats.top_missing.map(m => (
                   <div key={m.ingredient_id} className="flex items-center justify-between py-2 border-b border-parchment-200">
@@ -197,18 +308,165 @@ export default function MyBar() {
               </div>
             </div>
           )}
+
+          {/* Household */}
+          <div>
+            <h2 className="font-display text-2xl text-mahogany mb-3 flex items-center gap-2">
+              <Users className="w-5 h-5 text-amber" />
+              Household
+            </h2>
+
+            {linkStatus?.linked ? (
+              <div className="space-y-3">
+                <p className="font-body text-xs text-bark">
+                  Sharing this bar with:
+                </p>
+                {linkStatus.linked_to_emails.map(email => (
+                  <div key={email} className="flex items-center justify-between py-2 border-b border-parchment-200">
+                    <span className="font-body text-sm text-mahogany">{email}</span>
+                    <button
+                      onClick={() => unlink.mutate()}
+                      disabled={unlink.isPending}
+                      className="text-xs font-body text-red-500 hover:text-red-700 transition-colors disabled:opacity-40"
+                    >
+                      Unlink
+                    </button>
+                  </div>
+                ))}
+                <p className="font-body text-xs text-bark">
+                  Unlinking will give you a new empty bar.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="font-body text-xs text-bark mb-3">
+                  Link bars with a household member so you share one inventory.
+                </p>
+                {linkToken ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 bg-parchment-100 rounded-lg px-3 py-2">
+                      <span className="font-body text-xs text-bark flex-1 truncate">
+                        {`${window.location.origin}/bar/link?token=${linkToken}`}
+                      </span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/bar/link?token=${linkToken}`)
+                          setLinkCopied(true)
+                          setTimeout(() => setLinkCopied(false), 1500)
+                        }}
+                        className="shrink-0 text-bark hover:text-amber transition-colors"
+                        title="Copy link"
+                      >
+                        {linkCopied ? <Check className="w-4 h-4 text-green-600" /> : <Link2 className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => setLinkToken(null)}
+                        className="shrink-0 text-bark hover:text-mahogany transition-colors"
+                        title="Dismiss"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <p className="font-body text-xs text-bark">Link expires in 7 days.</p>
+                  </div>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      const result = await createLinkInvite.mutateAsync()
+                      setLinkToken(result.token)
+                    }}
+                    disabled={createLinkInvite.isPending}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-parchment-100 text-mahogany font-body text-sm font-semibold hover:bg-parchment-200 transition-colors disabled:opacity-40 border border-parchment-300 w-full justify-center"
+                  >
+                    <Users className="w-4 h-4" />
+                    {createLinkInvite.isPending ? 'Generating…' : 'Invite a household member'}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function AddIngredientSearch({
-  barIds,
+function KitRow({
+  kit,
+  barMappedNames,
   onAdd,
   loading,
 }: {
-  barIds: Set<number>
+  kit: StarterKitType
+  barMappedNames: Set<string>
+  onAdd: (ids: number[]) => Promise<unknown>
+  loading: boolean
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const missing = kit.ingredients.filter(i => !barMappedNames.has(i.mapped_ingredient.toLowerCase()))
+  const allInBar = missing.length === 0
+
+  return (
+    <div className="border border-parchment-200 rounded-lg overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between px-3 py-2.5 bg-white hover:bg-parchment-50 transition-colors text-left"
+      >
+        <span className="font-body font-semibold text-sm text-mahogany">{kit.name}</span>
+        <div className="flex items-center gap-2 shrink-0">
+          {allInBar ? (
+            <span className="text-xs font-body text-green-600 font-semibold flex items-center gap-1">
+              <Check className="w-3 h-3" /> All set
+            </span>
+          ) : (
+            <span className="text-xs font-body text-bark">{missing.length} to add</span>
+          )}
+          <ChevronDown className={`w-4 h-4 text-bark transition-transform ${expanded ? 'rotate-180' : ''}`} />
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="px-3 py-3 bg-parchment-50 border-t border-parchment-200">
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {kit.ingredients.map(i => {
+              const inBar = barMappedNames.has(i.mapped_ingredient.toLowerCase())
+              return (
+                <span
+                  key={i.ingredient_id}
+                  className={`inline-flex items-center gap-1 text-xs font-body px-2 py-1 rounded-full border ${
+                    inBar
+                      ? 'bg-green-50 text-green-700 border-green-200'
+                      : 'bg-white text-mahogany border-parchment-300'
+                  }`}
+                >
+                  {inBar && <Check className="w-2.5 h-2.5" />}
+                  {i.mapped_ingredient}
+                </span>
+              )
+            })}
+          </div>
+          {!allInBar && (
+            <button
+              onClick={() => onAdd(missing.map(i => i.ingredient_id))}
+              disabled={loading}
+              className="btn-amber w-full text-sm disabled:opacity-40"
+            >
+              Add {missing.length} missing ingredient{missing.length !== 1 ? 's' : ''}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+function AddIngredientSearch({
+  barMappedNames,
+  onAdd,
+  loading,
+}: {
+  barMappedNames: Set<string>
   onAdd: (ids: number[]) => Promise<unknown>
   loading: boolean
 }) {
@@ -224,9 +482,10 @@ function AddIngredientSearch({
     staleTime: 60_000,
   })
 
-  const filtered = suggestions.filter(
-    s => !barIds.has(s.ingredient_id) && !pending.some(p => p.ingredient_id === s.ingredient_id)
-  )
+  const filtered = suggestions.filter(s => {
+    const mappedName = (s.mapped_ingredient ?? s.ingredient).toLowerCase()
+    return !barMappedNames.has(mappedName) && !pending.some(p => p.ingredient_id === s.ingredient_id)
+  })
 
   function addPending(ing: IngredientSearchResult) {
     setPending(p => [...p, ing])

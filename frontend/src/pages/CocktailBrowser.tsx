@@ -1,22 +1,19 @@
-import { useState } from 'react'
-import { ChevronLeft, ChevronRight, GlassWater, Loader2 } from 'lucide-react'
-import { useCocktails } from '../hooks/useCocktails'
-import type { CocktailFilters } from '../api/cocktails'
+import { type Dispatch, type SetStateAction } from 'react'
+import { ChevronLeft, ChevronRight, GlassWater, Loader2, ShoppingCart, X } from 'lucide-react'
+import { useCocktails, useClearCart } from '../hooks/useCocktails'
+import { type CocktailFilters, DEFAULT_FILTERS } from '../api/cocktails'
 import CocktailCard from '../components/CocktailCard'
 import FilterPanel from '../components/FilterPanel'
 import LegendPopover from '../components/LegendModal'
 
-const DEFAULT_FILTERS: CocktailFilters = {
-  page: 1,
-  page_size: 24,
-  sort_by: 'recipe_name',
-  sort_dir: 'asc',
-  include_garnish: true,
+interface Props {
+  filters: CocktailFilters
+  setFilters: Dispatch<SetStateAction<CocktailFilters>>
 }
 
-export default function CocktailBrowser() {
-  const [filters, setFilters] = useState<CocktailFilters>(DEFAULT_FILTERS)
+export default function CocktailBrowser({ filters, setFilters }: Props) {
   const { data, isFetching, isError } = useCocktails(filters)
+  const clearCart = useClearCart()
 
   const total      = data?.total ?? 0
   const totalPages = data ? Math.ceil(data.total / (data.page_size || 24)) : 1
@@ -28,6 +25,32 @@ export default function CocktailBrowser() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+      {/* Cart banner */}
+      {filters.cart_only && (
+        <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl bg-amber/10 border border-amber/30">
+          <ShoppingCart className="w-4 h-4 text-amber shrink-0" />
+          <span className="font-body text-sm font-semibold text-mahogany flex-1">
+            Viewing tonight's cart
+          </span>
+          <button
+            onClick={() => {
+              clearCart.mutate()
+              setFilters(DEFAULT_FILTERS)
+            }}
+            className="font-body text-xs text-bark hover:text-red-500 transition-colors"
+          >
+            Clear cart
+          </button>
+          <button
+            onClick={() => setFilters(DEFAULT_FILTERS)}
+            className="p-1 text-bark hover:text-mahogany transition-colors"
+            title="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <h1 className="font-display text-4xl text-mahogany leading-none">

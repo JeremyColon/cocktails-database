@@ -106,7 +106,11 @@ class LiquorComScraper(BaseScraper):
                 data = json.loads(tag.string or "")
                 items = data if isinstance(data, list) else [data]
                 for item in items:
-                    if item.get("@type") in ("Recipe", "recipe"):
+                    # @type may be a string ("Recipe") or a list (["Recipe"])
+                    item_type = item.get("@type", "")
+                    if isinstance(item_type, list):
+                        item_type = item_type[0] if item_type else ""
+                    if item_type.lower() == "recipe":
                         raw_img = item.get("image")
                         if isinstance(raw_img, list):
                             raw_img = raw_img[0]
@@ -121,6 +125,7 @@ class LiquorComScraper(BaseScraper):
                 break
         if not image:
             img_el = soup.select_one(
+                "img.primary-image__image, "
                 "img.recipe__image, img.img-fluid, "
                 "div.recipe__image img, picture img"
             )
@@ -138,11 +143,15 @@ class LiquorComScraper(BaseScraper):
             "div.recipe-ingredients li, "
             ".structured-ingredients__list-item"
         ):
-            text = li.get_text(strip=True)
-            if not text:
-                continue
-            qty, unit, ingredient_name = _parse_ingredient_text(text)
-            ingredients.append(RawIngredient(name=ingredient_name, quantity=qty, unit=unit))
+            if "structured-ingredients__list-item" in (li.get("class") or []):
+                qty, unit, ingredient_name = _parse_structured_ingredient(li)
+            else:
+                text = li.get_text(separator=" ", strip=True)
+                if not text:
+                    continue
+                qty, unit, ingredient_name = _parse_ingredient_text(text)
+            if ingredient_name:
+                ingredients.append(RawIngredient(name=ingredient_name, quantity=qty, unit=unit))
 
         if not ingredients:
             logger.debug(f"[liquor.com] No ingredients found for {url}, skipping")
@@ -156,6 +165,33 @@ class LiquorComScraper(BaseScraper):
             alcohol_type=alcohol_type,
             ingredients=ingredients,
         )
+
+
+def _parse_structured_ingredient(li) -> tuple[float | None, str | None, str]:
+    """
+    Parse a .structured-ingredients__list-item using its data-attribute spans.
+    Falls back to text parsing if the expected structure isn't found.
+    """
+    p = li.find("p")
+    if not p:
+        return _parse_ingredient_text(li.get_text(separator=" ", strip=True))
+
+    qty_span = p.select_one("[data-ingredient-quantity]")
+    unit_span = p.select_one("[data-ingredient-unit]")
+
+    qty_raw = qty_span.get_text(strip=True) if qty_span else None
+    unit_raw = unit_span.get_text(strip=True) if unit_span else None
+
+    # Full ingredient text preserves modifiers like "London dry" before the name span
+    full_text = p.get_text(separator=" ", strip=True)
+    name = full_text
+    if qty_raw and name.startswith(qty_raw):
+        name = name[len(qty_raw):].strip()
+    if unit_raw and name.lower().startswith(unit_raw.lower()):
+        name = name[len(unit_raw):].strip()
+
+    qty = _parse_quantity(qty_raw) if qty_raw else None
+    return qty, unit_raw, name or full_text
 
 
 def _parse_ingredient_text(text: str) -> tuple[float | None, str | None, str]:
@@ -186,12 +222,17 @@ def _parse_ingredient_text(text: str) -> tuple[float | None, str | None, str]:
 
 
 def _parse_quantity(s: str) -> float | None:
-    """Convert fraction/unicode fraction strings to float."""
+    """Convert fraction/unicode fraction/mixed-number strings to float."""
     _FRACTIONS = {"½": 0.5, "¼": 0.25, "¾": 0.75, "⅓": 1 / 3, "⅔": 2 / 3, "⅛": 0.125}
     s = s.strip()
     for uc, val in _FRACTIONS.items():
         s = s.replace(uc, str(val))
     try:
+        # Mixed number: "1 1/2" → 1.5
+        if " " in s and "/" in s:
+            whole, frac = s.rsplit(" ", 1)
+            num, den = frac.split("/", 1)
+            return float(whole) + float(num) / float(den)
         if "/" in s:
             num, den = s.split("/", 1)
             return float(num) / float(den)

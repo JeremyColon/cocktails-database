@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './context/AuthContext'
@@ -6,6 +7,10 @@ import CocktailBrowser from './pages/CocktailBrowser'
 import MyBar from './pages/MyBar'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
+import CocktailDetail from './pages/CocktailDetail'
+import BarImport from './pages/BarImport'
+import BarLink from './pages/BarLink'
+import { type CocktailFilters, DEFAULT_FILTERS } from './api/cocktails'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +37,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   const { loading } = useAuth()
+  const [filters, setFilters] = useState<CocktailFilters>(DEFAULT_FILTERS)
 
   if (loading) {
     return (
@@ -43,9 +49,12 @@ function AppRoutes() {
 
   return (
     <div className="min-h-screen bg-parchment-100">
-      <Navbar />
+      <Navbar onCartClick={() => setFilters({ ...DEFAULT_FILTERS, cart_only: true })} />
       <Routes>
-        <Route path="/"       element={<CocktailBrowser />} />
+        <Route path="/"       element={<CocktailBrowser filters={filters} setFilters={setFilters} />} />
+        <Route path="/cocktail/:id" element={<CocktailDetail />} />
+        <Route path="/bar/import" element={<BarImport />} />
+        <Route path="/bar/link" element={<BarLink />} />
         <Route path="/login"  element={<Login />} />
         <Route path="/mybar"  element={
           <ProtectedRoute><MyBar /></ProtectedRoute>

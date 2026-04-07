@@ -25,6 +25,7 @@ class User(Base):
     favorites: Mapped[list["UserFavorite"]] = relationship(back_populates="user")
     bookmarks: Mapped[list["UserBookmark"]] = relationship(back_populates="user")
     ratings: Mapped[list["UserRating"]] = relationship(back_populates="user")
+    cart: Mapped[list["UserCart"]] = relationship(back_populates="user")
     bar: Mapped["UserBar"] = relationship(back_populates="user", uselist=False)
 
 
@@ -110,11 +111,48 @@ class UserRating(Base):
     user: Mapped["User"] = relationship(back_populates="ratings")
 
 
+class UserCart(Base):
+    __tablename__ = "user_cart"
+
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    cocktail_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    in_cart: Mapped[bool] = mapped_column(Boolean, default=False)
+    last_updated_ts: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False))
+
+    user: Mapped["User"] = relationship(back_populates="cart")
+
+
+class Bar(Base):
+    __tablename__ = "bars"
+
+    bar_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    ingredient_list: Mapped[list[int]] = mapped_column(ARRAY(BigInteger), default=list)
+    last_updated_ts: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False))
+    deleted_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False))
+
+
 class UserBar(Base):
     __tablename__ = "user_bar"
 
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), primary_key=True)
-    ingredient_list: Mapped[list[int]] = mapped_column(ARRAY(BigInteger), default=list)
+    bar_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("bars.bar_id"))
     last_updated_ts: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False))
 
     user: Mapped["User"] = relationship(back_populates="bar")
+
+
+class BarShareToken(Base):
+    __tablename__ = "bar_share_tokens"
+
+    token: Mapped[str] = mapped_column(Text, primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"))
+    expires_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False))
+
+
+class BarLinkInvite(Base):
+    __tablename__ = "bar_link_invites"
+
+    token: Mapped[str] = mapped_column(Text, primary_key=True)
+    inviter_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"))
+    expires_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False))
+    accepted_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False))

@@ -21,6 +21,7 @@ export interface Cocktail {
   num_ratings: number
   favorited: boolean
   bookmarked: boolean
+  in_cart: boolean
   user_rating: number | null
   ingredients: CocktailIngredient[]
 }
@@ -52,12 +53,21 @@ export interface CocktailFilters {
   nps_max?: number
   favorites_only?: boolean
   bookmarks_only?: boolean
+  cart_only?: boolean
   can_make?: 'all' | 'some' | 'none'
   include_garnish?: boolean
   sort_by?: 'recipe_name' | 'nps' | 'avg_rating' | 'num_ratings' | 'date_added'
   sort_dir?: 'asc' | 'desc'
   page?: number
   page_size?: number
+}
+
+export const DEFAULT_FILTERS: CocktailFilters = {
+  page: 1,
+  page_size: 24,
+  sort_by: 'recipe_name',
+  sort_dir: 'asc',
+  include_garnish: true,
 }
 
 export interface IngredientSearchResult {
@@ -70,9 +80,13 @@ export interface IngredientSearchResult {
 export const cocktailsApi = {
   searchIngredients: (q: string) =>
     api.get<IngredientSearchResult[]>(`/cocktails/ingredients?search=${encodeURIComponent(q)}`),
-  list:    (filters: CocktailFilters)     => api.post<CocktailListResponse>('/cocktails', filters),
-  options: ()                             => api.get<FilterOptions>('/cocktails/options'),
-  favorite:(id: number, val: boolean)     => api.post<void>(`/cocktails/${id}/favorite`, { favorite: val }),
-  bookmark:(id: number, val: boolean)     => api.post<void>(`/cocktails/${id}/bookmark`, { bookmark: val }),
-  rate:    (id: number, rating: number)   => api.post<{ nps: number; avg_rating: number; num_ratings: number }>(`/cocktails/${id}/rating`, { rating }),
+  list:       (filters: CocktailFilters)   => api.post<CocktailListResponse>('/cocktails', filters),
+  options:    ()                           => api.get<FilterOptions>('/cocktails/options'),
+  favorite:   (id: number, val: boolean)  => api.post<void>(`/cocktails/${id}/favorite`, { favorite: val }),
+  bookmark:   (id: number, val: boolean)  => api.post<void>(`/cocktails/${id}/bookmark`, { bookmark: val }),
+  rate:       (id: number, rating: number) => api.post<{ nps: number; avg_rating: number; num_ratings: number }>(`/cocktails/${id}/rating`, { rating }),
+  cart:       (id: number, val: boolean)  => api.post<void>(`/cocktails/${id}/cart`, { in_cart: val }),
+  cartCount:  ()                          => api.get<{ count: number; items: { cocktail_id: number; recipe_name: string }[] }>('/cocktails/cart'),
+  clearCart:  ()                          => api.delete<void>('/cocktails/cart'),
+  getById:    (id: number)               => api.get<Cocktail>(`/cocktails/${id}`),
 }
