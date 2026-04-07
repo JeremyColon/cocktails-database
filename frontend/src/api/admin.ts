@@ -3,6 +3,7 @@ import { api } from './client'
 export interface UnmappedIngredient {
   ingredient_id: number
   ingredient: string
+  mapped_ingredient: string | null
   alcohol_type: string | null
   cocktail_count: number
 }

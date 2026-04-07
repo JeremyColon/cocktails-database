@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Star, Bookmark, GlassWater, ExternalLink, Hourglass, Frown, Droplet, Leaf } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Star, Bookmark, ShoppingCart, GlassWater, Link2, Check, Hourglass, Frown, Droplet, Leaf } from 'lucide-react'
 import type { Cocktail } from '../api/cocktails'
-import { useFavorite, useBookmark, useRate } from '../hooks/useCocktails'
+import { useFavorite, useBookmark, useCart, useRate } from '../hooks/useCocktails'
 import { useAuth } from '../context/AuthContext'
 
 interface Props {
@@ -12,11 +13,19 @@ export default function CocktailCard({ cocktail: c }: Props) {
   const { user } = useAuth()
   const favorite = useFavorite()
   const bookmark = useBookmark()
+  const cart = useCart()
   const rate = useRate()
 
   const [showIngredients, setShowIngredients] = useState(false)
   const [showRating, setShowRating] = useState(false)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  function handleShare() {
+    navigator.clipboard.writeText(`${window.location.origin}/cocktail/${c.cocktail_id}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
 
   // Deduplicate by mapped_ingredient, merging garnish/non-garnish variants
   const dedupedIngredients = (() => {
@@ -54,8 +63,8 @@ export default function CocktailCard({ cocktail: c }: Props) {
 
   return (
     <div className="card-cocktail flex flex-col">
-      {/* Image */}
-      <div className="relative overflow-hidden h-48 bg-parchment-200">
+      {/* Image — links to detail page */}
+      <Link to={`/cocktail/${c.cocktail_id}`} className="relative overflow-hidden h-48 bg-parchment-200 block">
         {c.image ? (
           <img
             src={c.image}
@@ -93,26 +102,27 @@ export default function CocktailCard({ cocktail: c }: Props) {
             />
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Body */}
       <div className="p-4 flex flex-col flex-1 gap-3">
-        {/* Name + link */}
+        {/* Name + share */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display text-xl text-mahogany leading-tight line-clamp-2">
+          <Link
+            to={`/cocktail/${c.cocktail_id}`}
+            className="font-display text-xl text-mahogany leading-tight line-clamp-2 hover:text-amber transition-colors"
+          >
             {c.recipe_name}
-          </h3>
-          {c.link && (
-            <a
-              href={c.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 text-bark hover:text-amber transition-colors mt-0.5"
-              aria-label="View recipe"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          )}
+          </Link>
+          <button
+            onClick={handleShare}
+            className="shrink-0 text-bark hover:text-amber transition-colors mt-0.5"
+            title="Copy share link"
+          >
+            {copied
+              ? <Check className="w-4 h-4 text-green-600" />
+              : <Link2 className="w-4 h-4" />}
+          </button>
         </div>
 
         {/* NPS / rating */}
@@ -156,6 +166,19 @@ export default function CocktailCard({ cocktail: c }: Props) {
               title={c.bookmarked ? 'Remove bookmark' : 'Bookmark'}
             >
               <Bookmark className={`w-4 h-4 ${c.bookmarked ? 'fill-amber' : ''}`} />
+            </button>
+
+            {/* Cart */}
+            <button
+              onClick={() => cart.mutate({ id: c.cocktail_id, val: !c.in_cart })}
+              className={`p-2 rounded-lg transition-colors ${
+                c.in_cart
+                  ? 'text-amber bg-amber/10'
+                  : 'text-bark hover:text-amber hover:bg-amber/10'
+              }`}
+              title={c.in_cart ? 'Remove from tonight\'s cart' : 'Add to tonight\'s cart'}
+            >
+              <ShoppingCart className={`w-4 h-4 ${c.in_cart ? 'fill-amber' : ''}`} />
             </button>
 
             {/* Ingredients */}

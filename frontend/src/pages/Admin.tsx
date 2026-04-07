@@ -26,7 +26,7 @@ export default function Admin() {
         const initial: Record<number, RowState> = {}
         for (const ing of ings) {
           initial[ing.ingredient_id] = {
-            mappedValue: '',
+            mappedValue: ing.mapped_ingredient ?? '',
             alcoholType: ing.alcohol_type ?? '',
             suggestions: [],
             suggestionsLoaded: false,

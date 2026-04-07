@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,12 +8,14 @@ from backend.dependencies import get_current_user, get_optional_user
 from backend.models import User
 from backend.schemas import (
     BookmarkRequest,
+    CartRequest,
     CocktailFilterParams,
     CocktailListResponse,
+    CocktailOut,
     FavoriteRequest,
     RatingRequest,
 )
-from backend.services.cocktail_service import get_cocktails, get_ingredient_options
+from backend.services.cocktail_service import get_cocktail_by_id, get_cocktails, get_ingredient_options
 
 router = APIRouter(prefix="/api/cocktails", tags=["cocktails"])
 
@@ -39,12 +41,21 @@ async def search_ingredients(
         return cached
 
     sql = """
-        SELECT DISTINCT ON (mapped_ingredient)
-            ingredient_id, ingredient, mapped_ingredient, alcohol_type
-        FROM ingredients
-        WHERE mapped_ingredient IS NOT NULL
-          AND (mapped_ingredient ILIKE :q OR ingredient ILIKE :q)
-        ORDER BY mapped_ingredient
+        WITH mapped_counts AS (
+            SELECT
+                COALESCE(i.mapped_ingredient, i.ingredient) AS mapped_name,
+                COUNT(DISTINCT ci.cocktail_id)              AS n
+            FROM cocktails_ingredients ci
+            JOIN ingredients i ON i.ingredient_id = ci.ingredient_id
+            GROUP BY 1
+        )
+        SELECT DISTINCT ON (i.mapped_ingredient)
+            i.ingredient_id, i.ingredient, i.mapped_ingredient, i.alcohol_type
+        FROM ingredients i
+        JOIN mapped_counts mc ON mc.mapped_name = i.mapped_ingredient
+        WHERE i.mapped_ingredient ILIKE :q
+          AND mc.n >= 2
+        ORDER BY i.mapped_ingredient
         LIMIT 20
     """
     rows = (await db.execute(text(sql), {"q": f"%{search}%"})).mappings().all()
@@ -63,6 +74,72 @@ async def ingredient_options(db: AsyncSession = Depends(get_db)):
     options = await get_ingredient_options(db)
     await cache_set("ingredient_options", options, ttl=3600)
     return options
+
+
+@router.get("/cart")
+async def get_cart(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    rows = (await db.execute(
+        text("""
+            SELECT c.cocktail_id, c.recipe_name
+            FROM user_cart uc
+            JOIN cocktails c ON c.cocktail_id = uc.cocktail_id
+            WHERE uc.user_id = :uid AND uc.in_cart = true
+            ORDER BY uc.last_updated_ts DESC
+        """),
+        {"uid": user.id},
+    )).mappings().all()
+    return {
+        "count": len(rows),
+        "items": [{"cocktail_id": r["cocktail_id"], "recipe_name": r["recipe_name"]} for r in rows],
+    }
+
+
+@router.delete("/cart")
+async def clear_cart(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    await db.execute(
+        text("UPDATE user_cart SET in_cart = false, last_updated_ts = now() WHERE user_id = :uid AND in_cart = true"),
+        {"uid": user.id},
+    )
+    await db.commit()
+    return {"cleared": True}
+
+
+@router.get("/{cocktail_id}", response_model=CocktailOut)
+async def get_cocktail(
+    cocktail_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
+):
+    cocktail = await get_cocktail_by_id(cocktail_id, db, user_id=user.id if user else None)
+    if not cocktail:
+        raise HTTPException(status_code=404, detail="Cocktail not found")
+    return cocktail
+
+
+@router.post("/{cocktail_id}/cart")
+async def set_cart(
+    cocktail_id: int,
+    body: CartRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    await db.execute(
+        text("""
+            INSERT INTO user_cart (user_id, cocktail_id, in_cart, last_updated_ts)
+            VALUES (:user_id, :cocktail_id, :in_cart, now())
+            ON CONFLICT (user_id, cocktail_id)
+            DO UPDATE SET in_cart = EXCLUDED.in_cart, last_updated_ts = now()
+        """),
+        {"user_id": user.id, "cocktail_id": cocktail_id, "in_cart": body.in_cart},
+    )
+    await db.commit()
+    return {"cocktail_id": cocktail_id, "in_cart": body.in_cart}
 
 
 @router.post("/{cocktail_id}/favorite")

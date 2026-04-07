@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, field_validator
 
@@ -63,6 +64,7 @@ class CocktailOut(BaseModel):
     num_ratings: int
     favorited: bool
     bookmarked: bool
+    in_cart: bool
     user_rating: int | None
     ingredients: list[CocktailIngredientOut] = []
 
@@ -96,6 +98,7 @@ class CocktailFilterParams(BaseModel):
     # User preference filters (require auth)
     favorites_only: bool = False
     bookmarks_only: bool = False
+    cart_only: bool = False
 
     # Bar ingredient availability
     can_make: str | None = None  # "all" | "some" | "none"
@@ -138,6 +141,9 @@ class FavoriteRequest(BaseModel):
 class BookmarkRequest(BaseModel):
     bookmark: bool
 
+class CartRequest(BaseModel):
+    in_cart: bool
+
 class RatingRequest(BaseModel):
     rating: int
 
@@ -179,3 +185,47 @@ class BarStatsResponse(BaseModel):
     partial_count: int
     cannot_make_count: int
     top_missing: list[MissingIngredient]
+
+class StarterIngredient(BaseModel):
+    ingredient_id: int
+    mapped_ingredient: str
+    alcohol_type: str | None
+
+class TopStarterIngredient(StarterIngredient):
+    cocktail_count: int
+
+class StarterKit(BaseModel):
+    name: str
+    ingredients: list[StarterIngredient]
+
+class StartersResponse(BaseModel):
+    kits: list[StarterKit]
+    top_ingredients: list[TopStarterIngredient]
+
+class ShareTokenResponse(BaseModel):
+    token: str
+    expires_at: datetime
+
+class BarSharePreview(BaseModel):
+    owner_email: str
+    ingredient_count: int
+    ingredients: list[StarterIngredient]
+    expires_at: datetime
+
+class ImportBarRequest(BaseModel):
+    mode: Literal['add', 'replace']
+
+class LinkInviteResponse(BaseModel):
+    token: str
+    expires_at: datetime
+
+class BarLinkPreview(BaseModel):
+    inviter_email: str
+
+class AcceptLinkRequest(BaseModel):
+    mode: Literal['merge', 'replace']
+
+class BarLinkStatus(BaseModel):
+    linked: bool
+    linked_to_emails: list[str]
+    household_size: int

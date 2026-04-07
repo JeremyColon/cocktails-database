@@ -100,12 +100,13 @@ async def list_unmapped(
             SELECT
                 i.ingredient_id,
                 i.ingredient,
+                i.mapped_ingredient,
                 i.alcohol_type,
                 COUNT(DISTINCT ci.cocktail_id) AS cocktail_count
             FROM ingredients i
             JOIN cocktails_ingredients ci ON i.ingredient_id = ci.ingredient_id
             WHERE i.mapped_ingredient IS NULL
-            GROUP BY i.ingredient_id, i.ingredient, i.alcohol_type
+            GROUP BY i.ingredient_id, i.ingredient, i.mapped_ingredient, i.alcohol_type
             ORDER BY cocktail_count DESC, i.ingredient
         """))
     ).mappings().all()
