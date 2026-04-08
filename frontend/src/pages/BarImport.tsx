@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSearchParams, Link, useNavigate } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { GlassWater, ArrowLeft, Check, AlertCircle } from 'lucide-react'
 import { useBarSharePreview, useImportBar } from '../hooks/useBar'
 import { useAuth } from '../context/AuthContext'
@@ -10,7 +10,6 @@ export default function BarImport() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
   const { user } = useAuth()
-  const navigate = useNavigate()
 
   const { data: preview, isLoading, isError } = useBarSharePreview(token)
   const importBar = useImportBar()

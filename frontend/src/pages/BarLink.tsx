@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSearchParams, Link, useNavigate } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { Users, ArrowLeft, Check, AlertCircle } from 'lucide-react'
 import { useBarLinkPreview, useAcceptLink } from '../hooks/useBar'
 import { useAuth } from '../context/AuthContext'
@@ -8,7 +8,6 @@ export default function BarLink() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
   const { user } = useAuth()
-  const navigate = useNavigate()
 
   const { data: preview, isLoading, isError } = useBarLinkPreview(token)
   const acceptLink = useAcceptLink()
