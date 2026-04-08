@@ -267,26 +267,29 @@ export default function FilterPanel({ filters, setFilters, total }: Props) {
               <p className="text-xs font-body font-semibold text-bark uppercase tracking-wider mb-2">
                 Ingredient Availability
               </p>
-              <div className="space-y-2">
+              <div className="flex flex-wrap gap-1.5">
                 {[
                   { val: undefined, label: 'All' },
                   { val: 'all', label: 'Can make now' },
-                  { val: 'some', label: 'Have some ingredients' },
-                  { val: 'none', label: 'Missing everything' },
-                ].map(({ val, label }) => (
-                  <label key={label} className="flex items-center gap-2.5 cursor-pointer group" onClick={() => update({ can_make: val as any })}>
-                    <input
-                      type="radio"
-                      name="can_make"
-                      className="w-4 h-4 text-amber focus:ring-amber border-parchment-400"
-                      checked={filters.can_make === val}
-                      onChange={() => {/* handled by label onClick for iOS compatibility */}}
-                    />
-                    <span className="font-body text-sm text-mahogany group-hover:text-amber transition-colors">
+                  { val: 'some', label: 'Have some' },
+                  { val: 'none', label: 'Missing all' },
+                ].map(({ val, label }) => {
+                  const active = filters.can_make === val
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => update({ can_make: val as any })}
+                      className={`text-xs font-body px-2.5 py-1 rounded-full border transition-colors ${
+                        active
+                          ? 'bg-amber border-amber text-white'
+                          : 'border-parchment-400 text-bark hover:border-amber hover:text-amber'
+                      }`}
+                    >
                       {label}
-                    </span>
-                  </label>
-                ))}
+                    </button>
+                  )
+                })}
               </div>
               <label className="flex items-center gap-2.5 cursor-pointer mt-3">
                 <input
