@@ -186,7 +186,20 @@ async def accept_invite(
     """Accept a household link invite. mode='merge' or 'replace'."""
     ok = await accept_link_invite(token, user.id, body.mode, db)
     if not ok:
-        raise HTTPException(status_code=404, detail="Invite link not found, expired, or already used")
+        # Check if the user is already linked to the inviter's bar (idempotent success)
+        already_linked = (await db.execute(
+            text("""
+                SELECT 1
+                FROM bar_link_invites bli
+                JOIN user_bar ub_inviter ON ub_inviter.user_id = bli.inviter_id
+                JOIN user_bar ub_acceptor ON ub_acceptor.user_id = :uid
+                WHERE bli.token = :token
+                  AND ub_inviter.bar_id = ub_acceptor.bar_id
+            """),
+            {"token": token, "uid": user.id},
+        )).scalar_one_or_none()
+        if not already_linked:
+            raise HTTPException(status_code=404, detail="Invite link not found, expired, or already used")
     await _invalidate_household_caches(user.id, db)
     return await get_bar(user.id, db)
 

@@ -12,11 +12,18 @@ export default function BarLink() {
   const { data: preview, isLoading, isError } = useBarLinkPreview(token)
   const acceptLink = useAcceptLink()
   const [accepted, setAccepted] = useState(false)
+  const [acceptError, setAcceptError] = useState<string | null>(null)
 
   async function handleAccept(mode: 'merge' | 'replace') {
     if (!token) return
-    await acceptLink.mutateAsync({ token, mode })
-    setAccepted(true)
+    setAcceptError(null)
+    try {
+      await acceptLink.mutateAsync({ token, mode })
+      setAccepted(true)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      setAcceptError(msg)
+    }
   }
 
   if (!token) return <ErrorState message="No invite token provided." />
@@ -109,6 +116,9 @@ export default function BarLink() {
               Adopt {preview.inviter_email}'s bar as-is; your current ingredients are discarded
             </span>
           </button>
+          {acceptError && (
+            <p className="font-body text-sm text-red-600 text-center">{acceptError}</p>
+          )}
         </div>
       )}
     </div>
