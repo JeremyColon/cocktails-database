@@ -80,6 +80,34 @@ Migrations are in `migrations/` (Alembic). Run `alembic upgrade head` after pull
 
 JWT stored as an `httpOnly` cookie (`access_token`). Existing bcrypt password hashes are fully compatible — no user migration needed. `get_current_user` / `get_optional_user` are FastAPI dependencies in `dependencies.py`.
 
-## Legacy Dash App
+## Git Workflow
 
-The original Dash app (`app.py`, `index.py`, `login.py`, `pages/`, `utils/`) remains runnable via `python index.py` but is not being maintained. It will be removed after the React frontend (Phase 2) is complete.
+All work should be done on a branch. Never commit directly to `main`.
+
+**Branch naming:**
+- New feature: `feature/short-description` (e.g. `feature/ri-cost-breakdown`)
+- Bug fix: `bug/short-description` (e.g. `bug/ops-support-double-count`)
+
+**Workflow:**
+1. Branch from `main`: `git checkout -b feature/my-feature`
+2. Make changes, commit with descriptive messages
+3. Open a PR into `main` when ready for review
+4. Delete the branch after merge
+
+Never force-push to `main`. If a branch has conflicts with `main`, rebase or merge `main` into the branch before merging the PR.
+
+## Exploring Options Before Implementing
+
+Before jumping into implementation, consider whether a better approach exists that the developer may not be aware of. This codebase sits at the intersection of several domains (finance, Salesforce, SharePoint, React, Flask) — it is easy to solve a problem with a custom solution when a built-in capability, library feature, or platform primitive would do it more simply and reliably.
+
+When given a task, ask: **is there a cleaner way to do this that I should surface before writing code?**
+
+Examples of things worth raising proactively:
+- A Salesforce formula field or flow that eliminates backend logic entirely
+- A Microsoft Graph API capability that replaces custom Excel parsing
+- A React Query pattern (caching, optimistic updates, background refetch) that replaces manual state management
+- A Flask/SQLAlchemy feature that replaces a hand-rolled implementation
+- A Python standard library function that replaces a custom utility
+- A Tailwind component pattern that avoids a bespoke CSS solution
+
+The right approach is: briefly describe the option, explain the tradeoff, and let the developer decide. Don't assume the simplest implementation you already know is the best one available.
