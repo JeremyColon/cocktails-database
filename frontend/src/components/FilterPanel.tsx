@@ -274,13 +274,13 @@ export default function FilterPanel({ filters, setFilters, total }: Props) {
                   { val: 'some', label: 'Have some ingredients' },
                   { val: 'none', label: 'Missing everything' },
                 ].map(({ val, label }) => (
-                  <label key={label} className="flex items-center gap-2.5 cursor-pointer group">
+                  <label key={label} className="flex items-center gap-2.5 cursor-pointer group" onClick={() => update({ can_make: val as any })}>
                     <input
                       type="radio"
                       name="can_make"
                       className="w-4 h-4 text-amber focus:ring-amber border-parchment-400"
                       checked={filters.can_make === val}
-                      onChange={() => update({ can_make: val as any })}
+                      onChange={() => {/* handled by label onClick for iOS compatibility */}}
                     />
                     <span className="font-body text-sm text-mahogany group-hover:text-amber transition-colors">
                       {label}
