@@ -17,8 +17,8 @@ Cocktail discovery app. Users create accounts, add ingredients to their bar, fil
 ## Running the New Backend
 
 ```bash
-cd backend
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Run FastAPI dev server
 uvicorn backend.main:app --reload --port 8000
@@ -95,6 +95,49 @@ All work should be done on a branch. Never commit directly to `main`.
 4. Delete the branch after merge
 
 Never force-push to `main`. If a branch has conflicts with `main`, rebase or merge `main` into the branch before merging the PR.
+
+## Testing (Red/Green TDD)
+
+This project has no test suite yet. When adding tests, follow red/green TDD:
+
+1. **Red** — write a failing test that describes the intended behavior. Run it and confirm it fails for the right reason (not a syntax error or import problem).
+2. **Green** — write the minimum code to make it pass. No more.
+3. **Refactor** — clean up without breaking the test.
+
+### Backend
+
+Use `pytest` + `pytest-asyncio` + `httpx.AsyncClient` (FastAPI's test client). Tests live in `backend/tests/`.
+
+```bash
+uv add --dev pytest pytest-asyncio
+uv run pytest backend/tests/
+```
+
+**Fixtures** (`backend/tests/conftest.py`):
+- Spin up a real test database (separate `TEST_DATABASE_URL` env var pointing at a local Postgres test DB).
+- Apply migrations with `alembic upgrade head` before the test session.
+- Wrap each test in a transaction that rolls back after, so tests are isolated without re-running migrations.
+- Yield an `AsyncClient` pointed at the FastAPI app with `base_url="http://test"`.
+
+**What to test:**
+- Service functions directly (e.g. `add_to_bar`, `get_bar_stats`) — these contain the real logic.
+- Router endpoints for auth/permission boundaries (unauthenticated requests should 401, wrong user shouldn't see another's bar).
+- Do **not** mock the database — we've been burned by mock/prod divergence before. Hit the real test DB.
+
+### Frontend
+
+Use Vitest + React Testing Library. Tests live alongside components as `*.test.tsx`.
+
+```bash
+cd frontend && npm run test
+```
+
+**What to test:**
+- Hook behavior (e.g. `useCart` optimistic update reverts on error).
+- Components that have non-trivial conditional rendering (e.g. `BarLink` showing error state vs. success state).
+- Do **not** test Tailwind classes or static markup — test behavior, not appearance.
+
+---
 
 ## Exploring Options Before Implementing
 
