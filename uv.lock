@@ -205,7 +205,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = "==2.6.1" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "python-jose", extras = ["cryptography"], specifier = ">=3.4.0" },
-    { name = "python-multipart", specifier = ">=0.0.22" },
+    { name = "python-multipart", specifier = "==0.0.24" },
     { name = "redis", specifier = "==5.2.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = "==2.0.36" },
     { name = "unidecode", specifier = "==1.3.8" },
